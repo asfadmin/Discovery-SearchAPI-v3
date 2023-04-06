@@ -1,17 +1,6 @@
-from fastapi import FastAPI
 from mangum import Mangum
-from fastapi.responses import JSONResponse
 import uvicorn
-
-app = FastAPI()
-
-@app.get("/")
-def health_check():
-    return JSONResponse({"hello": "world"})
-
-@app.get("/{text}")
-def read_item(text: str):
-    return JSONResponse({"result": text})
+from app import app
 
 # Lambda handle:
 lambda_handler = Mangum(app)
