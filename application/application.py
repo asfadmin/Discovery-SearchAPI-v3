@@ -6,10 +6,10 @@ import asf_search as asf
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import Response, StreamingResponse
 
-from asf_env import get_config, load_config
-from SearchAPIQuery import SearchAPIQuery
-from health import get_cmr_health
-from output import as_output, get_baseline, make_filename
+from .asf_env import get_config, load_config
+from .SearchAPIQuery import SearchAPIQuery
+from .health import get_cmr_health
+from .output import as_output, get_baseline, make_filename
 
 asf.REPORT_ERRORS = False
 app = FastAPI()

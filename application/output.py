@@ -6,6 +6,10 @@ from typing import Generator
 from fastapi.responses import StreamingResponse, Response
 import logging
 from datetime import datetime
+
+
+
+
 def as_output(search_generator: Generator[ASFSearchResults, None, None], output: str):
     output = output.lower()
     if output == 'jsonlite':

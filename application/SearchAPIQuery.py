@@ -3,7 +3,8 @@ from typing import List
 import asf_search as asf
 from datetime import datetime
 from fastapi import Query
-from asf_env import load_maturity_config
+
+from .asf_env import load_maturity_config
 
 class SearchAPIQuery(asf.ASFSearchOptions):
     def __init__(
