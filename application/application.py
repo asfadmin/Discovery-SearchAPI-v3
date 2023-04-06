@@ -58,8 +58,8 @@ def query_params(wkt: str):
     repairs = [{'type': report.report_type, 'report': report.report} for report in reports]
     response = json.dumps({
         'wkt': {
-            'unwrapped': unwrapped,
-            'wrapped': wrapped
+            'unwrapped': unwrapped.wkt,
+            'wrapped': wrapped.wkt
         },
         'repairs':  repairs
     })

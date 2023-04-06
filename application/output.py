@@ -6,7 +6,7 @@ from typing import Generator
 from fastapi.responses import StreamingResponse, Response
 import logging
 from datetime import datetime
-
+from . import constants
 
 def as_output(search_generator: Generator[ASFSearchResults, None, None], output: str):
     output_format = output.lower()
@@ -68,7 +68,7 @@ def get_baseline(reference: str, opts: ASFSearchOptions):
     ref = granule_search(granule_list=[reference])
 
     return StreamingResponse(
-            yield_jsonlite2(iter([ref[0].stack(opts=opts)])),
+            yield_jsonlite2(ref[0].stack(opts=opts)),
             media_type='application/json; charset=utf-8',
              headers={
                  **constants.DEFAULT_HEADERS,
