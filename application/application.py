@@ -3,13 +3,13 @@ import logging
 import os
 
 import asf_search as asf
-from fastapi import Depends, FastAPI, HTTPException, Request
-from fastapi.responses import Response, StreamingResponse
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.responses import Response
 
-from .asf_env import get_config, load_config
+from .asf_env import get_config
 from .SearchAPIQuery import SearchAPIQuery
 from .health import get_cmr_health
-from .output import as_output, get_baseline, make_filename
+from .output import as_output, get_baseline
 from . import constants
 
 asf.REPORT_ERRORS = False
@@ -32,13 +32,13 @@ def query_params(opts: SearchAPIQuery = Depends(), output: str = 'jsonlite'):
 
 @app.post("/services/search/baseline")
 @app.get("/services/search/baseline")
-def query_params(reference: str, opts: SearchAPIQuery = Depends()):
+def query_baseline(reference: str, opts: SearchAPIQuery = Depends()):
     opts.maxResults = None
     return get_baseline(reference, opts)
 
 @app.get('/services/utils/mission_list')
-def missionList(platform: str | None = None):
-    if platform != None:
+def query_mission_list(platform: str | None = None):
+    if platform is not None:
         platform = platform.upper()
 
     response = json.dumps({'result' :asf.campaigns(platform)}, sort_keys=True, indent=4)
@@ -52,7 +52,7 @@ def missionList(platform: str | None = None):
 
 
 @app.get("/services/utils/wkt")
-def query_params(wkt: str):
+def query_wkt_validation(wkt: str):
     wrapped, unwrapped, reports = asf.validate_wkt(wkt)
 
     repairs = [{'type': report.report_type, 'report': report.report} for report in reports]

@@ -23,8 +23,8 @@ class SearchAPIQuery(asf.ASFSearchOptions):
         flightDirection:        str | None = None,
         flightLine:             str | None = None,
         frame:                  int | List[int] | None = None,
-        granule_list:           str | None = None,
-        product_list:           str | None = None,
+        granule_list:           str | List[str] | None = None,
+        product_list:           str | List[str] | None = None,
         intersectsWith:         str | None = None,
         lookDirection:          str | None = None,
         offNadirAngle:          float | List[float] | None = None,
@@ -39,6 +39,7 @@ class SearchAPIQuery(asf.ASFSearchOptions):
         groupID:                str | None = None,
         insarStackId:           str | None = None,
         instrument:             str | None = None,
+        collections:            str | List[str] | None = None,
         # Config parameters       Parser
         cmr_maturity:           str | None = Query(default=None, alias='maturity'),
         # host:                   str | None = None,
@@ -74,7 +75,7 @@ class SearchAPIQuery(asf.ASFSearchOptions):
         self.insarStackId = insarStackId
         self.instrument = instrument
         
-        args = [(key, item) for key, item in locals().items() if not key in ['cmr_maturity', 'collectionName', 'asfPlatform', 'config', 'session']]
+        args = [(key, item) for key, item in locals().items() if not key in ['cmr_maturity', 'collectionName', 'asfPlatform', 'config', 'session', 'collections']]
         
         asf.ASFSearchOptions.__init__(**dict(args))
 
@@ -89,7 +90,7 @@ class SearchAPIQuery(asf.ASFSearchOptions):
         self.provider = provider
 
 def string_to_list(param: List[str] | str | None):
-    if param != None:
+    if param is not None:
         if ',' in param:
             response = param.split(',')
             logging.warning(response)

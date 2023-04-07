@@ -23,21 +23,6 @@ def load_config(request: Request):
     if config['flexible_maturity']:
         if 'cmr_maturity' in request.query_params:
             request.host = parse.urlparse(config['cmr_base']).netloc
-            # for flex_key in ['bulk_download_api', 'cmr_base', 'cmr_health', 'cmr_api', 'cmr_collections']:
-            #     config[flex_key] = all_config[temp_maturity][flex_key]
-            # temp_maturity = .local_values['maturity']
-            # request.temp_maturity = temp_maturity
-            # del request.local_values['maturity']
-            # for flex_key in ['bulk_download_api', 'cmr_base', 'cmr_health', 'cmr_api', 'cmr_collections']:
-            #     config[flex_key] = all_config[temp_maturity][flex_key]
-            # if config.cmr_base != None:
-            #     request.state.query_params['host'] = parse.urlparse(config['cmr_base']).netloc
-            # if 'cmr_token' in request.local_values:
-            #     request.cmr_token = request.local_values['cmr_token']
-            #     del request.local_values['cmr_token']
-            # if 'cmr_provider' in request.local_values:
-            #     request.state.query_params['provider'] = request.local_values['cmr_provider']
-            #     del request.local_values['cmr_provider']
 
     print(request.query_params)
     # if cmr_maturity 
@@ -46,7 +31,7 @@ def load_config(request: Request):
 
 def load_maturity_config(cmr_maturity: str):
     all_config = load_config_file()
-    if cmr_maturity == None:
+    if cmr_maturity is None:
         cmr_maturity = 'local'
     config = all_config[cmr_maturity]
     # if config['flexible_maturity']:

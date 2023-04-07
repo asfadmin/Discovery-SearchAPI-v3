@@ -1,10 +1,7 @@
-import json
-from time import perf_counter
 import asf_search as asf
 from asf_search import ASFSearchResults, ASFSearchOptions, granule_search
 from typing import Generator
-from fastapi.responses import StreamingResponse, Response
-import logging
+from fastapi.responses import StreamingResponse
 from datetime import datetime
 from . import constants
 
