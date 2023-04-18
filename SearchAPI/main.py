@@ -14,8 +14,10 @@ lambda_handler = Mangum(app)
 
 # Beanstalk handle:
 def run_server() -> None:
-    open_to_ip = os.getenv("OPEN_TO_IP")
-    open_to_port = int(os.getenv("OPEN_TO_PORT"))
+    if not os.environ.get("OPEN_TO_IP") or not os.environ.get("OPEN_TO_PORT"):
+        raise RuntimeError("ERROR: Both env vars 'OPEN_TO_IP' and 'OPEN_TO_PORT' need to be set!")
+    open_to_ip = os.environ["OPEN_TO_IP"]
+    open_to_port = int(os.environ["OPEN_TO_PORT"])
     uvicorn.run(app, host=open_to_ip, port=open_to_port)
 
 if __name__ == "__main__":
