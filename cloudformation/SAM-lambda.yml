@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Description: >
+    SearchAPI v3 - SAM and FastAPI
+
+Parameters:
+
+    PythonRuntime:
+        Type: String
+        Description: The runtime to run the API as (i.e "python3.9")
+        Default: python3.9
+
+Resources:
+
+    SearchApiLambda:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: SearchAPI-lambda-python
+            Description: FastAPI aws lambda example
+            # This has to change if the file is ever moved!!
+            CodeUri: ../SearchAPI
+            Handler: main.lambda_handler
+            Runtime: !Ref PythonRuntime
+            Timeout: 300 # timeout of your lambda function
+            MemorySize: 128 # memory size of your lambda function
+            Layers:
+                - !Ref SearchApiPipLayer
+            Events:
+                Root:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref SearchApiGateway
+                        Path: /
+                        Method: ANY
+                NonRoot:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref SearchApiGateway
+                        Path: /{proxy+}
+                        Method: ANY
+
+    SearchApiPipLayer:
+        Type: AWS::Serverless::LayerVersion
+        Properties:
+            Description: Provides pip dependencies
+            CompatibleRuntimes:
+                - !Ref PythonRuntime
+            ContentUri: ../SearchAPI
+            LayerName: SearchAPI-PipDependencies
+
+    SearchApiGateway:
+        Type: AWS::Serverless::Api
+        Properties:
+            StageName: prod
+            OpenApiVersion: '3.0.0'
+ 
+Outputs:
+  ApiUrl:
+    Description: URL of the API
+    Value: !Sub 'https://${SearchApiGateway}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod'
