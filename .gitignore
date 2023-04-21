@@ -130,3 +130,7 @@ dmypy.json
 
 # Visual Studio Code
 .vscode/
+
+# SAM files
+.aws-sam/
+sam-output.yml
