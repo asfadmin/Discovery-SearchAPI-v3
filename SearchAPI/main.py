@@ -7,7 +7,7 @@ import os
 from mangum import Mangum
 import uvicorn
 
-from .application.application import app
+from application.application import app
 
 # Lambda handle:
 lambda_handler = Mangum(app)
