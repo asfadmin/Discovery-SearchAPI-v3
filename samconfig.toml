@@ -4,7 +4,7 @@ version = 0.1
 
 [default]
 [default.global.parameters]
-stack_name = "SearchAPI-v4"
+stack_name = "SearchAPI-v3-SAM"
 
 [default.build.parameters]
 cached = true
