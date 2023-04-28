@@ -9,6 +9,10 @@ This project contains source code and supporting files for a serverless applicat
 
 The application uses several AWS resources, including Lambda functions and an API Gateway API. These resources are defined in the `template.yaml` file in this project. You can update the template to add AWS resources through the same deployment process that updates your application code.
 
+## Default Parameters
+
+I added the parameters for deploying to `samconfig.toml` to have sensible default params specific to this project. Thus SAM may not behave the same on other projects!
+
 ## Deploy the sample application
 
 To use the SAM CLI, you need the following tools.
@@ -31,10 +35,10 @@ sam deploy --stack-name SearchAPI-v3-SAM
 
 ## Use the SAM CLI to build and test locally
 
-Build your application with the `sam build --use-container` command.
+Build your application with the `sam build` command.
 
 ```bash
-sam build --use-container
+sam build
 ```
 
 The SAM CLI installs dependencies defined in `SearchAPI/requirements.txt`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
