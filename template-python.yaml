@@ -1,5 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Transform: AWS::Serverless-2016-10-31
+Transform:
+  - AWS::Serverless-2016-10-31
+
 Description: >
   SearchAPI-v3
 
@@ -9,21 +11,22 @@ Description: >
 Globals:
   Function:
     Timeout: 300
-    MemorySize: 128
-
+    MemorySize: 10240
+    Architectures:
+      - x86_64
     Tracing: Active
   Api:
     TracingEnabled: true
+
 Resources:
+
   SearchApiFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       Description: !Sub 'SAM deployment for stack "${AWS::StackName}"'
-      CodeUri: SearchAPI/
       Handler: main.lambda_handler
+      CodeUri: SearchAPI/
       Runtime: python3.10
-      Architectures:
-      - x86_64
       Events:
         Root:
             Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -42,11 +45,13 @@ Resources:
       Name: !Sub ApplicationInsights-SAM-${AWS::StackName}
       ResourceQuery:
         Type: CLOUDFORMATION_STACK_1_0
+
   ApplicationInsightsMonitoring:
     Type: AWS::ApplicationInsights::Application
     Properties:
       ResourceGroupName: !Ref ApplicationResourceGroup
       AutoConfigurationEnabled: 'true'
+
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM

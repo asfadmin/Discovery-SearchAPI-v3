@@ -7,7 +7,13 @@ import os
 from mangum import Mangum
 import uvicorn
 
-from application.application import app
+# Running as a script (python3 main.py) requires one
+# Running as a module (python3 -m SearchAPI.main) requires the other
+# I give up. We can get rid of this once we know which method we're using:
+try:
+    from application.application import app
+except (ModuleNotFoundError, ImportError):
+    from .application.application import app
 
 # Lambda handle:
 lambda_handler = Mangum(app)

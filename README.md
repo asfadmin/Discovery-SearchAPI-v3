@@ -11,35 +11,50 @@ The application uses several AWS resources, including Lambda functions and an AP
 
 ## Default Parameters
 
-I added the parameters for deploying to `samconfig.toml` to have sensible default params specific to this project. Thus SAM may not behave the same on other projects!
+I added the parameters for deploying to `samconfig.toml` to have sensible default params specific to this project. Thus SAM may not behave the same as on other projects!
 
 ## Deploy the sample application
 
 To use the SAM CLI, you need the following tools.
 
-* SAM CLI - [Install the SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
-* [Python 3 installed](https://www.python.org/downloads/)
-* Docker - [Install Docker community edition](https://hub.docker.com/search/?type=edition&offering=community)
+- SAM CLI - [Install the SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
+- [Python 3 installed](https://www.python.org/downloads/)
+- Docker - [Install Docker community edition](https://hub.docker.com/search/?type=edition&offering=community)
 
 To build and deploy your application for the first time, run the following in your shell:
 
+### For Python-based Lambda
+
 ```bash
 export AWS_PROFILE=<your-profile>
-sam validate  # <- This will fail until they add python3.10
-              # to their whitelist. Everything still works
-              # after this though.
-sam package 
-sam build
-sam deploy --stack-name SearchAPI-v3-SAM
+# Validate will fail until they add python3.10
+# to their whitelist. Everything still works
+# after this though.
+sam validate --template-file template-python.yaml
+sam build --template-file template-python.yaml
+sam package
+sam deploy /
+    --stack-name SearchAPI-v3-SAM-python
+```
+
+### For Docker-based Lambda
+
+```bash
+export AWS_PROFILE=<your-profile>
+# Validate will fail until they add python3.10
+# to their whitelist. Everything still works
+# after this though.
+sam validate --template-file template-docker.yaml
+sam build --template-file template-docker.yaml
+sam package --image-repository "$(aws sts get-caller-identity --query Account --output text).dkr.ecr.us-east-1.amazonaws.com/searchapi"
+sam deploy \ 
+    --stack-name SearchAPI-v3-SAM-docker \ 
+    --image-repository "$(aws sts get-caller-identity --query Account --output text).dkr.ecr.us-east-1.amazonaws.com/searchapi"
 ```
 
 ## Use the SAM CLI to build and test locally
 
-Build your application with the `sam build` command.
-
-```bash
-sam build
-```
+Build your application with the `sam build ...` command above.
 
 The SAM CLI installs dependencies defined in `SearchAPI/requirements.txt`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
 

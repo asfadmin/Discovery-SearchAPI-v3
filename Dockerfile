@@ -6,7 +6,7 @@ WORKDIR ${LAMBDA_TASK_ROOT}
 ### GENERIC INSTALLS:
 # Install the function's dependencies using file requirements.txt
 # from your project folder.
-COPY requirements.txt  .
+COPY SearchAPI/requirements.txt  .
 RUN  python3 -m pip install -U --no-cache-dir -r requirements.txt
 
 ### OUR FILES:
@@ -24,4 +24,4 @@ ENV OPEN_TO_IP="127.0.0.1"
 ENV OPEN_TO_PORT=9000
 EXPOSE ${OPEN_TO_PORT}
 
-ENTRYPOINT [ "python3", "-m", "SearchAPI.main" ]
+ENTRYPOINT [ "python3", "SearchAPI/main.py" ]
