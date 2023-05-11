@@ -100,6 +100,9 @@ def hammer_api(stack_name: str, count: int=10, should_cold_start: bool=False, **
     """
     Does the same query 'count' number of times.
 
+    All of "time_query_params", just gets passed along to the "time_query" method, so we don't have
+    to maintain params in two areas.
+
     Returns the average time, along with a list of all the times. (average time, [time1, time2, ... ])
     """
     # If it shouldn't cold start, make sure the container is warm:
