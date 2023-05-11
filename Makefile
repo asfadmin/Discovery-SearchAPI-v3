@@ -7,9 +7,9 @@ guard-%:
         exit 1; \
     fi
 
-deploy: guard-TAG
+deploy-vanilla:
 	export STACK_NAME="SearchAPI-v3-vanilla" && \
-	export TAG="$${TAG//[^[:alnum:]]/-}" && \
+	export TAG="vanilla" && \
 	export AWS_ECR="$$(aws sts get-caller-identity --query 'Account' --output text).dkr.ecr.us-east-1.amazonaws.com/searchapi-v3" && \
 	aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin "$${AWS_ECR}" && \
 	docker build --pull -t "$${AWS_ECR}:$${TAG}" . && \
@@ -35,3 +35,21 @@ deploy: guard-TAG
 	aws lambda wait function-updated \
 		--function-name "$${FUNCTION}" && \
 	echo "Updating lambda function DONE."
+
+deploy-python:
+	export STACK_NAME="SearchAPI-v3-python" && \
+	export TAG="$${TAG//[^[:alnum:]]/-}" && \
+	sam build --template-file template-python.yaml && \
+	sam package && \
+	sam deploy \
+		--stack-name "$${STACK_NAME}"
+
+deploy-docker:
+	export STACK_NAME="SearchAPI-v3-docker" && \
+	export TAG="$${TAG//[^[:alnum:]]/-}" && \
+	export AWS_ECR="$$(aws sts get-caller-identity --query Account --output text).dkr.ecr.us-east-1.amazonaws.com/searchapi-v3" && \
+	sam build --template-file template-docker.yaml && \
+	sam package --image-repository "$${AWS_ECR}" && \
+	sam deploy \
+		--stack-name "$${STACK_NAME}" \
+		--image-repository "$${AWS_ECR}"
