@@ -97,7 +97,7 @@ def time_query(stack_name: str, endpoint: str="/", **query_strings) -> timedelta
     print(f"Took {total_time} to run.")
     return total_time
 
-def hammer_api(stack_name: str, count: int=10, should_cold_start: bool=False, **time_query_params) -> list:
+def hammer_api(stack_name: str, count: int=10, should_cold_start: bool=False, **time_query_params) -> (timedelta, list):
     """
     Does the same query 'count' number of times.
 
