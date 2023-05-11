@@ -53,6 +53,7 @@ def reset_lambda(stack_name: str) -> dict:
     function_name = lambda_api["StackResourceDetail"]["PhysicalResourceId"]
 
     # Force lambda to update, so it invalidates all active/running lambda's
+    # (Just make some environment variable a random string)
     lambda_info = lambda_client.update_function_configuration(
         FunctionName=function_name,
         Environment={
@@ -111,7 +112,7 @@ def hammer_api(stack_name: str, count: int=10, should_cold_start: bool=False, **
         health_check(stack_name)
     query_times = []
     for _ in range(count):
-        # if it SHOULD cold start, force it too before each request:
+        # if it SHOULD cold start, force it to before each request:
         if should_cold_start:
             reset_lambda(stack_name)
         # Finally run the request:
