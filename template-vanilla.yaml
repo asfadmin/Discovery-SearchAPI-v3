@@ -1,7 +1,7 @@
 
 AWSTemplateFormatVersion: 2010-09-09
 
-Description: Minimal SearchAPI for Debugging
+Description: Minimal SearchAPI-v3 for Debugging
 
 Parameters:
 
@@ -18,7 +18,7 @@ Parameters:
 
 Resources:
 
-  LambdaContainer:
+  SearchApiFunction:
     Type: AWS::Lambda::Function
     Properties:
       Description: !Sub "For SearchAPI stack '${AWS::StackName}'"
@@ -40,7 +40,7 @@ Resources:
   LambdaLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub /aws/lambda/${LambdaContainer}
+      LogGroupName: !Sub /aws/lambda/${SearchApiFunction}
       RetentionInDays: 60
 
   LambdaServiceRole:
@@ -80,7 +80,7 @@ Resources:
       Name: !Sub "${AWS::StackName}-ApiGatewayV2"
       Description: !Sub "Lambda proxy for SearchAPI stack '${AWS::StackName}'"
       ProtocolType: HTTP
-      Target: !GetAtt LambdaContainer.Arn
+      Target: !GetAtt SearchApiFunction.Arn
       CredentialsArn: !GetAtt ApiGatewayServiceRole.Arn
       CorsConfiguration:
          AllowOrigins:
@@ -124,7 +124,7 @@ Resources:
                 Action:
                   - lambda:InvokeFunction
                 Resource:
-                  - !GetAtt LambdaContainer.Arn
+                  - !GetAtt SearchApiFunction.Arn
               - Effect: Allow
                 Action:
                   - logs:CreateLogStream
@@ -135,7 +135,6 @@ Resources:
 
 Outputs:
   LambdaFunction:
-    Value: !Ref LambdaContainer
-  ApiUrl:
-    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com"
-    
+    Value: !Ref SearchApiFunction
+  SearchApiUrl:
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/"

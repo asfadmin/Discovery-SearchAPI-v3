@@ -46,10 +46,10 @@ export AWS_PROFILE=<your-profile>
 # after this though.
 sam validate --template-file template-docker.yaml
 sam build --template-file template-docker.yaml
-sam package --image-repository "$(aws sts get-caller-identity --query Account --output text).dkr.ecr.us-east-1.amazonaws.com/searchapi"
+sam package --image-repository "$(aws sts get-caller-identity --query Account --output text).dkr.ecr.us-east-1.amazonaws.com/searchapi-v3"
 sam deploy \ 
     --stack-name SearchAPI-v3-SAM-docker \ 
-    --image-repository "$(aws sts get-caller-identity --query Account --output text).dkr.ecr.us-east-1.amazonaws.com/searchapi"
+    --image-repository "$(aws sts get-caller-identity --query Account --output text).dkr.ecr.us-east-1.amazonaws.com/searchapi-v3"
 ```
 
 ## Use the SAM CLI to build and test locally
