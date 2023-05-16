@@ -51,6 +51,7 @@ def reset_lambda(stack_name: str) -> dict:
 
     Returns lambda information.
     """
+    print("Refreshing Lambda to trigger Cold Start")
     # From stack name, get the lambda function
     lambda_api: dict = cfn_client.describe_stack_resource(
         StackName=stack_name,
@@ -128,8 +129,8 @@ def hammer_api(stack_name: str, count: int=10, should_cold_start: bool=False, **
         # Finally run the request:
         time = time_query(stack_name, **time_query_params)
         query_times.append(time)
-    # giving datetime.timedelta(0) as the start value makes sum work on tds
-    average_query_time = sum(query_times, timedelta(0)) / len(query_times)
+    # Start with datetime.timedelta(0) instead of default "int(0)":
+    average_query_time = sum(query_times, start=timedelta(0)) / len(query_times)
     print(f"Average Time: {average_query_time}, Number Queries: {len(query_times)}")
     return average_query_time, query_times
 
@@ -150,7 +151,7 @@ def complex_query(stack_name: str, query_dict: dict, should_cold_start: bool=Fal
         for item in first_item_val:
             recursive_query_list(query_left_copy, current_query + [(first_item_key, item)])
     # Back to complex_query method. Make each value in dict a list if it's not already.
-    # (makes it easier to recurse through). 
+    # (makes it easier to recurse through).
     for key, val in query_dict.items():
         if not isinstance(val, list):
             query_dict[key] = [val]
@@ -168,7 +169,7 @@ def complex_query(stack_name: str, query_dict: dict, should_cold_start: bool=Fal
             reset_lambda(stack_name)
         time = time_query(stack_name, **q)
         total_time += time
-    print(f"Total time is: {total_time}. Numer of Queries: {len(query_list)}")
+    print(f"Total time is: {total_time}. Number of Queries: {len(query_list)}")
     return total_time, query_list
 
 
@@ -176,10 +177,11 @@ if __name__ == "__main__":
     # health_check("SearchAPI-v3-docker")
     # reset_lambda("SearchAPI-v3-docker")
     # time_query("SearchAPI-v3-vanilla", endpoint="/services/search/param", maxResults=5, platform="S1")
-    # hammer_api("SearchAPI-v3-vanilla", count=1, should_cold_start=False, endpoint="/services/search/param", maxResults=5, platform="S1")
-    query = {
-        "endpoint": "/services/search/param",
-        "maxResults": [5,8,2],
-        "platform": ["S1", "ALOS"]
-    }
-    complex_query("SearchAPI-v3-vanilla", query, should_cold_start=False)
+    _, query_time_list = hammer_api("SearchAPI-v3-docker", count=20, should_cold_start=True, endpoint="/services/search/param", maxResults=5, platform="S1")
+    print(sum(query_time_list, start=timedelta(0)))
+    # query = {
+    #     "endpoint": "/services/search/param",
+    #     "maxResults": [5,8,2],
+    #     "platform": ["S1", "ALOS"]
+    # }
+    # complex_query("SearchAPI-v3-vanilla", query, should_cold_start=False)
