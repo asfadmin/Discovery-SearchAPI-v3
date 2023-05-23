@@ -59,7 +59,7 @@ def as_output(search_generator: Generator[ASFSearchResults, None, None], output:
         }
     }
 
-    return StreamingResponse(**output_config[output_format])
+    return output_config[output_format]
 
 def get_baseline(reference: str, opts: ASFSearchOptions):
     ref = granule_search(granule_list=[reference])
