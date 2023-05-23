@@ -7,6 +7,8 @@ WORKDIR ${LAMBDA_TASK_ROOT}
 # Install the function's dependencies using file requirements.txt
 # from your project folder.
 COPY SearchAPI/requirements.txt  .
+# Setup wheel first so it can be used for the rest of the installs:
+RUN  python3 -m pip install -U --no-cache-dir wheel
 RUN  python3 -m pip install -U --no-cache-dir -r requirements.txt
 
 ### OUR FILES:
