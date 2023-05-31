@@ -178,20 +178,21 @@ if __name__ == "__main__":
     # reset_lambda("SearchAPI-v3-docker")
     # time_query("SearchAPI-v3-vanilla", endpoint="/services/search/param", maxResults=5, platform="S1")
     # _, query_time_list = hammer_api("SearchAPI-v3-docker", count=20, should_cold_start=True, endpoint="/services/search/param", maxResults=5, platform="S1")
-    # print(sum(query_time_list, start=timedelta(0)))
-    query_wkt = {
-        "endpoint": "/services/search/param",
-        "maxResults": [5,8,2],
-        "platform": ["S1", "ALOS"],
-        "intersectsWith": [
-            "linestring(-119.543 37.925, -118.443 37.7421)",
-            "point(-119.543, 37.925)",
-            "polygon((-119.543 37.925, -118.443 37.7421, -118.682 36.8525, -119.77 37.0352, -119.543 37.925 ))"
-        ]
-    }
-    query_baseline = {
-        "endpoint": "/services/search/baseline",
-        "reference": "S1B_IW_SLC__1SDV_20210704T135937_20210704T140004_027645_034CB0_4B2C",
-        "maxResults": 5
-    }
-    complex_query("SearchAPI-v3-vanilla", query_wkt, should_cold_start=False)
+    _, query_time_list = hammer_api("SearchAPI-v3-docker", count=20, should_cold_start=True, endpoint="/services/search/param", maxResults=5, platform="S1")
+    print(sum(query_time_list, start=timedelta(0)))
+    # query_wkt = {
+    #     "endpoint": "/services/search/param",
+    #     "maxResults": [5,8,2],
+    #     "platform": ["S1", "ALOS"],
+    #     "intersectsWith": [
+    #         "linestring(-119.543 37.925, -118.443 37.7421)",
+    #         "point(-119.543, 37.925)",
+    #         "polygon((-119.543 37.925, -118.443 37.7421, -118.682 36.8525, -119.77 37.0352, -119.543 37.925 ))"
+    #     ]
+    # }
+    # query_baseline = {
+    #     "endpoint": "/services/search/baseline",
+    #     "reference": "S1B_IW_SLC__1SDV_20210704T135937_20210704T140004_027645_034CB0_4B2C",
+    #     "maxResults": 5
+    # }
+    # complex_query("SearchAPI-v3-vanilla", query_wkt, should_cold_start=False)
