@@ -7,7 +7,7 @@ from fastapi import Depends, FastAPI, Request, HTTPException
 from fastapi.responses import Response, JSONResponse, StreamingResponse
 
 from .asf_env import get_config
-# from .SearchAPIQuery import SearchAPIQuery
+from .SearchAPIQuery import SearchAPIQuery
 from .health import get_cmr_health
 from .output import as_output, get_baseline
 from . import constants
@@ -21,13 +21,10 @@ async def query_params(request: Request):
     params = request.query_params
     try:
         opts = asf.ASFSearchOptions(**params)
-    except ValueError as exc:
-        error = {
-            "type": "Value",
-            "report": repr(exc)
-        }
-        raise HTTPException(detail=error, status_code=400) from exc
-    output = params.get("output") or 'jsonlite'
+    except (KeyError, ValueError) as exc:
+        raise HTTPException(detail=repr(exc), status_code=400) from exc
+    output = params.get("output") or 'jsonlite' # Default if they provide nothing.
+
     if output.lower() == 'count':
         return Response(
             content=str(asf.search_count(opts=opts)),
@@ -39,7 +36,7 @@ async def query_params(request: Request):
         try:
             response_info = as_output(asf.search_generator(opts=opts), output)
         except ValueError as exc:
-            raise HTTPException(status_code=400) from exc
+            raise HTTPException(detail=repr(exc), status_code=400) from exc
         return StreamingResponse(**response_info)
 
 @app.post("/services/search/baseline", response_class=JSONResponse)
@@ -58,7 +55,6 @@ async def query_mission_list(platform: str | None = None):
     return JSONResponse(
         content=response,
         status_code=200,
-        # media_type='application/json',
         headers=constants.DEFAULT_HEADERS
     )
 
@@ -79,7 +75,6 @@ async def query_wkt_validation(wkt: str):
     return JSONResponse(
         content=response,
         status_code=200,
-        # media_type='application/json',
         headers=constants.DEFAULT_HEADERS
     )
 
@@ -107,36 +102,17 @@ async def health_check():
     return JSONResponse(
         content=api_health,
         status_code=200,
-        # media_type='application/json; charset=utf-8',
         headers=constants.DEFAULT_HEADERS
     )
 
-# @app.exception_handler(ValueError)
-# async def handle_error(request: Request, error: ValueError):
-#     response = {
-#         'errors': [
-#             {'type': 'VALUE', 'report': error.detail}
-#         ]
-#     }
-#     return JSONResponse(
-#         content=response,
-#         status=400,
-#         # mimetype='application/json',
-#         headers=constants.DEFAULT_HEADERS
-#     )
-
-# @app.exception_handler(HTTPException)
-# async def handle_error(request: Request, error: HTTPException):
-#     logging.error("HIT handle error")
-#     print("HIT handle error")
-#     response = {
-#         'errors': [
-#             {'type': 'VALUE', 'report': error.detail}
-#         ]
-#     }
-#     return JSONResponse(
-#         content=response,
-#         status=400,
-#         # mimetype='application/json',
-#         headers=constants.DEFAULT_HEADERS
-#     )
+@app.exception_handler(HTTPException)
+async def handle_error(request: Request, error: HTTPException):
+    response = {
+        "type": "ERROR",
+        "report": error.detail
+    }
+    return JSONResponse(
+        content=response,
+        status_code=error.status_code,
+        headers=constants.DEFAULT_HEADERS
+    )
