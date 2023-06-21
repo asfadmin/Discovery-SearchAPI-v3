@@ -15,11 +15,14 @@ try:
 except (ModuleNotFoundError, ImportError):
     from .application.application import app
 
-# Lambda handle:
+# Lambda handle - for any 'serverless'-like environment:
 lambda_handler = Mangum(app)
 
 # Beanstalk handle:
 def run_server() -> None:
+    """
+    To run this API from EC2, or another 'server'-like environment
+    """
     if not os.environ.get("OPEN_TO_IP") or not os.environ.get("OPEN_TO_PORT"):
         raise RuntimeError("ERROR: Both env vars 'OPEN_TO_IP' and 'OPEN_TO_PORT' need to be set!")
     open_to_ip = os.environ["OPEN_TO_IP"]

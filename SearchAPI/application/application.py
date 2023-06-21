@@ -1,3 +1,4 @@
+
 import json
 import logging
 import os
@@ -6,8 +7,10 @@ import asf_search as asf
 from fastapi import Depends, FastAPI, Request, HTTPException
 from fastapi.responses import Response, JSONResponse, StreamingResponse
 
+from SearchAPI import api_logger
+
 from .asf_env import get_config
-from .SearchAPIQuery import SearchAPIQuery
+from .asf_opts import get_asf_opts
 from .health import get_cmr_health
 from .output import as_output, get_baseline
 from . import constants
@@ -15,16 +18,11 @@ from . import constants
 asf.REPORT_ERRORS = False
 app = FastAPI()
 
+
 @app.post("/services/search/param", response_class=JSONResponse)
 @app.get("/services/search/param", response_class=JSONResponse)
-async def query_params(request: Request):
-    params = request.query_params
-    try:
-        opts = asf.ASFSearchOptions(**params)
-    except (KeyError, ValueError) as exc:
-        raise HTTPException(detail=repr(exc), status_code=400) from exc
-    output = params.get("output") or 'jsonlite' # Default if they provide nothing.
-
+async def query_params(output: str='jsonlite', opts: asf.ASFSearchOptions = Depends(get_asf_opts)):
+    api_logger.info(f"SearchAPI '/services/search/param' endpoint:\n{output=}\n{dict(opts)=}")
     if output.lower() == 'count':
         return Response(
             content=str(asf.search_count(opts=opts)),
@@ -41,7 +39,7 @@ async def query_params(request: Request):
 
 @app.post("/services/search/baseline", response_class=JSONResponse)
 @app.get("/services/search/baseline", response_class=JSONResponse)
-async def query_baseline(reference: str, opts: SearchAPIQuery = Depends()):
+async def query_baseline(reference: str, opts: asf.ASFSearchOptions = Depends(get_asf_opts)):
     opts.maxResults = None
     return get_baseline(reference, opts)
 

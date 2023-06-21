@@ -39,6 +39,9 @@ Resources:
             Properties:
                 Path: /{proxy+}
                 Method: ANY
+      Environment:
+        Variables:
+          LOCAL_RUN: "FALSE"
     Metadata:
       DockerTag: searchapi-v3
       DockerContext: ./

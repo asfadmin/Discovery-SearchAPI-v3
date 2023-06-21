@@ -27,9 +27,6 @@ To build and deploy your application for the first time, run the following in yo
 
 ```bash
 export AWS_PROFILE=<your-profile>
-# Validate will fail until they add python3.10
-# to their whitelist. Everything still works
-# after this though.
 sam validate --template-file template-python.yaml
 sam build --template-file template-python.yaml
 sam package
@@ -41,9 +38,6 @@ sam deploy /
 
 ```bash
 export AWS_PROFILE=<your-profile>
-# Validate will fail until they add python3.10
-# to their whitelist. Everything still works
-# after this though.
 sam validate --template-file template-docker.yaml
 sam build --template-file template-docker.yaml
 sam package --image-repository "$(aws sts get-caller-identity --query Account --output text).dkr.ecr.us-east-1.amazonaws.com/searchapi-v3"
@@ -71,7 +65,7 @@ sam local invoke SearchApiFunction --event events/event.json
 The SAM CLI can also emulate your application's API. Use the `sam local start-api` to run the API locally on port 3000.
 
 ```bash
-sam local start-api
+sam local start-api --env-vars local-env-vars.conf
 curl http://localhost:3000/
 ```
 
