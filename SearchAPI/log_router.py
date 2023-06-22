@@ -46,11 +46,14 @@ class LoggingRoute(APIRoute):
                 response: Response = await original_route_handler(request)
             finally:
                 duration = time.time() - before
-                api_logger.info("Query finished running!", extra={
-                    "QueryTime": duration,
-                    "QueryParams": dict(request.query_params),
-                    "Endpoint": request.scope['path']
-                })
+                api_logger.info(
+                    "Query finished running!",
+                    extra={
+                        "QueryTime": duration,
+                        "QueryParams": dict(request.query_params),
+                        "Endpoint": request.scope['path']
+                    }
+                )
             response.headers["X-Response-Time"] = str(duration)
             return response
 
