@@ -2,9 +2,13 @@
 import logging
 import json
 import os
+from pythonjsonlogger import jsonlogger
 
 
 class ConsoleStreamFormatter(logging.Formatter):
+    """
+    Custom Logger formatter, used when running this app locally
+    """
     class Colors:
         """
         I.e: print(f"{colors.WARNING} Some warning text here {colors.END}")
@@ -34,8 +38,11 @@ class ConsoleStreamFormatter(logging.Formatter):
     }
 
     def format(self, record: logging.LogRecord) -> logging.Formatter:
+        # If it's bytes, turn it to a string:
+        if isinstance(record.msg, bytes):
+            record.msg = record.msg.decode("utf-8")
         # IF the message is bigger than one line, give it it's own block, and indent a bit:
-        if record.msg.count('\n') > 0:
+        if isinstance(record.msg, str) and record.msg.count('\n') > 0:
             msg_list = record.msg.split("\n")
             msg_list = [f"       {msg}" for msg in msg_list]
             record.msg = "<multi-line>:\n" + "\n".join(msg_list)
@@ -46,17 +53,21 @@ class ConsoleStreamFormatter(logging.Formatter):
         return formatter.format(record)
 
 class AwsStreamFormatter(logging.Formatter):
-
-    LOGGER_FORMAT = json.dumps({
-        "datetime": "%(asctime)s",
-        "ModuleName": "%(name)s",
-        "FileLocation": "%(pathname)s:%(lineno)d",
-        "LogLevel": "%(levelname)s",
-        "Message": "%(message)s",
-    })
+    """
+    Custom Logger formatter, used when running this app in AWS
+    """
+    LOGGER_FORMAT = " ".join([
+        "%(asctime)s",
+        "%(name)s",
+        "%(pathname)s",
+        "%(lineno)d",
+        "%(levelname)s",
+        "%(message)s",
+        "%(uuid)s",
+    ])
 
     def format(self, record: logging.LogRecord) -> logging.Formatter:
-        formatter = logging.Formatter(self.LOGGER_FORMAT)
+        formatter = jsonlogger.JsonFormatter(self.LOGGER_FORMAT)
         return formatter.format(record)
 
 def get_logger(name: str, level: int=logging.DEBUG) -> logging.Logger:
@@ -70,8 +81,7 @@ def get_logger(name: str, level: int=logging.DEBUG) -> logging.Logger:
     ## Setup what the format should look like, depending on if in AWS or local:
     stream_handle = logging.StreamHandler()
     # Default to false if not set:
-    # if os.environ.get('LOCAL_RUN', "FALSE").upper() == "TRUE":
-    if os.environ.get('LOCAL_RUN').upper() == "TRUE":
+    if os.environ.get('LOCAL_RUN', "FALSE").upper() == "TRUE":
         # You're running locally!
         stream_handle.setFormatter(ConsoleStreamFormatter())
     else:

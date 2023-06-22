@@ -10,3 +10,4 @@ api_logger = logger.get_logger(__name__, logging.DEBUG)
 # Generic imports:
 from . import application
 from . import main
+from . import log_router

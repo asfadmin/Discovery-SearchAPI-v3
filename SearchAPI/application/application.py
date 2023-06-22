@@ -4,10 +4,10 @@ import logging
 import os
 
 import asf_search as asf
-from fastapi import Depends, FastAPI, Request, HTTPException
+from fastapi import Depends, FastAPI, Request, HTTPException, APIRouter
 from fastapi.responses import Response, JSONResponse, StreamingResponse
 
-from SearchAPI import api_logger
+from SearchAPI import api_logger, log_router
 
 from .asf_env import get_config
 from .asf_opts import get_asf_opts
@@ -16,11 +16,12 @@ from .output import as_output, get_baseline
 from . import constants
 
 asf.REPORT_ERRORS = False
+router = APIRouter(route_class=log_router.LoggingRoute)
 app = FastAPI()
 
 
-@app.post("/services/search/param", response_class=JSONResponse)
-@app.get("/services/search/param", response_class=JSONResponse)
+@router.post("/services/search/param")
+@router.get("/services/search/param")
 async def query_params(output: str='jsonlite', opts: asf.ASFSearchOptions = Depends(get_asf_opts)):
     api_logger.info(f"SearchAPI '/services/search/param' endpoint:\n{output=}\n{dict(opts)=}")
     if output.lower() == 'count':
@@ -37,13 +38,13 @@ async def query_params(output: str='jsonlite', opts: asf.ASFSearchOptions = Depe
             raise HTTPException(detail=repr(exc), status_code=400) from exc
         return StreamingResponse(**response_info)
 
-@app.post("/services/search/baseline", response_class=JSONResponse)
-@app.get("/services/search/baseline", response_class=JSONResponse)
+@router.post("/services/search/baseline", response_class=JSONResponse)
+@router.get("/services/search/baseline", response_class=JSONResponse)
 async def query_baseline(reference: str, opts: asf.ASFSearchOptions = Depends(get_asf_opts)):
     opts.maxResults = None
     return get_baseline(reference, opts)
 
-@app.get('/services/utils/mission_list', response_class=JSONResponse)
+@router.get('/services/utils/mission_list', response_class=JSONResponse)
 async def query_mission_list(platform: str | None = None):
     if platform is not None:
         platform = platform.upper()
@@ -57,7 +58,7 @@ async def query_mission_list(platform: str | None = None):
     )
 
 
-@app.get("/services/utils/wkt", response_class=JSONResponse)
+@router.get("/services/utils/wkt", response_class=JSONResponse)
 async def query_wkt_validation(wkt: str):
     wrapped, unwrapped, reports = asf.validate_wkt(wkt)
 
@@ -76,8 +77,8 @@ async def query_wkt_validation(wkt: str):
         headers=constants.DEFAULT_HEADERS
     )
 
-@app.get('/', response_class=JSONResponse)
-@app.get('/health', response_class=JSONResponse)
+@router.get('/', response_class=JSONResponse)
+@router.get('/health', response_class=JSONResponse)
 async def health_check():
     try:
         version_path = os.path.join("SearchAPI", "version.json")
@@ -114,3 +115,5 @@ async def handle_error(request: Request, error: HTTPException):
         status_code=error.status_code,
         headers=constants.DEFAULT_HEADERS
     )
+
+app.include_router(router)
