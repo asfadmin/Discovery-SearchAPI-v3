@@ -23,7 +23,6 @@ app = FastAPI()
 @router.post("/services/search/param")
 @router.get("/services/search/param")
 async def query_params(output: str='jsonlite', opts: asf.ASFSearchOptions = Depends(get_asf_opts)):
-    api_logger.info(f"SearchAPI '/services/search/param' endpoint:\n{output=}\n{dict(opts)=}")
     if output.lower() == 'count':
         return Response(
             content=str(asf.search_count(opts=opts)),
