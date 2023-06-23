@@ -66,8 +66,17 @@ class AwsStreamFormatter(logging.Formatter):
         "%(uuid)s",
     ])
 
+    LOGGER_RENAME_FIELDS = {
+        "asctime": "datetime",
+        "lineno": "line_number",
+        "levelname": "log_level",
+    }
+
     def format(self, record: logging.LogRecord) -> logging.Formatter:
-        formatter = jsonlogger.JsonFormatter(self.LOGGER_FORMAT)
+        formatter = jsonlogger.JsonFormatter(
+            self.LOGGER_FORMAT,
+            rename_fields=self.LOGGER_RENAME_FIELDS
+        )
         return formatter.format(record)
 
 def get_logger(name: str, level: int=logging.DEBUG) -> logging.Logger:
