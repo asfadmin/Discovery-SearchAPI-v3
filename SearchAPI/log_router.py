@@ -11,11 +11,13 @@ from . import api_logger
 
 class LoggingRoute(APIRoute):
     """
-    Modify the default route to expand logging to every endpoint
+    APRRoute's are used to preform tasks before/after every API endpoint is hit.
+
+    This one is for logging request info for every endpoint.
     """
 
     old_factory = logging.getLogRecordFactory()
-    request_uuid = ""
+    aws_request_id = ""
 
     def record_factory(self, *args, **kwargs):
         """
@@ -24,7 +26,7 @@ class LoggingRoute(APIRoute):
         From: https://stackoverflow.com/a/57820456
         """
         record = self.old_factory(*args, **kwargs)
-        record.uuid = self.request_uuid
+        record.aws_request_id = self.aws_request_id
         return record
 
     def get_route_handler(self) -> Callable:
@@ -38,7 +40,7 @@ class LoggingRoute(APIRoute):
 
         async def custom_route_handler(request: Request) -> Response:
             # Grab the AWS UUID and set it for every log:
-            self.request_uuid = request.scope["aws.context"].aws_request_id
+            self.aws_request_id = request.scope["aws.context"].aws_request_id
             logging.setLogRecordFactory(self.record_factory)
             # Time the request itself:
             before = time.time()
@@ -54,6 +56,7 @@ class LoggingRoute(APIRoute):
                         "Endpoint": request.scope['path']
                     }
                 )
+            # An example on adding headers. IDK if we actually need this one:
             response.headers["X-Response-Time"] = str(duration)
             return response
 

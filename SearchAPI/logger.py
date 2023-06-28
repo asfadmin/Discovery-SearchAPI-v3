@@ -63,7 +63,7 @@ class AwsStreamFormatter(logging.Formatter):
         "%(lineno)d",
         "%(levelname)s",
         "%(message)s",
-        "%(uuid)s",
+        "%(aws_request_id)s",
     ])
 
     LOGGER_RENAME_FIELDS = {
