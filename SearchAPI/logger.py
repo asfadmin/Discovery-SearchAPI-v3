@@ -1,6 +1,5 @@
 
 import logging
-import json
 import os
 from pythonjsonlogger import jsonlogger
 
