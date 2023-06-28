@@ -14,9 +14,6 @@ Globals:
     MemorySize: 10240
     Architectures:
       - x86_64
-    Tracing: Active
-  Api:
-    TracingEnabled: true
 
 Resources:
 
@@ -47,18 +44,6 @@ Resources:
       DockerContext: ./
       Dockerfile: Dockerfile
 
-  ApplicationResourceGroup:
-    Type: AWS::ResourceGroups::Group
-    Properties:
-      Name: !Sub ApplicationInsights-SAM-${AWS::StackName}
-      ResourceQuery:
-        Type: CLOUDFORMATION_STACK_1_0
-
-  ApplicationInsightsMonitoring:
-    Type: AWS::ApplicationInsights::Application
-    Properties:
-      ResourceGroupName: !Ref ApplicationResourceGroup
-      AutoConfigurationEnabled: 'true'
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
