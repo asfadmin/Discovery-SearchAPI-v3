@@ -1,0 +1,35 @@
+# More information about the configuration file can be found here:
+# https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-config.html
+version = 0.1
+
+[default]
+[default.global.parameters]
+stack_name = "SearchAPI-v3-SAM"
+
+[default.build.parameters]
+cached = true
+parallel = true
+use_container = true
+
+[default.validate.parameters]
+lint = true
+
+[default.deploy.parameters]
+capabilities = "CAPABILITY_IAM"
+no_confirm_changeset = true
+resolve_s3 = true
+template_file = "sam-output.yml"
+no_fail_on_empty_changeset = true
+
+[default.package.parameters]
+resolve_s3 = true
+output_template_file = "sam-output.yml"
+
+[default.sync.parameters]
+watch = true
+
+[default.local_start_api.parameters]
+warm_containers = "EAGER"
+
+[default.local_start_lambda.parameters]
+warm_containers = "EAGER"

@@ -1,58 +1,109 @@
-# SearchAPI v3 Minimal Example
+# SearchAPI-v3
 
-## Deploy with SAM (Recommended)
+This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes the following files and folders.
 
-The core [SAM](https://github.com/aws/serverless-application-model) commands I have setup in the makefile. You can run:
+- SearchAPI - Code for the application's Lambda function.
+- events - Invocation events that you can use to invoke the function.
+- tests - Unit tests for the application code.
+- template.yaml - A template that defines the application's AWS resources.
+
+The application uses several AWS resources, including Lambda functions and an API Gateway API. These resources are defined in the `template.yaml` file in this project. You can update the template to add AWS resources through the same deployment process that updates your application code.
+
+## Default Parameters
+
+I added the parameters for deploying to `samconfig.toml` to have sensible default params specific to this project. Thus SAM may not behave the same as on other projects!
+
+## Deploy the sample application
+
+To use the SAM CLI, you need the following tools.
+
+- SAM CLI - [Install the SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
+- [Python 3 installed](https://www.python.org/downloads/)
+- Docker - [Install Docker community edition](https://hub.docker.com/search/?type=edition&offering=community)
+
+To build and deploy your application for the first time, run the following in your shell:
+
+### For Python-based Lambda
 
 ```bash
-make sam-validate       # Validate the stack
-make sam-build          # Pull everything together it needs to deploy
-make sam-package        # Push it up to an S3 bucket
-make sam-deploy         # Setup the cloudformation stack
-make sam-all            # Does everything above ^^^ in order
-make sam-local-invoke   # Setup a lambda-like container for local testing
+export AWS_PROFILE=<your-profile>
+sam validate --template-file template-python.yaml
+sam build --template-file template-python.yaml
+sam package
+sam deploy /
+    --stack-name SearchAPI-v3-SAM-python
 ```
 
-To get off the ground, I have one stack hard-coded that the above commands use/modify. If we need more granule control sooner, let me know and I can prioritize it more.
-
-## Deploy with Cloudformation Directly
-
-Quick setup:
+### For Docker-based Lambda
 
 ```bash
-# Setup a NEW virtual-env:
-virtual-env --python=python3 ~/SearchAPIv3-env
-source ~/SearchAPIv3-env/bin/activate
-# Probably a more minimal package set exists, but for now grab everything:
-python3 -m pip install fastapi[all] uvicorn mangum
-# Build the container and push it to AWS:
-cd SearchAPI-v3
-make build
-# Create the stack:
-make deploy
+export AWS_PROFILE=<your-profile>
+sam validate --template-file template-docker.yaml
+sam build --template-file template-docker.yaml
+sam package --image-repository "$(aws sts get-caller-identity --query Account --output text).dkr.ecr.us-east-1.amazonaws.com/searchapi-v3"
+sam deploy \ 
+    --stack-name SearchAPI-v3-SAM-docker \ 
+    --image-repository "$(aws sts get-caller-identity --query Account --output text).dkr.ecr.us-east-1.amazonaws.com/searchapi-v3"
 ```
 
-Lambda:
-    You can now test the lambda by going to the lambda function, test tab, then selecting "cloudfront-modify-querystring" for the template. The basic function returns whatever is in the url for a response, the default test should return `"body": "{\"result\":\"test\"}"` somewhere inside the json block. (since it hit `/test?otherparams=foo`).
+## Use the SAM CLI to build and test locally
 
-## Getting Started Guides
+Build your application with the `sam build ...` command above.
 
-Deploying [FastAPI](https://fastapi.tiangolo.com/) in AWS Lambda (Starting Guides):
+The SAM CLI installs dependencies defined in `SearchAPI/requirements.txt`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
 
-- <https://dimmaski.com/fastapi-aws-sam/>
-- <https://iwpnd.pw/articles/2020-01/deploy-fastapi-to-aws-lambda>
+Test a single function by invoking it directly with a test event. An event is a JSON document that represents the input that the function receives from the event source. Test events are included in the `events` folder in this project.
 
-Installing [SAM](https://github.com/aws/serverless-application-model):
+Run functions locally and invoke them with the `sam local invoke` command.
 
-- <https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html>
+```bash
+# THIS WON'T WORK until we add API Gateway events to events/*
+# for now, use `sam local start-api` in the next part instead.
+sam local invoke SearchApiFunction --event events/event.json
+```
 
-Getting incite into how the API is doing:
+The SAM CLI can also emulate your application's API. Use the `sam local start-api` to run the API locally on port 3000.
 
-- <https://www.eliasbrange.dev/posts/observability-with-fastapi-aws-lambda-powertools/>
+```bash
+sam local start-api --env-vars local-env-vars.conf
+curl http://localhost:3000/
+```
 
-## ToDo - future us problems
+## Fetch, tail, and filter Lambda function logs
 
-- Restructure repo, so that:
-  - SAM-lambda.yml is in the root for deployments
-  - SearchAPI python package is inside some sort of "upload" dir. We want to upload it and requirements.txt, without uploading the entire repo along-side it.
-- Fix indent from 4 to 2 on SAM-lambda.yml
+To simplify troubleshooting, SAM CLI has a command called `sam logs`. `sam logs` lets you fetch logs generated by your deployed Lambda function from the command line. In addition to printing the logs on the terminal, this command has several nifty features to help you quickly find the bug.
+
+`NOTE`: This command works for all AWS Lambda functions; not just the ones you deploy using SAM.
+
+```bash
+sam logs -n SearchApiFunction --stack-name SearchAPI-v3-SAM --tail
+```
+
+You can find more information and examples about filtering Lambda function logs in the [SAM CLI Documentation](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-logging.html).
+
+## Tests
+
+Tests are defined in the `tests` folder in this project. Use PIP to install the test dependencies and run tests.
+
+```bash
+pip install -r tests/requirements.txt --user
+# unit test
+python -m pytest tests/unit -v
+# integration test, requiring deploying the stack first.
+# Create the env variable AWS_SAM_STACK_NAME with the name of the stack we are testing
+AWS_SAM_STACK_NAME=<stack-name> python -m pytest tests/integration -v
+```
+
+## Cleanup
+
+To delete the sample application that you created, use the AWS CLI. Assuming you used your project name for the stack name, you can run the following:
+
+```bash
+sam delete --stack-name SearchAPI-v3-SAM
+```
+
+## Resources
+
+See the [AWS SAM developer guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html) for an introduction to SAM specification, the SAM CLI, and serverless application concepts.
+
+Next, you can use AWS Serverless Application Repository to deploy ready to use Apps that go beyond hello world samples and learn how authors developed their applications: [AWS Serverless Application Repository main page](https://aws.amazon.com/serverless/serverlessrepo/)

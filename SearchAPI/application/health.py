@@ -9,9 +9,13 @@ def get_cmr_health():
     try:
         r = requests.get(cfg['cmr_base'] + cfg['cmr_health'], timeout=10)
         d = {'host': cfg['cmr_base'], 'health': json.loads(r.text)}
-    except Exception as e:
-        logging.debug(e)
-        d = {'host': cfg['cmr_base'], 'error': {
-            'display': 'ASF is experiencing errors loading data.  Please try again later.',
-            'raw': f'{e}'}}
+    except Exception as exc:
+        logging.debug(repr(exc))
+        d = {
+            'host': cfg['cmr_base'],
+            'error': {
+                'display': 'ASF is experiencing errors loading data.  Please try again later.',
+                'raw': repr(exc)
+            }
+        }
     return d
