@@ -2,6 +2,7 @@ import asf_search as asf
 from asf_search import ASFSearchResults, ASFSearchOptions, granule_search
 from typing import Generator
 from fastapi.responses import StreamingResponse
+from fastapi import HTTPException
 from datetime import datetime
 from . import constants
 
@@ -59,20 +60,12 @@ def as_output(search_generator: Generator[ASFSearchResults, None, None], output:
         }
     }
     if output_format not in output_config:
-        raise ValueError(f"Unknown output '{output_format}' was requested.")
+        raise HTTPException(
+            detail=f"Unknown output '{output_format}' was requested. Must be one of: {output_config.keys()}",
+            status_code=400
+        )
     return output_config[output_format]
 
-def get_baseline(reference: str, opts: ASFSearchOptions):
-    ref = granule_search(granule_list=[reference])
-
-    return StreamingResponse(
-            yield_jsonlite2(ref[0].stack(opts=opts)),
-            media_type='application/json; charset=utf-8',
-             headers={
-                 **constants.DEFAULT_HEADERS,
-                 'Content-Disposition': f"attachment; filename={make_filename('json')}",
-             }
-         )
 
 def yield_jsonlite(result_gen: Generator[ASFSearchResults, None, None]):
     for page in asf.export.jsonlite.results_to_jsonlite(result_gen):

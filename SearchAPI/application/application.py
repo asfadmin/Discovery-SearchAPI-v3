@@ -12,7 +12,7 @@ from SearchAPI import api_logger, log_router
 from .asf_env import get_config
 from .asf_opts import get_asf_opts
 from .health import get_cmr_health
-from .output import as_output, get_baseline
+from .output import as_output
 from . import constants
 
 asf.REPORT_ERRORS = False
@@ -22,6 +22,7 @@ app = FastAPI()
 
 @router.post("/services/search/param")
 @router.get("/services/search/param")
+@router.head("/services/search/param")
 async def query_params(output: str='jsonlite', opts: asf.ASFSearchOptions = Depends(get_asf_opts)):
     if output.lower() == 'count':
         return Response(
@@ -31,17 +32,34 @@ async def query_params(output: str='jsonlite', opts: asf.ASFSearchOptions = Depe
             headers=constants.DEFAULT_HEADERS
         )
     else:
-        try:
-            response_info = as_output(asf.search_generator(opts=opts), output)
-        except ValueError as exc:
-            raise HTTPException(detail=repr(exc), status_code=400) from exc
+        response_info = as_output(asf.search_generator(opts=opts), output)
         return StreamingResponse(**response_info)
 
-@router.post("/services/search/baseline", response_class=JSONResponse)
-@router.get("/services/search/baseline", response_class=JSONResponse)
-async def query_baseline(reference: str, opts: asf.ASFSearchOptions = Depends(get_asf_opts)):
+
+@router.post("/services/search/baseline")
+@router.get("/services/search/baseline")
+@router.head("/services/search/baseline")
+async def query_baseline(request: Request, reference: str, output: str='jsonlite', opts: asf.ASFSearchOptions = Depends(get_asf_opts)):
+    if request.method == "HEAD":
+        # Need head request separately, so it doesn't do all
+        # the work to figure out the body
+        metadata = as_output(None, output)
+        return Response(
+            status_code=200,
+            headers=metadata["headers"],
+            media_type=metadata["media_type"]
+        )
     opts.maxResults = None
-    return get_baseline(reference, opts)
+    # Load the reference scene:
+    try:
+        ref = asf.granule_search(granule_list=[reference])[0]
+    except KeyError as exc:
+        raise HTTPException(detail=f"Reference scene not found: {reference}", status_code=400) from exc
+    # Figure out the response params:
+    response_info = as_output(ref.stack(opts=opts), output)
+    # Finally stream everything back:
+    return StreamingResponse(**response_info)
+
 
 @router.get('/services/utils/mission_list', response_class=JSONResponse)
 async def query_mission_list(platform: str | None = None):

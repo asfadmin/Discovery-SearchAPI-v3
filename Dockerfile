@@ -4,12 +4,15 @@ FROM public.ecr.aws/lambda/python:3.10
 WORKDIR ${LAMBDA_TASK_ROOT}
 
 ### GENERIC INSTALLS:
-# Install the function's dependencies using file requirements.txt
-# from your project folder.
-COPY SearchAPI/requirements.txt  .
-# Setup wheel first so it can be used for the rest of the installs:
+# System installs first so they're cached:
+RUN yum install -y git
 RUN  python3 -m pip install -U --no-cache-dir wheel
+# Now add/install our files:
+COPY SearchAPI/requirements.txt  .
 RUN  python3 -m pip install -U --no-cache-dir -r requirements.txt
+COPY Discovery-asf_search ./Discovery-asf_search
+RUN  python3 -m pip install -U --no-cache-dir ./Discovery-asf_search
+
 
 ### OUR FILES:
 # Install our SearchAPI
