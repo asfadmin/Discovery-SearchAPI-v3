@@ -1,10 +1,10 @@
-name: Merged to Stable
+name: Merged to Production
 
 on:
   pull_request:
     types: [closed]
     branches:
-      - stable
+      - prod
 
 jobs:
   OpenRequest:
