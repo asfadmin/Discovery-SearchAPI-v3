@@ -8,7 +8,7 @@ import asf_search as asf
 from SearchAPI import api_logger
 
 def string_to_range(v: str) -> tuple:
-    api_logger.debug(f"string_to_range({v})")
+    # api_logger.debug(f"string_to_range({v})")
     try:
         v = v.replace(' ', '')
         m = re.search(r'^(-?\d+(\.\d*)?)-(-?\d+(\.\d*)?)$', v)
@@ -21,48 +21,42 @@ def string_to_range(v: str) -> tuple:
             a = a[0]
     except ValueError as exc:
         raise ValueError(f'Invalid range: {exc}') from exc
-    api_logger.debug(f"string_to_range returning({v})")
+    # api_logger.debug(f"string_to_range returning({v})")
     return a
 
 def string_to_list(v: str) -> list:
-    api_logger.debug(f"string_to_list({v})")
     v = v.replace(" ", "")
     v = v.split(",")
-    api_logger.debug(f"string_to_list returning({v})")
     return v
 
 def parse_number_or_range(v: str):
-    api_logger.debug(f"parse_number_or_range({v})")
     m = re.search(r'^(-?\d+(\.\d*)?)$', v)
     # If it's a digit:
     if m:
-        api_logger.debug(f"parse_number_or_range returning digit({v})")
         return v
     # Else it's a range:
-    api_logger.debug(f"parse_number_or_range returning range({v})")
     return string_to_range(v)
 
 
 
 def string_to_num_or_range_list(v: str):
-    api_logger.debug(f"string_to_num_or_range_list({v})")
     v_list = string_to_list(v)
     v_list = [parse_number_or_range(i) for i in v_list]
-    api_logger.debug(f"string_to_num_or_range_list returning({v_list})")
     return v_list
 
 string_to_obj_map = {
     # Range only:
-    asf.validators.parse_date_range: string_to_range,
-    asf.validators.parse_int_range: string_to_range,
-    asf.validators.parse_float_range: string_to_range,
+    asf.validators.parse_date_range:            string_to_range,
+    asf.validators.parse_int_range:             string_to_range,
+    asf.validators.parse_float_range:           string_to_range,
     # List only:
-    asf.validators.parse_string_list: string_to_list,
-    asf.validators.parse_int_list: string_to_list,
-    asf.validators.parse_float_list: string_to_list,
+    asf.validators.parse_string_list:           string_to_list,
+    asf.validators.parse_int_list:              string_to_list,
+    asf.validators.parse_float_list:            string_to_list,
+    asf.validators.parse_circle:                string_to_list,
     # Number or Range-list:
-    asf.validators.parse_int_or_range_list: string_to_num_or_range_list,
-    asf.validators.parse_float_or_range_list: string_to_num_or_range_list,
+    asf.validators.parse_int_or_range_list:     string_to_num_or_range_list,
+    asf.validators.parse_float_or_range_list:   string_to_num_or_range_list,
 }
 
 class ValidatorMap(collections.UserDict):
@@ -116,6 +110,8 @@ def get_asf_opts(request: Request) -> asf.ASFSearchOptions:
     params = {k: params[k] for k in params.keys() if k.lower() not in ignore_keys_lower}
 
     try:
-        return asf.ASFSearchOptions(**params)
+        opts = asf.ASFSearchOptions(**params)
     except (KeyError, ValueError) as exc:
         raise HTTPException(detail=repr(exc), status_code=400) from exc
+    api_logger.debug(f"asf.ASFSearchOptions object constructed: {opts})")
+    return opts
