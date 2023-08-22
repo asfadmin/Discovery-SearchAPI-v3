@@ -2,10 +2,10 @@ import requests
 import logging
 import json
 
-from .asf_env import get_config
+from .asf_env import load_config_maturity
 
 def get_cmr_health():
-    cfg = get_config()
+    cfg = load_config_maturity()
     try:
         r = requests.get(cfg['cmr_base'] + cfg['cmr_health'], timeout=10)
         d = {'host': cfg['cmr_base'], 'health': json.loads(r.text)}

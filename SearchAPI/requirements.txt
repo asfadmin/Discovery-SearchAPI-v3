@@ -28,5 +28,5 @@ uvloop==0.17.0
 watchfiles==0.19.0
 websockets==10.4
 
-asf-search==6.3.1
+asf_search==6.6.0
 python-json-logger==2.0.7

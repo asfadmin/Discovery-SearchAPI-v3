@@ -47,15 +47,23 @@ class LoggingRoute(APIRoute):
             try:
                 response: Response = await original_route_handler(request)
             finally:
+                # What to ALWAYS log:
                 duration = time.time() - before
                 api_logger.info(
-                    "Query finished running!",
+                    "Query finished running.",
                     extra={
                         "QueryTime": duration,
                         "QueryParams": dict(request.query_params),
-                        "Endpoint": request.scope['path']
+                        "Endpoint": request.scope['path'],
                     }
                 )
+            # What to log if the query was successful:
+            api_logger.info(
+                "Query was successful!",
+                extra={
+                    "media_type": response.media_type,
+                }
+            )
             # An example on adding headers. IDK if we actually need this one:
             response.headers["X-Response-Time"] = str(duration)
             return response
