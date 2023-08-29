@@ -33,8 +33,14 @@ async def query_params(output: str='jsonlite', opts: asf.ASFSearchOptions = Depe
             headers=constants.DEFAULT_HEADERS
         )
     else:
-        response_info = as_output(asf.search_generator(opts=opts), output)
-        return StreamingResponse(**response_info)
+        try:
+            results = asf.search(opts=opts)
+            response_info = as_output(results, output)
+            return Response(**response_info)
+
+        except asf.ASFSearch4xxError as exc:
+            raise HTTPException(detail=f"Search failed to find results: {exc}", status_code=400) from exc
+
 
 
 @router.post("/services/search/baseline")
@@ -152,5 +158,18 @@ async def handle_error(request: Request, error: HTTPException):
         status_code=error.status_code,
         headers=constants.DEFAULT_HEADERS
     )
+# @app.exception_handler(asf.ASFSearch4xxError)
+# async def handle_error_2(request: Request, error: HTTPException):
+#     response = {
+#         "error": {
+#             "type": "ERROR",
+#             "report": error.detail,
+#         }
+#     }
+#     return JSONResponse(
+#         content=response,
+#         status_code=error.status_code,
+#         headers=constants.DEFAULT_HEADERS
+#     )
 
 app.include_router(router)
