@@ -13,6 +13,19 @@ The application uses several AWS resources, including Lambda functions and an AP
 
 I added the parameters for deploying to `samconfig.toml` to have sensible default params specific to this project. Thus SAM may not behave the same as on other projects!
 
+## Quick start: Develop the app locally
+
+To develop against anything inside the container itself (FastAPI), run these commands to build/start the server:
+
+```bash
+sam build --template-file template-docker.yaml
+sam local start-api --env-vars local-env-vars.conf
+```
+
+If you haven't done so, you'll have to pull the `asf_search` repo to the root of this project (and switch to the `cs.searchapi-v3-edits` branch if it's not merged yet).
+
+Once that branch is merged, we can remove the local install from the dockerfile and delete the local repo. This helps with developing against asf_search until then.
+
 ## Deploy the sample application
 
 To use the SAM CLI, you need the following tools.
