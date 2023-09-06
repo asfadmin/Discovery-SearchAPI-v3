@@ -11,6 +11,8 @@ from . import asf_env
 
 def as_output(results: asf.ASFSearchResults, output: str) -> dict:
     output_format = output.lower()
+    if output_format == "json":
+        output_format = "jsonlite"
 
     # Use a switch statement, so you only load the type of output you need:
     match output_format:
