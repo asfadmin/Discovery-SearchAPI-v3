@@ -21,15 +21,16 @@ router = APIRouter(route_class=log_router.LoggingRoute)
 app = FastAPI()
 
 
-@router.post("/services/search/param")
-@router.get("/services/search/param")
-@router.head("/services/search/param")
+@router.api_route("/services/search/param", methods=["GET", "POST", "HEAD"])
 async def query_params(output: str='jsonlite', opts: asf.ASFSearchOptions = Depends(get_asf_opts)):
+    # TODO: Now that we don't have to use streaming responses, this count
+    #       block could probably be moved to 'as_output', especially
+    #       since it's a switch statement now.
     if output.lower() == 'count':
         return Response(
             content=str(asf.search_count(opts=opts)),
             status_code=200,
-            media_type='text/plain; charset=utf-8',
+            media_type='text/html; charset=utf-8',
             headers=constants.DEFAULT_HEADERS
         )
     else:
@@ -38,14 +39,11 @@ async def query_params(output: str='jsonlite', opts: asf.ASFSearchOptions = Depe
             response_info = as_output(results, output)
             return Response(**response_info)
 
-        except asf.ASFSearch4xxError as exc:
+        except (asf.ASFSearchError, asf.CMRError) as exc:
             raise HTTPException(detail=f"Search failed to find results: {exc}", status_code=400) from exc
 
 
-
-@router.post("/services/search/baseline")
-@router.get("/services/search/baseline")
-@router.head("/services/search/baseline")
+@router.api_route("/services/search/baseline", methods=["GET", "POST", "HEAD"])
 async def query_baseline(request: Request, reference: str, output: str='jsonlite', opts: asf.ASFSearchOptions = Depends(get_asf_opts)):
     if request.method == "HEAD":
         # Need head request separately, so it doesn't do all
@@ -158,18 +156,6 @@ async def handle_error(request: Request, error: HTTPException):
         status_code=error.status_code,
         headers=constants.DEFAULT_HEADERS
     )
-# @app.exception_handler(asf.ASFSearch4xxError)
-# async def handle_error_2(request: Request, error: HTTPException):
-#     response = {
-#         "error": {
-#             "type": "ERROR",
-#             "report": error.detail,
-#         }
-#     }
-#     return JSONResponse(
-#         content=response,
-#         status_code=error.status_code,
-#         headers=constants.DEFAULT_HEADERS
-#     )
+
 
 app.include_router(router)
