@@ -22,6 +22,10 @@ sam build --template-file template-docker.yaml
 sam local start-api --env-vars local-env-vars.conf
 ```
 
+If you haven't done so, you'll have to pull the `asf_search` repo to the root of this project (and switch to the `cs.searchapi-v3-edits` branch if it's not merged yet).
+
+Once that branch is merged, we can remove the local install from the dockerfile and delete the local repo. This helps with developing against asf_search until then.
+
 ## Deploy the sample application
 
 To use the SAM CLI, you need the following tools.
