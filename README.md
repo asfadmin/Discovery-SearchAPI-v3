@@ -13,6 +13,15 @@ The application uses several AWS resources, including Lambda functions and an AP
 
 I added the parameters for deploying to `samconfig.toml` to have sensible default params specific to this project. Thus SAM may not behave the same as on other projects!
 
+## Quick start: Develop the app locally
+
+To develop against anything inside the container itself (FastAPI), run these commands to build/start the server:
+
+```bash
+sam build --template-file template-docker.yaml
+sam local start-api --env-vars local-env-vars.conf
+```
+
 ## Deploy the sample application
 
 To use the SAM CLI, you need the following tools.
