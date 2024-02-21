@@ -115,8 +115,9 @@ def yield_metalink(result_gen: Generator[ASFSearchResults, None, None]):
 
 def yield_download(result_gen: Generator[ASFSearchResults, None, None], filename=None):
     script_url = asf_env.load_config_maturity()['bulk_download_api']
-    [dir(p) for p in result_gen]
-    product_list = [ p['downloadUrl'] for p in result_gen ]
+    product_list = []
+    for page in result_gen:
+        product_list.extend([product.properties['url'] for product in page])
     # Setup the data you're posting with. Optional filename so it lines up with our headers:
     script_data = { 'products': ','.join(product_list) }
     if filename:

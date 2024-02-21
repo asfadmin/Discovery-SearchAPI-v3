@@ -15,6 +15,7 @@ from .asf_opts import get_asf_opts
 from .health import get_cmr_health
 from .output import as_output
 from . import constants
+from shapely import from_wkt
 
 asf.REPORT_ERRORS = False
 router = APIRouter(route_class=log_router.LoggingRoute)
@@ -57,6 +58,15 @@ async def query_baseline(request: Request, reference: str, output: str='jsonlite
     except KeyError as exc:
         raise HTTPException(detail=f"Reference scene not found: {reference}", status_code=400) from exc
     # Figure out the response params:
+    if output.lower() == 'count':
+        stack_opts = ref.get_stack_opts()
+        return Response(
+            content=str(asf.search_count(opts=stack_opts)),
+            status_code=200,
+            media_type='text/html; charset=utf-8',
+            headers=constants.DEFAULT_HEADERS
+        )
+    
     response_info = as_output(ref.stack(opts=opts), output)
     # Finally stream everything back:
     return StreamingResponse(**response_info)
@@ -96,8 +106,10 @@ async def query_mission_list(platform: str | None = None):
 @router.get("/services/utils/wkt", response_class=JSONResponse)
 async def query_wkt_validation(wkt: str):
     wrapped, unwrapped, reports = asf.validate_wkt(wkt)
-
+    
     repairs = [{'type': report.report_type, 'report': report.report} for report in reports]
+    # if asf.CMR.translate.should_use_bbox(from_wkt(wkt)):
+
     response = {
         'wkt': {
             'unwrapped': unwrapped.wkt,
