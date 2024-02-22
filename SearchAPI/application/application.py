@@ -71,9 +71,14 @@ async def query_baseline(request: Request, reference: str, output: str='jsonlite
             headers=constants.DEFAULT_HEADERS
         )
     
-    response_info = as_output(ref.stack(opts=opts), output)
     # Finally stream everything back:
-    return StreamingResponse(**response_info)
+    try:
+        response_info = as_output(ref.stack(opts=opts), output)
+        return Response(**response_info)
+
+    except (asf.ASFSearchError, asf.CMRError) as exc:
+        raise HTTPException(detail=f"Search failed to find results: {exc}", status_code=400) from exc
+
 
 
 @router.get('/services/utils/date', response_class=JSONResponse)

@@ -1,5 +1,5 @@
 import requests
-
+import json
 import asf_search as asf
 from asf_search import ASFSearchResults, ASFSearchOptions, granule_search
 from typing import Generator
@@ -18,7 +18,7 @@ def as_output(results: asf.ASFSearchResults, output: str) -> dict:
     match output_format:
         case 'jsonlite':
             return {
-                'content': get_jsonlite(results),
+                'content': ''.join(results.jsonlite()),
                 'media_type': 'application/json; charset=utf-8',
                 'headers': {
                     **constants.DEFAULT_HEADERS,
@@ -27,7 +27,7 @@ def as_output(results: asf.ASFSearchResults, output: str) -> dict:
             }
         case 'jsonlite2':
             return {
-                'content': get_jsonlite2(results),
+                'content': ''.join(results.jsonlite2()),
                 'media_type': 'application/json; charset=utf-8',
                 'headers': {
                     **constants.DEFAULT_HEADERS,
@@ -36,7 +36,7 @@ def as_output(results: asf.ASFSearchResults, output: str) -> dict:
             }
         case 'geojson':
             return {
-                'content': get_geojson(results),
+                'content': json.dumps(results.geojson(), indent=4),
                 'media_type': 'application/geojson; charset=utf-8',
                 'headers': {
                     **constants.DEFAULT_HEADERS,
@@ -45,7 +45,7 @@ def as_output(results: asf.ASFSearchResults, output: str) -> dict:
             }
         case 'csv':
             return {
-                'content': get_csv(results),
+                'content': ''.join(results.csv()),
                 'media_type': 'text/csv; charset=utf-8',
                 'headers': {
                     **constants.DEFAULT_HEADERS,
@@ -54,7 +54,7 @@ def as_output(results: asf.ASFSearchResults, output: str) -> dict:
             }
         case 'kml':
             return {
-                'content': get_kml(results),
+                'content': ''.join(results.kml()),
                 'media_type': 'application/vnd.google-earth.kml+xml; charset=utf-8',
                 'headers': {
                     **constants.DEFAULT_HEADERS,
@@ -63,7 +63,7 @@ def as_output(results: asf.ASFSearchResults, output: str) -> dict:
             }
         case 'metalink':
             return {
-                'content': get_metalink(results),
+                'content': ''.join(results.metalink()),
                 'media_type': 'application/metalink+xml; charset=utf-8',
                 'headers': {
                     **constants.DEFAULT_HEADERS,
@@ -88,36 +88,15 @@ def as_output(results: asf.ASFSearchResults, output: str) -> dict:
                 status_code=400
             )
 
-def get_jsonlite(results: asf.ASFSearchResults):
-    pages = [i for i in asf.export.results_to_jsonlite(results)]
-    return ''.join(pages)
-
-def get_jsonlite2(results: asf.ASFSearchResults):
-    pages = [i for i in asf.export.jsonlite2.results_to_jsonlite2(results)]
-    return ''.join(pages)
-
-def get_geojson(results: asf.ASFSearchResults):
-    pages = [i for i in asf.export.results_to_geojson(results)]
-    return ''.join(pages)
-
-def get_csv(results: asf.ASFSearchResults):
-    pages = [i for i in asf.export.results_to_csv(results)]
-    return ''.join(pages)
-
-def get_kml(results: asf.ASFSearchResults):
-    pages = [i for i in asf.export.results_to_kml(results)]
-    return ''.join(pages)
-
-def get_metalink(results: asf.ASFSearchResults):
-    pages = [i for i in asf.export.results_to_metalink(results)]
-    return ''.join(pages)
-
 def get_download(results: asf.ASFSearchResults, filename=None):
     # Load basic consts:
     script_url = asf_env.load_config_maturity()['bulk_download_api']
     file_type = asf.FileDownloadType.DEFAULT_FILE
     # Build the url list:
-    url_list = [url for result in results for url in result.get_urls(fileType=file_type)]
+    url_list = []
+    for product in results:
+        url_list.extend(product.get_urls(fileType=file_type))
+    
     # Setup the data you're posting with. Optional filename so it lines up with our headers:
     script_data = { 'products': ','.join(url_list) }
     if filename:
