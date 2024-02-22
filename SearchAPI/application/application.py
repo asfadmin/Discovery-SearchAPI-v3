@@ -49,7 +49,13 @@ async def query_baseline(request: Request, reference: str, output: str='jsonlite
     if request.method == "HEAD":
         # Need head request separately, so it doesn't do all
         # the work to figure out the body
-        metadata = as_output(None, output)
+        if output.lower() == 'count':
+            return Response(
+                status_code=200,
+                media_type='text/html; charset=utf-8',
+                headers=constants.DEFAULT_HEADERS
+            )
+        metadata = as_output(asf.ASFSearchResults([]), output)
         return Response(
             status_code=200,
             headers=metadata["headers"],
