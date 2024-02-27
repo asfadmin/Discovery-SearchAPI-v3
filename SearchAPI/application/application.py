@@ -23,7 +23,7 @@ app = FastAPI()
 
 
 @router.api_route("/services/search/param", methods=["GET", "POST", "HEAD"])
-async def query_params(output: str='jsonlite', opts: asf.ASFSearchOptions = Depends(get_asf_opts)):
+async def query_params(output: str='metalink', opts: asf.ASFSearchOptions = Depends(get_asf_opts)):
     # TODO: Now that we don't have to use streaming responses, this count
     #       block could probably be moved to 'as_output', especially
     #       since it's a switch statement now.
@@ -45,7 +45,22 @@ async def query_params(output: str='jsonlite', opts: asf.ASFSearchOptions = Depe
 
 
 @router.api_route("/services/search/baseline", methods=["GET", "POST", "HEAD"])
-async def query_baseline(request: Request, reference: str, output: str='jsonlite', opts: asf.ASFSearchOptions = Depends(get_asf_opts)):
+async def query_baseline(request: Request, reference: str, output: str='metalink', opts: asf.ASFSearchOptions = Depends(get_asf_opts)):
+    opts.maxResults = None
+    # Load the reference scene:
+    try:
+        reference_product = asf.granule_search(granule_list=[reference], opts=opts)[0]
+    except (KeyError, IndexError) as exc:
+        raise HTTPException(detail=f"Reference scene not found: {reference}", status_code=400) from exc
+    
+    try:
+        if reference_product.get_stack_opts() is None:
+            reference_product = asf.ASFStackableProduct(args={'umm': reference_product.umm, 'meta': reference_product.meta}, session=reference_product.session)
+        if not reference_product.has_baseline() or not reference_product.is_valid_reference():
+            raise asf.exceptions.ASFBaselineError(f"Requested reference scene has no baseline")
+    except (asf.exceptions.ASFBaselineError, ValueError) as exc:
+        raise HTTPException(detail=f"Search failed to find results: {exc}", status_code=400)
+    
     if request.method == "HEAD":
         # Need head request separately, so it doesn't do all
         # the work to figure out the body
@@ -61,15 +76,9 @@ async def query_baseline(request: Request, reference: str, output: str='jsonlite
             headers=metadata["headers"],
             media_type=metadata["media_type"]
         )
-    opts.maxResults = None
-    # Load the reference scene:
-    try:
-        ref = asf.granule_search(granule_list=[reference], opts=opts)[0]
-    except KeyError as exc:
-        raise HTTPException(detail=f"Reference scene not found: {reference}", status_code=400) from exc
     # Figure out the response params:
     if output.lower() == 'count':
-        stack_opts = ref.get_stack_opts()
+        stack_opts = reference_product.get_stack_opts()
         return Response(
             content=str(asf.search_count(opts=stack_opts)),
             status_code=200,
@@ -79,10 +88,10 @@ async def query_baseline(request: Request, reference: str, output: str='jsonlite
     
     # Finally stream everything back:
     try:
-        response_info = as_output(ref.stack(opts=opts), output)
+        response_info = as_output(reference_product.stack(opts=opts), output)
         return Response(**response_info)
 
-    except (asf.ASFSearchError, asf.CMRError) as exc:
+    except (asf.ASFSearchError, asf.CMRError, ValueError) as exc:
         raise HTTPException(detail=f"Search failed to find results: {exc}", status_code=400) from exc
 
 
