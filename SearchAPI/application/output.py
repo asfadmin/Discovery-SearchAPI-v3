@@ -9,6 +9,8 @@ from datetime import datetime
 from . import constants
 from . import asf_env
 
+from SearchAPI import api_logger
+
 def as_output(results: asf.ASFSearchResults, output: str) -> dict:
     output_format = output.lower()
     if output_format == "json":

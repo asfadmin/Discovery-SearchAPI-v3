@@ -5,9 +5,9 @@ from typing import Callable
 
 from fastapi import HTTPException, Request
 import asf_search as asf
+from .asf_env import load_config_maturity
 
 from SearchAPI import api_logger
-
 def string_to_range(v: str) -> tuple:
     # api_logger.debug(f"string_to_range({v})")
     try:
@@ -38,12 +38,11 @@ def parse_number_or_range(v: str):
     # Else it's a range:
     return string_to_range(v)
 
-
-
 def string_to_num_or_range_list(v: str):
     v_list = string_to_list(v)
     v_list = [parse_number_or_range(i) for i in v_list]
     return v_list
+
 
 string_to_obj_map = {
     # Range only:
@@ -54,7 +53,9 @@ string_to_obj_map = {
     asf.validators.parse_string_list:           string_to_list,
     asf.validators.parse_int_list:              string_to_list,
     asf.validators.parse_float_list:            string_to_list,
-    # asf.validators.parse_circle:                string_to_list,
+    asf.validators.parse_circle:                string_to_list,
+    asf.validators.parse_linestring:            string_to_list,
+    asf.validators.parse_point:                 string_to_list,
     # Number or Range-list:
     asf.validators.parse_int_or_range_list:     string_to_num_or_range_list,
     asf.validators.parse_float_or_range_list:   string_to_num_or_range_list,
@@ -75,6 +76,10 @@ class ValidatorMap(collections.UserDict):
     FLIGHT_DIRECTIONS = {
         'A': 'ASCENDING',
         'D': 'DESCENDING'
+    }
+    LOOK_DIRECTIONS = {
+        'R': 'R',
+        'L': 'L'
     }
     """
     legacy SearchAPI keys that have new names in asf-search
@@ -125,12 +130,21 @@ def get_asf_opts(request: Request) -> asf.ASFSearchOptions:
 
     ### SearchOpts doesn't know how to handle these keys, but other methods need them
     # (We still want to throw on any UNKNOWN keys)
-    ignore_keys_lower = ["output", "reference", "maturity"]
+    ignore_keys_lower = ["output", "reference", "maturity", "cmr_keywords"]
     params = {k: params[k] for k in params.keys() if k.lower() not in ignore_keys_lower}
     
-    if flight_direction := params.get('flightDirection') is not None:
+    if (flight_direction := params.get('flightDirection')) is not None:
         if isinstance(flight_direction, str) and len(flight_direction):
-            params['flightDirection'] = ValidatorMap.FLIGHT_DIRECTIONS.get(flight_direction[0], flight_direction)
+            params['flightDirection'] = ValidatorMap.FLIGHT_DIRECTIONS.get(flight_direction.upper()[0], flight_direction)
+
+    if (lookDirection := params.get('lookDirection')) is not None:
+        if isinstance(lookDirection, str) and len(lookDirection):
+            params['lookDirection'] = ValidatorMap.LOOK_DIRECTIONS.get(lookDirection.upper()[0], lookDirection)
+    
+    maturity = request.query_params.get('maturity')
+
+    config = load_config_maturity(maturity=maturity)
+    params['host'] = config['cmr_base']
     try:
         opts = asf.ASFSearchOptions(**params)
     except (KeyError, ValueError) as exc:
