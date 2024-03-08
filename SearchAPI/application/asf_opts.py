@@ -4,6 +4,7 @@ import re
 from typing import Callable
 
 from fastapi import HTTPException, Request
+from pydantic import BaseModel, Field
 import asf_search as asf
 from .asf_env import load_config_maturity
 
@@ -108,7 +109,13 @@ class ValidatorMap(collections.UserDict):
 
 def get_asf_opts(request: Request) -> asf.ASFSearchOptions:
     params = dict(request.query_params)
-
+    try:
+        for param, value in params.items():
+            if len(value) == 0:
+                raise ValueError(f'Empty value passed to search keyword "{param}"')
+    except ValueError as exc:
+        raise HTTPException(detail=repr(exc), status_code=400) from exc
+    
     ### If your key is in validator map, make it match case sensitivity:
     validatorMap = ValidatorMap()
     params = validatorMap.alias_params(params)
@@ -125,29 +132,57 @@ def get_asf_opts(request: Request) -> asf.ASFSearchOptions:
         if k in validatorMap:
             validator_method = validatorMap[k]
             # If the method is in our map, de-stringify it:
-            if validator_method in string_to_obj_map:
-                params[k] = string_to_obj_map[validator_method](v)
-
+            try:
+                if validator_method in string_to_obj_map:
+                    params[k] = string_to_obj_map[validator_method](v)
+            except ValueError as exc:
+                raise HTTPException(detail=repr(exc), status_code=400) from exc
+    
     ### SearchOpts doesn't know how to handle these keys, but other methods need them
     # (We still want to throw on any UNKNOWN keys)
     ignore_keys_lower = ["output", "reference", "maturity", "cmr_keywords"]
     params = {k: params[k] for k in params.keys() if k.lower() not in ignore_keys_lower}
-    
-    if (flight_direction := params.get('flightDirection')) is not None:
-        if isinstance(flight_direction, str) and len(flight_direction):
-            params['flightDirection'] = ValidatorMap.FLIGHT_DIRECTIONS.get(flight_direction.upper()[0], flight_direction)
 
-    if (lookDirection := params.get('lookDirection')) is not None:
-        if isinstance(lookDirection, str) and len(lookDirection):
-            params['lookDirection'] = ValidatorMap.LOOK_DIRECTIONS.get(lookDirection.upper()[0], lookDirection)
+    try:
+        if "granule_list" in params or "product_list" in params:
+            if len([param for param in params if param not in ["collections", "maxResults"]]) > 1:
+                raise ValueError(f'Cannot use search keywords "granule_list/product_list" with other search params')
+        
+        if (flight_direction := params.get('flightDirection')) is not None:
+            if isinstance(flight_direction, str) and len(flight_direction):
+                params['flightDirection'] = ValidatorMap.FLIGHT_DIRECTIONS.get(flight_direction.upper()[0], None)
+                if params['flightDirection'] is None:
+                    raise ValueError(f'Invalid value passed to search keyword "flightDirection": "{flight_direction}". Valid directions are "ASCENDING" or "DESCENDING"')
+        if (lookDirection := params.get('lookDirection')) is not None:
+            if isinstance(lookDirection, str) and len(lookDirection):
+                params['lookDirection'] = ValidatorMap.LOOK_DIRECTIONS.get(lookDirection.upper()[0], None)
+                if params['lookDirection'] is None:
+                    raise ValueError(f'Invalid value passed to search keyword "lookDirection": "{lookDirection}". Valid directions are "R" or "L"')
+    except ValueError as exc:
+        raise HTTPException(detail=repr(exc), status_code=400) from exc 
     
     maturity = request.query_params.get('maturity')
 
     config = load_config_maturity(maturity=maturity)
     params['host'] = config['cmr_base']
+    
     try:
         opts = asf.ASFSearchOptions(**params)
+
+        # we are no longer allowing unbounded searches
+        if opts.granule_list is None and opts.product_list is None:
+            if opts.maxResults is None:
+                opts.maxResults = asf.search_count(opts=opts)
+            elif opts.maxResults <= 0:
+                raise ValueError(f'Search keyword "maxResults" must be greater than 0')
+        
+            opts.maxResults = min(1500, opts.maxResults)
+    
     except (KeyError, ValueError) as exc:
         raise HTTPException(detail=repr(exc), status_code=400) from exc
     api_logger.debug(f"asf.ASFSearchOptions object constructed: {opts})")
     return opts
+
+
+class WKTModel(BaseModel):
+    wkt: str = Field(default='')

@@ -3,15 +3,17 @@ import json
 import logging
 import os
 import dateparser
+from pydantic import BaseModel
 
 import asf_search as asf
-from fastapi import Depends, FastAPI, Request, HTTPException, APIRouter
+from fastapi import Depends, FastAPI, Request, HTTPException, APIRouter, UploadFile
 from fastapi.responses import Response, JSONResponse, StreamingResponse
 
 from SearchAPI import api_logger, log_router
 
+# from WKTUtils import FilesToWKT
 from .asf_env import load_config_maturity
-from .asf_opts import get_asf_opts
+from .asf_opts import WKTModel, get_asf_opts
 from .health import get_cmr_health
 from .output import as_output
 from . import constants
@@ -40,7 +42,7 @@ async def query_params(output: str='metalink', opts: asf.ASFSearchOptions = Depe
             response_info = as_output(results, output)
             return Response(**response_info)
 
-        except (asf.ASFSearchError, asf.CMRError) as exc:
+        except (asf.ASFSearchError, asf.CMRError, ValueError) as exc:
             raise HTTPException(detail=f"Search failed to find results: {exc}", status_code=400) from exc
 
 
@@ -50,7 +52,7 @@ async def query_baseline(request: Request, reference: str, output: str='metalink
     # Load the reference scene:
     try:
         reference_product = asf.granule_search(granule_list=[reference], opts=opts)[0]
-    except (KeyError, IndexError) as exc:
+    except (KeyError, IndexError, ValueError) as exc:
         raise HTTPException(detail=f"Reference scene not found: {reference}", status_code=400) from exc
     
     try:
@@ -125,14 +127,22 @@ async def query_mission_list(platform: str | None = None):
         status_code=200,
         headers=constants.DEFAULT_HEADERS
     )
-
-
-@router.get("/services/utils/wkt", response_class=JSONResponse)
-async def query_wkt_validation(wkt: str):
-    wrapped, unwrapped, reports = asf.validate_wkt(wkt)
     
-    repairs = [{'type': report.report_type, 'report': report.report} for report in reports]
-    # if asf.CMR.translate.should_use_bbox(from_wkt(wkt)):
+@router.api_route("/services/utils/wkt", methods=["GET", "POST"])
+async def query_wkt_validation(body: WKTModel, wkt: str=''): # = Depends()): #, wkt: str | None = None):
+    if len(wkt) == 0:
+       wkt = body.wkt
+    # params = dict(request.query_params)
+    # try:
+    #     if params.get('wkt') is not None:
+    #         wkt = params['wkt']
+        # else:
+        #     raise KeyError(f'Missing required key, "wkt" in request body')
+    try:
+        wrapped, unwrapped, reports = asf.validate_wkt(wkt)
+        repairs = [{'type': report.report_type, 'report': report.report} for report in reports]
+    except Exception as exc:
+        raise HTTPException(detail=f"Failed to validate wkt: {exc}", status_code=400) from exc
 
     response = {
         'wkt': {
@@ -145,8 +155,15 @@ async def query_wkt_validation(wkt: str):
     return JSONResponse(
         content=response,
         status_code=200,
+        media_type = 'application/json; charset=utf-8',
         headers=constants.DEFAULT_HEADERS
     )
+
+@router.post('/services/utils/files_to_wkt')
+async def file_to_wkt(file: UploadFile):
+    # file.content_type
+    # data = FilesToWKT(file).getWKT()
+    pass
 
 @router.get('/', response_class=JSONResponse)
 @router.get('/health', response_class=JSONResponse)
