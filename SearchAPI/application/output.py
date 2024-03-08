@@ -39,7 +39,7 @@ def as_output(results: asf.ASFSearchResults, output: str) -> dict:
         case 'geojson':
             return {
                 'content': json.dumps(results.geojson(), indent=4),
-                'media_type': 'application/geojson; charset=utf-8',
+                'media_type': 'application/geo+json; charset=utf-8',
                 'headers': {
                     **constants.DEFAULT_HEADERS,
                     'Content-Disposition': f"attachment; filename={make_filename('geojson')}",

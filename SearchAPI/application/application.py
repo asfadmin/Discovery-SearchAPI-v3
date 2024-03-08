@@ -11,7 +11,7 @@ from fastapi.responses import Response, JSONResponse, StreamingResponse
 
 from SearchAPI import api_logger, log_router
 
-# from WKTUtils import FilesToWKT
+from WKTUtils import FilesToWKT
 from .asf_env import load_config_maturity
 from .asf_opts import WKTModel, get_asf_opts
 from .health import get_cmr_health
@@ -138,32 +138,38 @@ async def query_wkt_validation(body: WKTModel, wkt: str=''): # = Depends()): #, 
     #         wkt = params['wkt']
         # else:
         #     raise KeyError(f'Missing required key, "wkt" in request body')
-    try:
-        wrapped, unwrapped, reports = asf.validate_wkt(wkt)
-        repairs = [{'type': report.report_type, 'report': report.report} for report in reports]
-    except Exception as exc:
-        raise HTTPException(detail=f"Failed to validate wkt: {exc}", status_code=400) from exc
+    
 
-    response = {
-        'wkt': {
-            'unwrapped': unwrapped.wkt,
-            'wrapped': wrapped.wkt
-        },
-        'repairs':  repairs
-    }
-
-    return JSONResponse(
-        content=response,
+    return Response(
+        content=json.dumps(validate_wkt(wkt)),
         status_code=200,
         media_type = 'application/json; charset=utf-8',
         headers=constants.DEFAULT_HEADERS
     )
 
 @router.post('/services/utils/files_to_wkt')
-async def file_to_wkt(file: UploadFile):
+async def file_to_wkt(files: UploadFile):
     # file.content_type
-    # data = FilesToWKT(file).getWKT()
-    pass
+    api_logger.debug(f"Uploaded file: {files.filename}\n{files.content_type}\n")
+    files.file.filename = files.filename
+    data = FilesToWKT.filesToWKT([files.file]).getWKT()
+    api_logger.debug(f"{data}")
+    return validate_wkt(data["parsed wkt"])
+
+def validate_wkt(wkt: str):
+    try:
+        wrapped, unwrapped, reports = asf.validate_wkt(wkt)
+        repairs = [{'type': report.report_type, 'report': report.report} for report in reports]
+    except Exception as exc:
+        raise HTTPException(detail=f"Failed to validate wkt: {exc}", status_code=400) from exc
+
+    return {
+        'wkt': {
+            'unwrapped': unwrapped.wkt,
+            'wrapped': wrapped.wkt
+        },
+        'repairs':  repairs
+    }
 
 @router.get('/', response_class=JSONResponse)
 @router.get('/health', response_class=JSONResponse)
