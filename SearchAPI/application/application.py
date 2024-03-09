@@ -132,13 +132,6 @@ async def query_mission_list(platform: str | None = None):
 async def query_wkt_validation(body: WKTModel, wkt: str=''): # = Depends()): #, wkt: str | None = None):
     if len(wkt) == 0:
        wkt = body.wkt
-    # params = dict(request.query_params)
-    # try:
-    #     if params.get('wkt') is not None:
-    #         wkt = params['wkt']
-        # else:
-        #     raise KeyError(f'Missing required key, "wkt" in request body')
-    
 
     return Response(
         content=json.dumps(validate_wkt(wkt)),
@@ -154,7 +147,12 @@ async def file_to_wkt(files: UploadFile):
     files.file.filename = files.filename
     data = FilesToWKT.filesToWKT([files.file]).getWKT()
     api_logger.debug(f"{data}")
-    return validate_wkt(data["parsed wkt"])
+    return JSONResponse(content={
+        ** data,
+        ** validate_wkt(data["parsed wkt"])},
+        status_code=200,
+        headers=constants.DEFAULT_HEADERS
+    )
 
 def validate_wkt(wkt: str):
     try:
