@@ -141,12 +141,12 @@ async def query_wkt_validation(body: WKTModel, wkt: str=''): # = Depends()): #, 
     )
 
 @router.post('/services/utils/files_to_wkt')
-async def file_to_wkt(files: UploadFile):
-    # file.content_type
-    api_logger.debug(f"Uploaded file: {files.filename}\n{files.content_type}\n")
-    files.file.filename = files.filename
-    data = FilesToWKT.filesToWKT([files.file]).getWKT()
-    api_logger.debug(f"{data}")
+async def file_to_wkt(files: list[UploadFile]):
+    for file in files:
+        file.file.filename = file.filename
+    
+    data = FilesToWKT.filesToWKT([file.file for file in files]).getWKT()
+
     return JSONResponse(content={
         ** data,
         ** validate_wkt(data["parsed wkt"])},
