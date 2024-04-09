@@ -140,7 +140,7 @@ def get_asf_opts(request: Request) -> asf.ASFSearchOptions:
     
     ### SearchOpts doesn't know how to handle these keys, but other methods need them
     # (We still want to throw on any UNKNOWN keys)
-    ignore_keys_lower = ["output", "reference", "maturity", "cmr_keywords"]
+    ignore_keys_lower = ["output", "reference", "maturity", "cmr_keywords", "cmr_token"]
     params = {k: params[k] for k in params.keys() if k.lower() not in ignore_keys_lower}
 
     try:
@@ -162,10 +162,16 @@ def get_asf_opts(request: Request) -> asf.ASFSearchOptions:
         raise HTTPException(detail=repr(exc), status_code=400) from exc 
     
     maturity = request.query_params.get('maturity')
+    
 
     config = load_config_maturity(maturity=maturity)
     params['host'] = config['cmr_base']
     
+    # assumes passed token is valid. May want to consider running auth_with_token(), or try passing request cookiejar??
+    if (token := request.query_params.get('cmr_token')):
+        session = asf.ASFSession()
+        session.headers.update({'Authorization': 'Bearer {0}'.format(token)})
+        params['session'] =  session
     try:
         opts = asf.ASFSearchOptions(**params)
 
