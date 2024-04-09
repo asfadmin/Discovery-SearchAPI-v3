@@ -11,7 +11,6 @@ from fastapi.responses import Response, JSONResponse, StreamingResponse
 
 from SearchAPI import api_logger, log_router
 
-from WKTUtils import FilesToWKT
 from .asf_env import load_config_maturity
 from .asf_opts import WKTModel, get_asf_opts
 from .health import get_cmr_health
@@ -145,7 +144,7 @@ async def file_to_wkt(files: list[UploadFile]):
     for file in files:
         file.file.filename = file.filename
     
-    data = FilesToWKT.filesToWKT([file.file for file in files]).getWKT()
+    data = asf.filesToWKT([file.file for file in files]).getWKT()
 
     return JSONResponse(content={
         ** data,

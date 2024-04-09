@@ -12,8 +12,6 @@ COPY SearchAPI/requirements.txt .
 RUN  python3 -m pip install -U --no-cache-dir -r requirements.txt
 COPY Discovery-asf_search ./Discovery-asf_search
 RUN  python3 -m pip install -U --no-cache-dir ./Discovery-asf_search
-COPY Discovery-WKTUtils ./Discovery-WKTUtils
-RUN  python3 -m pip install -U --no-cache-dir ./Discovery-WKTUtils
 
 ### OUR FILES:
 # Install our SearchAPI
