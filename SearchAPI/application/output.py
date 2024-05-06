@@ -10,6 +10,7 @@ from . import constants
 from . import asf_env
 
 from SearchAPI import api_logger
+from tenacity import retry, stop_after_attempt
 
 def as_output(results: asf.ASFSearchResults, output: str) -> dict:
     output_format = output.lower()
@@ -91,20 +92,33 @@ def as_output(results: asf.ASFSearchResults, output: str) -> dict:
             )
 
 def get_download(results: asf.ASFSearchResults, filename=None):
+    if len(results) == 0:
+        return
     # Load basic consts:
     script_url = asf_env.load_config_maturity()['bulk_download_api']
     file_type = asf.FileDownloadType.DEFAULT_FILE
+    
     # Build the url list:
     url_list = []
     for product in results:
         url_list.extend(product.get_urls(fileType=file_type))
+
+    product_urls_str = ','.join(url_list)
+
+    return _bulk_download_query(url=script_url, product_urls_str=product_urls_str, filename=filename )
     
-    # Setup the data you're posting with. Optional filename so it lines up with our headers:
-    script_data = { 'products': ','.join(url_list) }
-    if filename:
-        script_data['filename'] = filename
-    # Finally make the request:
-    script_request = requests.post( script_url, data=script_data, timeout=30 )
+
+@retry(stop=stop_after_attempt(3),reraise=True)
+def _bulk_download_query(url: str, product_urls_str: str, filename: str = None):
+    data = { 'products': product_urls_str }
+
+    # Optional filename so it lines up with our headers:
+    if filename is not None:
+        data['filename'] = filename
+
+    script_request = requests.post(url=url, data=data, timeout=30 )
+    script_request.raise_for_status()
+
     return script_request.text
 
 def make_filename(suffix):
