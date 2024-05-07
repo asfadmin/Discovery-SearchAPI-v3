@@ -3,17 +3,17 @@ import json
 import logging
 import os
 import dateparser
-from pydantic import BaseModel
 
 import asf_search as asf
 from fastapi import Depends, FastAPI, Request, HTTPException, APIRouter, UploadFile
-from fastapi.responses import Response, JSONResponse, StreamingResponse
+from fastapi.responses import Response, JSONResponse
 
-from SearchAPI import api_logger, log_router
+from SearchAPI import log_router
 
 from .asf_env import load_config_maturity
-from .asf_opts import WKTModel, get_asf_opts
+from .asf_opts import process_baseline_request, process_search_request
 from .health import get_cmr_health
+from .models import BaselineSearchOptsModel, SearchOptsModel, WKTModel
 from .output import as_output
 from . import constants
 from shapely import from_wkt
@@ -24,10 +24,13 @@ app = FastAPI()
 
 
 @router.api_route("/services/search/param", methods=["GET", "POST", "HEAD"])
-async def query_params(output: str='metalink', opts: asf.ASFSearchOptions = Depends(get_asf_opts)):
+async def query_params(searchOptions: SearchOptsModel = Depends(process_search_request)):
     # TODO: Now that we don't have to use streaming responses, this count
     #       block could probably be moved to 'as_output', especially
     #       since it's a switch statement now.
+    output = searchOptions.output
+    opts = searchOptions.opts
+    
     if output.lower() == 'count':
         return Response(
             content=str(asf.search_count(opts=opts)),
@@ -46,8 +49,12 @@ async def query_params(output: str='metalink', opts: asf.ASFSearchOptions = Depe
 
 
 @router.api_route("/services/search/baseline", methods=["GET", "POST", "HEAD"])
-async def query_baseline(request: Request, reference: str, output: str='metalink', opts: asf.ASFSearchOptions = Depends(get_asf_opts)):
+async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(process_baseline_request)):
+    opts = searchOptions.opts
     opts.maxResults = None
+    output = searchOptions.output
+    reference = searchOptions.reference
+    request_method = searchOptions.request_method
     # Load the reference scene:
     try:
         reference_product = asf.granule_search(granule_list=[reference], opts=opts)[0]
@@ -62,7 +69,7 @@ async def query_baseline(request: Request, reference: str, output: str='metalink
     except (asf.exceptions.ASFBaselineError, ValueError) as exc:
         raise HTTPException(detail=f"Search failed to find results: {exc}", status_code=400)
     
-    if request.method == "HEAD":
+    if request_method == "HEAD":
         # Need head request separately, so it doesn't do all
         # the work to figure out the body
         if output.lower() == 'count':
