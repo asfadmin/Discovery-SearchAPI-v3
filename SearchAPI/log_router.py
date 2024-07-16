@@ -40,7 +40,9 @@ class LoggingRoute(APIRoute):
 
         async def custom_route_handler(request: Request) -> Response:
             # Grab the AWS UUID and set it for every log:
-            self.aws_request_id = request.scope["aws.context"].aws_request_id
+            context = request.scope.get("aws.context")
+            if context is not None:
+                self.aws_request_id = context.aws_request_id
             logging.setLogRecordFactory(self.record_factory)
             # Time the request itself:
             before = time.time()

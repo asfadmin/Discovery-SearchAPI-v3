@@ -2,9 +2,9 @@ default:
     # If the --api param doesn't match anything in this list, assume it IS a url, and load these params here:
     bulk_download_api: https://bulk-download.asf.alaska.edu
     analytics_id: None
-    cmr_base: https://cmr.uat.earthdata.nasa.gov
+    cmr_base: cmr.uat.earthdata.nasa.gov
     cmr_health: /search/health
-    cmr_api: /search/granules.echo10
+    cmr_api: /search/granules.umm_json
     cmr_collections: /search/collections
     cmr_page_size: 250
     cmr_headers:
@@ -16,9 +16,9 @@ local:
     bulk_download_api: https://bulk-download.asf.alaska.edu
     analytics_id: None
     this_api: http://127.0.0.1:8080
-    cmr_base: https://cmr.uat.earthdata.nasa.gov
+    cmr_base: cmr.uat.earthdata.nasa.gov
     cmr_health: /search/health
-    cmr_api: /search/granules.echo10
+    cmr_api: /search/granules.umm_json
     cmr_collections: /search/collections
     cmr_page_size: 250
     cmr_headers:
@@ -30,9 +30,9 @@ devel:
     bulk_download_api: https://bulk-download-dev.asf.alaska.edu
     analytics_id: UA-118881300-4
     this_api: https://api-devel.asf.alaska.edu
-    cmr_base: https://cmr.uat.earthdata.nasa.gov
+    cmr_base: cmr.uat.earthdata.nasa.gov
     cmr_health: /search/health
-    cmr_api: /search/granules.echo10
+    cmr_api: /search/granules.umm_json
     cmr_collections: /search/collections
     cmr_page_size: 1000
     cmr_headers:
@@ -44,9 +44,9 @@ devel-beanstalk:
     bulk_download_api: https://bulk-download-dev.asf.alaska.edu
     analytics_id: UA-118881300-4
     this_api: https://api-devel-beanstalk.asf.alaska.edu
-    cmr_base: https://cmr.uat.earthdata.nasa.gov
+    cmr_base: cmr.uat.earthdata.nasa.gov
     cmr_health: /search/health
-    cmr_api: /search/granules.echo10
+    cmr_api: /search/granules.umm_json
     cmr_collections: /search/collections
     cmr_page_size: 250
     cmr_headers:
@@ -58,9 +58,9 @@ test:
     bulk_download_api: https://bulk-download-test.asf.alaska.edu
     analytics_id: UA-118881300-3
     this_api: https://api-test.asf.alaska.edu
-    cmr_base: https://cmr.uat.earthdata.nasa.gov
+    cmr_base: cmr.uat.earthdata.nasa.gov
     cmr_health: /search/health
-    cmr_api: /search/granules.echo10
+    cmr_api: /search/granules.umm_json
     cmr_collections: /search/collections
     cmr_page_size: 1000
     cmr_headers:
@@ -72,9 +72,9 @@ test-beanstalk:
     bulk_download_api: https://bulk-download-test.asf.alaska.edu
     analytics_id: UA-118881300-3
     this_api: https://api-test-beanstalk.asf.alaska.edu
-    cmr_base: https://cmr.uat.earthdata.nasa.gov
+    cmr_base: cmr.uat.earthdata.nasa.gov
     cmr_health: /search/health
-    cmr_api: /search/granules.echo10
+    cmr_api: /search/granules.umm_json
     cmr_collections: /search/collections
     cmr_page_size: 250
     cmr_headers:
@@ -86,9 +86,9 @@ test-staging:
     bulk_download_api: https://bulk-download-test.asf.alaska.edu
     analytics_id: None
     this_api: https://api-test-staging.asf.alaska.edu
-    cmr_base: https://cmr.uat.earthdata.nasa.gov
+    cmr_base: cmr.uat.earthdata.nasa.gov
     cmr_health: /search/health
-    cmr_api: /search/granules.echo10
+    cmr_api: /search/granules.umm_json
     cmr_collections: /search/collections
     cmr_page_size: 250
     cmr_headers:
@@ -100,9 +100,9 @@ prod:
     bulk_download_api: https://bulk-download.asf.alaska.edu
     analytics_id: UA-118881300-2
     this_api: https://api.daac.asf.alaska.edu
-    cmr_base: https://cmr.earthdata.nasa.gov
+    cmr_base: cmr.earthdata.nasa.gov
     cmr_health: /search/health
-    cmr_api: /search/granules.echo10
+    cmr_api: /search/granules.umm_json
     cmr_collections: /search/collections
     cmr_page_size: 250
     cmr_headers:
@@ -114,9 +114,9 @@ prod-private:
     bulk_download_api: https://bulk-download.asf.alaska.edu
     analytics_id: UA-118881300-5
     this_api: https://api-prod-private.asf.alaska.edu
-    cmr_base: https://cmr.earthdata.nasa.gov
+    cmr_base: cmr.earthdata.nasa.gov
     cmr_health: /search/health
-    cmr_api: /search/granules.echo10
+    cmr_api: /search/granules.umm_json
     cmr_collections: /search/collections
     cmr_page_size: 1000
     cmr_headers:
@@ -128,9 +128,9 @@ prod-staging:
     bulk_download_api: https://bulk-download-test.asf.alaska.edu
     analytics_id: None
     this_api: https://api-prod-private-staging.asf.alaska.edu
-    cmr_base: https://cmr.earthdata.nasa.gov
+    cmr_base: cmr.earthdata.nasa.gov
     cmr_health: /search/health
-    cmr_api: /search/granules.echo10
+    cmr_api: /search/granules.umm_json
     cmr_collections: /search/collections
     cmr_page_size: 1000
     cmr_headers:
