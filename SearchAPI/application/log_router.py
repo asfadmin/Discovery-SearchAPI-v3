@@ -1,4 +1,3 @@
-
 from typing import Callable
 import time
 import logging
@@ -6,7 +5,7 @@ import logging
 from fastapi import Response, Request
 from fastapi.routing import APIRoute
 
-from . import api_logger
+from logger import api_logger
 
 
 class LoggingRoute(APIRoute):
