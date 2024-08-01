@@ -5,6 +5,7 @@ from typing import Union
 from fastapi import HTTPException, Request
 from pydantic import ValidationError
 from application.models import BaselineSearchOptsModel, SearchOptsModel
+
 import asf_search as asf
 
 from application.asf_env import load_config_maturity
@@ -95,7 +96,7 @@ class ValidatorMap(collections.UserDict):
 
     def __init__(self):
         # This sets self.data:
-        super().__init__(asf.validator_map.validator_map)
+        super().__init__(asf.validator_map)
         # value is the normalized key, key is the lower-key
         self.lower_lookup = {k.lower(): k for k in self.data.keys()}
 
@@ -254,4 +255,5 @@ def get_asf_opts(params: dict) -> asf.ASFSearchOptions:
     except (KeyError, ValueError) as exc:
         raise HTTPException(detail=repr(exc), status_code=400) from exc
     api_logger.debug(f"asf.ASFSearchOptions object constructed: {opts})")
+
     return opts

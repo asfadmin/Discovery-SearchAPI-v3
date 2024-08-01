@@ -30,3 +30,9 @@ mangum
 
 asf_search==7.1.4
 python-json-logger==2.0.7
+
+pyshp
+geopandas
+geomet
+kml2geojson
+defusedxml

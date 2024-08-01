@@ -15,6 +15,7 @@ from .asf_opts import process_baseline_request, process_search_request
 from .health import get_cmr_health
 from .models import BaselineSearchOptsModel, SearchOptsModel, WKTModel
 from .output import as_output
+from .files_to_wkt import FilesToWKT
 from . import constants
 
 
@@ -162,7 +163,7 @@ async def file_to_wkt(files: list[UploadFile]):
     for file in files:
         file.file.filename = file.filename
 
-    data = asf.filesToWKT([file.file for file in files]).getWKT()
+    data = FilesToWKT([file.file for file in files]).getWKT()
 
     return JSONResponse(content={
         ** data,
