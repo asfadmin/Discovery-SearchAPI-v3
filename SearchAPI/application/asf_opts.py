@@ -115,7 +115,7 @@ class ValidatorMap(collections.UserDict):
 
 async def get_body(request: Request):
     """
-    Can remove 
+    Can remove when ASFSearchOptions uses Pydantic Model
     """
     if (content_type := request.headers.get('content-type')) is not None:
         try: 
@@ -245,9 +245,8 @@ def get_asf_opts(params: dict) -> asf.ASFSearchOptions:
     # assumes passed token is valid. May want to consider running auth_with_token(), or try passing request cookiejar??
     try:
         opts = asf.ASFSearchOptions(**params)
-    
+
     except (KeyError, ValueError) as exc:
         raise HTTPException(detail=repr(exc), status_code=400) from exc
     api_logger.debug(f"asf.ASFSearchOptions object constructed: {opts})")
     return opts
-
