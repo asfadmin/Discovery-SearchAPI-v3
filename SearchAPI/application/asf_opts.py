@@ -121,7 +121,7 @@ class ValidatorMap(collections.UserDict):
 
 async def get_body(request: Request):
     """
-    Can remove
+    Can remove when ASFSearchOptions uses Pydantic Model
     """
     if (content_type := request.headers.get('content-type')) is not None:
         try:
