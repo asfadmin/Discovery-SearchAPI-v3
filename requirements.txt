@@ -28,7 +28,7 @@ watchfiles==0.19.0
 websockets==10.4
 mangum
 
-asf_search==7.1.4
+asf_search==8.0.0
 python-json-logger==2.0.7
 
 pyshp

@@ -1,4 +1,4 @@
-name: Composite user app data deploy
+name: Composite Search API deploy
 
 inputs:
   aws-account-id:
