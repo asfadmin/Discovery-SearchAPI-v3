@@ -11,6 +11,12 @@ runs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Configure AWS OIDC credentials
+      uses: aws-actions/configure-aws-credentials@v3
+      with:
+        role-to-assume: arn:aws:iam::${{ inputs.aws-account-id }}:role/SearchAPIv3TestOIDCRole
+        aws-region: us-east-1
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
@@ -28,12 +34,6 @@ runs:
         python -m pip install -r requirements.txt
         python -m pip install -r cdk/requirements.txt
         npm install -g aws-cdk
-
-    - name: Configure AWS OIDC credentials
-      uses: aws-actions/configure-aws-credentials@v3
-      with:
-        role-to-assume: arn:aws:iam::${{ inputs.aws-account-id }}:role/SearchAPIv3TestOIDCRole
-        aws-region: us-east-1
 
     - name: Deploy to AWS
       shell: bash
