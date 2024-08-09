@@ -54,7 +54,10 @@ async def query_params(searchOptions: SearchOptsModel = Depends(process_search_r
             return Response(**response_info)
 
         except (asf.ASFSearchError, asf.CMRError, ValueError) as exc:
-            raise HTTPException(detail=f"Search failed to find results: {exc}", status_code=400) from exc
+            raise HTTPException(
+                detail=f"Search failed to find results: {exc}",
+                status_code=400
+            ) from exc
 
 
 @router.api_route("/services/search/baseline", methods=["GET", "POST", "HEAD"])
@@ -146,14 +149,14 @@ async def query_mission_list(platform: str | None = None):
 
 
 @router.api_route("/services/utils/wkt", methods=["GET", "POST"])
-async def query_wkt_validation(body: WKTModel, wkt: str=''): # = Depends()): #, wkt: str | None = None):
+async def query_wkt_validation(body: WKTModel, wkt: str=''):
     if len(wkt) == 0:
-       wkt = body.wkt
+        wkt = body.wkt
 
     return Response(
         content=json.dumps(validate_wkt(wkt)),
         status_code=200,
-        media_type = 'application/json; charset=utf-8',
+        media_type='application/json; charset=utf-8',
         headers=constants.DEFAULT_HEADERS
     )
 
@@ -200,7 +203,9 @@ async def health_check():
         logging.debug(exc)
         api_version = {'version': 'unknown'}
 
-    cmr_health = get_cmr_health()
+    cfg = load_config_maturity()
+    cmr_health = get_cmr_health(cfg['cmr_base'], cfg['cmr_health'])
+
     api_health = {
         'ASFSearchAPI': {
             'ok?': True,
@@ -215,6 +220,7 @@ async def health_check():
         status_code=200,
         headers=constants.DEFAULT_HEADERS
     )
+
 
 @app.exception_handler(HTTPException)
 async def handle_error(request: Request, error: HTTPException):

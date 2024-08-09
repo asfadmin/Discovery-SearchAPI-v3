@@ -1,0 +1,23 @@
+name: SearchAPIv3 deploy action (test)
+
+on:
+  push:
+    branches:
+      - cdk
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: cdk
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: build
+        uses: ./.github/workflows/search-api-composite
+        with:
+          aws-account-id: ${{ secrets.AWS_ACCOUNT_ID }}

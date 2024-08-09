@@ -1,3 +1,5 @@
 pytest
 boto3
 requests
+requests-mock
+httpx

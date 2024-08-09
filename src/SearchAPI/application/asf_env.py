@@ -1,7 +1,7 @@
 import os
 import yaml
 
-from logger import api_logger
+from .logger import api_logger
 
 
 def load_config_file() -> dict:

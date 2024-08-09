@@ -6,8 +6,8 @@ from fastapi import HTTPException
 
 from datetime import datetime
 
-from application import constants
-from application import asf_env
+from . import constants
+from . import asf_env
 
 
 def as_output(results: asf.ASFSearchResults, output: str) -> dict:
@@ -89,6 +89,7 @@ def as_output(results: asf.ASFSearchResults, output: str) -> dict:
                 status_code=400
             )
 
+
 def get_download(results: asf.ASFSearchResults, filename=None):
     # Load basic consts:
     script_url = asf_env.load_config_maturity()['bulk_download_api']
@@ -99,12 +100,13 @@ def get_download(results: asf.ASFSearchResults, filename=None):
         url_list.extend(product.get_urls(fileType=file_type))
 
     # Setup the data you're posting with. Optional filename so it lines up with our headers:
-    script_data = { 'products': ','.join(url_list) }
+    script_data = {'products': ','.join(url_list)}
     if filename:
         script_data['filename'] = filename
     # Finally make the request:
-    script_request = requests.post( script_url, data=script_data, timeout=30 )
+    script_request = requests.post(script_url, data=script_data, timeout=30)
     return script_request.text
+
 
 def make_filename(suffix):
     return f'asf-results-{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}.{suffix}'
