@@ -10,7 +10,8 @@ import asf_search as asf
 
 from application.asf_env import load_config_maturity
 
-from logger import api_logger
+from .logger import api_logger
+
 
 def string_to_range(v: Union[str, list]) -> tuple:
     if isinstance(v, list):
