@@ -14,7 +14,7 @@ runs:
     - name: Configure AWS OIDC credentials
       uses: aws-actions/configure-aws-credentials@v3
       with:
-        role-to-assume: arn:aws:iam::${{ inputs.aws-account-id }}:role/SearchAPIv3TestOIDCRole
+        role-to-assume: arn:aws:iam::${{ inputs.aws-account-id }}:role/GitHubActionsRoleSearchAPItest
         aws-region: us-east-1
 
     - name: Set up Python
