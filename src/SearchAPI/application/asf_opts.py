@@ -7,6 +7,7 @@ from pydantic import ValidationError
 from application.models import BaselineSearchOptsModel, SearchOptsModel
 
 import asf_search as asf
+from asf_search.ASFSearchOptions import validator_map
 
 from application.asf_env import load_config_maturity
 
@@ -30,11 +31,13 @@ def string_to_range(v: Union[str, list]) -> tuple:
         raise ValueError(f'Invalid range: {exc}') from exc
     return a
 
+
 def string_to_list(v: Union[str, list[str]]) -> list:
     # v = v.replace(" ", "")
     if isinstance(v, str):
         v = v.split(",")
     return v
+
 
 def parse_number_or_range(v: Union[str, list]):
     m = re.search(r'^(-?\d+(\.\d*)?)$', v)
@@ -43,6 +46,7 @@ def parse_number_or_range(v: Union[str, list]):
         return v
     # Else it's a range:
     return string_to_range(v)
+
 
 def string_to_num_or_range_list(v: Union[str, list]):
     if isinstance(v, list):
@@ -71,6 +75,7 @@ string_to_obj_map = {
     asf.validators.parse_float_or_range_list:   string_to_num_or_range_list,
 }
 
+
 class ValidatorMap(collections.UserDict):
     """
     For adding case-insensitive logic to the validator map, and mapping legacy keywords to ASFSearchOptions
@@ -97,7 +102,7 @@ class ValidatorMap(collections.UserDict):
 
     def __init__(self):
         # This sets self.data:
-        super().__init__(asf.validator_map)
+        super().__init__(validator_map.validator_map)
         # value is the normalized key, key is the lower-key
         self.lower_lookup = {k.lower(): k for k in self.data.keys()}
 
@@ -117,8 +122,9 @@ class ValidatorMap(collections.UserDict):
     def alias_params(self, params: dict) -> dict:
             return {
                 self.ALIASED_KEYWORDS.get(k.lower(), k): v
-                for k,v in params.items()
+                for k, v in params.items()
             }
+
 
 async def get_body(request: Request):
     """
@@ -134,7 +140,9 @@ async def get_body(request: Request):
                 return dict(data)
         except Exception as exc:
             raise HTTPException(detail=repr(exc), status_code=400) from exc
+
     return {}
+
 
 async def process_search_request(request: Request) -> SearchOptsModel:
     """
@@ -180,6 +188,7 @@ async def process_search_request(request: Request) -> SearchOptsModel:
 
     return searchOpts
 
+
 async def process_baseline_request(request: Request) -> BaselineSearchOptsModel:
     """Processes request to baseline endpoint"""
     searchOpts = await process_search_request(request=request)
@@ -190,6 +199,7 @@ async def process_baseline_request(request: Request) -> BaselineSearchOptsModel:
         raise HTTPException(detail=repr(exc), status_code=400) from exc
 
     return baselineSearchOpts
+
 
 def get_asf_opts(params: dict) -> asf.ASFSearchOptions:
     """
@@ -202,19 +212,19 @@ def get_asf_opts(params: dict) -> asf.ASFSearchOptions:
     except ValueError as exc:
         raise HTTPException(detail=repr(exc), status_code=400) from exc
 
-    ### If your key is in validator map, make it match case sensitivity:
+    # If your key is in validator map, make it match case sensitivity:
     validatorMap = ValidatorMap()
     params = validatorMap.alias_params(params)
     # You have to rebuild the dict, since you can't change keys in place
     params = {
         validatorMap.actual_key_case(k)
-            if k in validatorMap
-            else k:v
-        for k,v in params.items()
+        if k in validatorMap
+        else k: v
+        for k, v in params.items()
     }
 
-    ### De-stringify the values if we know how:
-    for k,v in params.items():
+    # De-stringify the values if we know how:
+    for k, v in params.items():
         if k in validatorMap:
             validator_method = validatorMap[k]
             # If the method is in our map, de-stringify it:
@@ -224,11 +234,10 @@ def get_asf_opts(params: dict) -> asf.ASFSearchOptions:
             except ValueError as exc:
                 raise HTTPException(detail=repr(exc), status_code=400) from exc
 
-    ### SearchOpts doesn't know how to handle these keys, but other methods need them
+    # SearchOpts doesn't know how to handle these keys, but other methods need them
     # (We still want to throw on any UNKNOWN keys)
     ignore_keys_lower = ["output", "reference", "maturity", "cmr_keywords", "cmr_token"]
     params = {k: params[k] for k in params.keys() if k.lower() not in ignore_keys_lower}
-
 
     try:
         if "granule_list" in params or "product_list" in params:
@@ -248,11 +257,9 @@ def get_asf_opts(params: dict) -> asf.ASFSearchOptions:
     except ValueError as exc:
         raise HTTPException(detail=repr(exc), status_code=400) from exc
 
-
     # assumes passed token is valid. May want to consider running auth_with_token(), or try passing request cookiejar??
     try:
         opts = asf.ASFSearchOptions(**params)
-
     except (KeyError, ValueError) as exc:
         raise HTTPException(detail=repr(exc), status_code=400) from exc
     api_logger.debug(f"asf.ASFSearchOptions object constructed: {opts})")
