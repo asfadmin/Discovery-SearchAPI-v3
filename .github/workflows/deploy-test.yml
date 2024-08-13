@@ -1,4 +1,4 @@
-name: SearchAPIv3 deploy action (test)
+name: SearchAPI deploy action (test)
 
 on:
   push:
