@@ -1,4 +1,4 @@
-name: SearchAPIv3 deploy action (test)
+name: SearchAPI deploy action (test)
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: test
+    environment: edc-test
     permissions:
       id-token: write
       contents: read
