@@ -47,17 +47,17 @@ async def query_params(searchOptions: SearchOptsModel = Depends(process_search_r
             media_type='text/html; charset=utf-8',
             headers=constants.DEFAULT_HEADERS
         )
-    else:
-        try:
-            results = asf.search(opts=opts)
-            response_info = as_output(results, output)
-            return Response(**response_info)
 
-        except (asf.ASFSearchError, asf.CMRError, ValueError) as exc:
-            raise HTTPException(
-                detail=f"Search failed to find results: {exc}",
-                status_code=400
-            ) from exc
+    try:
+        results = asf.search(opts=opts)
+        response_info = as_output(results, output)
+        return Response(**response_info)
+
+    except (asf.ASFSearchError, asf.CMRError, ValueError) as exc:
+        raise HTTPException(
+            detail=f"Search failed to find results: {exc}",
+            status_code=400
+        ) from exc
 
 
 @router.api_route("/services/search/baseline", methods=["GET", "POST", "HEAD"])
