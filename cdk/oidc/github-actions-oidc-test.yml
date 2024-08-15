@@ -6,7 +6,7 @@ Resources:
   GitHubActionsRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: GitHubActionsRoleSearchAPItest
+      RoleName: GitHubActionsRoleSearchAPIEDCtest
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -34,3 +34,71 @@ Resources:
                   - !Sub arn:aws:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}
                   - !Sub arn:aws:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}
                   - !Sub arn:aws:iam::${AWS::AccountId}:role/cdk-hnb659fds-image-publishing-role-${AWS::AccountId}-${AWS::Region}
+        - PolicyName: CDKCloudformationAllow
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudformation:*
+                Resource:
+                  - !Sub arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/CDKToolkit/*
+        - PolicyName: CDKS3Allow
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:*
+                Resource:
+                  - !Sub arn:aws:s3:::cdk-*-assets-${AWS::AccountId}-${AWS::Region}
+        - PolicyName: CDKListBucketsAllow
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:ListAllMyBuckets
+                Resource: "*"
+        - PolicyName: GetSecrestsAllow
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudformation:DescribeStacks
+                  - rds:DescribeDBClusters
+                  - secretsmanager:ListSecrets
+                  - secretsmanager:GetSecretValue
+                  - secretsmanager:DescribeSecret
+                  - ec2:DescribeSecurityGroups
+                  - ec2:DescribeSubnets
+                Resource: "*"
+        - PolicyName: SSMAllow
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                Resource:
+                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/cdk-bootstrap/*
+        - PolicyName: LambdaAllow
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:*
+                Resource:
+                  - !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:*CustomAWSCDK*
+        - PolicyName: CloudformationCalledViaAllow
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: "*"
+                Resource: "*"
+                Condition:
+                  "ForAnyValue:StringEquals":
+                    "aws:CalledVia": "cloudformation.amazonaws.com"
