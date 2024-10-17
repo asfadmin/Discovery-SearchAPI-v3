@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: GitHub OIDC for when GitHub wants to communicate with AWS EDC Account.
+Description: GitHub OIDC for when GitHub wants to communicate with AWS EDC Account
 
 Resources:
   # This is the bare-bones role.
