@@ -9,6 +9,7 @@ from fastapi import Depends, FastAPI, Request, HTTPException, APIRouter, UploadF
 from fastapi.responses import Response, JSONResponse
 
 from SearchAPI import log_router
+from SearchAPI.application.wkt_utils import filesToWKT
 
 from .asf_env import load_config_maturity
 from .asf_opts import process_baseline_request, process_search_request
@@ -16,7 +17,6 @@ from .health import get_cmr_health
 from .models import BaselineSearchOptsModel, SearchOptsModel, WKTModel
 from .output import as_output
 from . import constants
-from shapely import from_wkt
 
 asf.REPORT_ERRORS = False
 router = APIRouter(route_class=log_router.LoggingRoute)
@@ -151,7 +151,7 @@ async def file_to_wkt(files: list[UploadFile]):
     for file in files:
         file.file.filename = file.filename
     
-    data = asf.filesToWKT([file.file for file in files]).getWKT()
+    data = filesToWKT([file.file for file in files]).getWKT()
 
     return JSONResponse(content={
         ** data,
