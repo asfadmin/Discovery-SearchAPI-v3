@@ -21,8 +21,8 @@ class SearchAPIStack(Stack):
                 )
         )
 
-        api = apigateway.LambdaRestApi(
-            self,
-            "search-api-gateway",
-            handler=search_api_lambda
-        )
+        # api = apigateway.LambdaRestApi(
+        #     self,
+        #     "search-api-gateway",
+        #     handler=search_api_lambda
+        # )
