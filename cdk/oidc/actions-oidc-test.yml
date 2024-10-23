@@ -1,0 +1,200 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: GitHub OIDC for when GitHub wants to communicate with AWS EDC Test Account
+
+Resources:
+  # This is the bare-bones role.
+  GitHubActionsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: GitHubActionsRoleSearchAPItest
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Sub arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringLike:
+                'token.actions.githubusercontent.com:sub': ['repo:asfadmin/Discovery-SearchAPI-v3:*']
+              StringEqualsIgnoreCase:
+                'token.actions.githubusercontent.com:aud': sts.amazonaws.com
+      Policies:
+        - PolicyName: GitHubActionsSearchAPITestDeployPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: AssumeCDKRoles
+                Effect: Allow
+                Action:
+                  - sts:AssumeRole
+                  - iam:PassRole
+                Resource:
+                  - !Sub arn:aws:iam::${AWS::AccountId}:role/cdk-hnb659fds-lookup-role-${AWS::AccountId}-${AWS::Region}
+                  - !Sub arn:aws:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}
+                  - !Sub arn:aws:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}
+                  - !Sub arn:aws:iam::${AWS::AccountId}:role/cdk-hnb659fds-image-publishing-role-${AWS::AccountId}-${AWS::Region}
+        - PolicyName: CDKCloudformationAllow
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudformation:*
+                Resource:
+                  - !Sub arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/CDKToolkit/*
+        - PolicyName: CDKS3Allow
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:*
+                Resource:
+                  - !Sub arn:aws:s3:::cdk-*-assets-${AWS::AccountId}-${AWS::Region}
+        - PolicyName: CDKListBucketsAllow
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:ListAllMyBuckets
+                Resource: "*"
+        - PolicyName: GetSecrestsAllow
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudformation:DescribeStacks
+                  - rds:DescribeDBClusters
+                  - secretsmanager:ListSecrets
+                  - secretsmanager:GetSecretValue
+                  - secretsmanager:DescribeSecret
+                  - ec2:DescribeSecurityGroups
+                  - ec2:DescribeSubnets
+                Resource: "*"
+        - PolicyName: SSMAllow
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                Resource:
+                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/cdk-bootstrap/*
+        - PolicyName: GetAuthTokenAllow
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ecr:GetAuthorizationToken
+                Resource:
+                  - "*"
+        - PolicyName: LambdaAllow
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:*
+                Resource:
+                  - !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:*CustomAWSCDK*
+        - PolicyName: EcrActionsAllow
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ecr:DescribeRepositories
+                  - ecr:DescribeImages
+                  - ecr:CreateRepository
+                  - ecr:InitiateLayerUpload
+                  - ecr:UploadLayerPart
+                  - ecr:CompleteLayerUpload
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:PutImage
+                Resource:
+                  - !Sub arn:aws:ecr:*:${AWS::AccountId}:repository/*
+        - PolicyName: CloudformationAllow
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ecr:DescribeRepositories
+                  - cloudformation:RegisterType
+                  - cloudformation:CreateUploadBucket
+                  - cloudformation:ListExports
+                  - cloudformation:DescribeStackDriftDetectionStatus
+                  - cloudformation:SetTypeDefaultVersion
+                  - cloudformation:ListResourceScanRelatedResources
+                  - cloudformation:DescribeOrganizationsAccess
+                  - cloudformation:RegisterPublisher
+                  - cloudformation:ActivateType
+                  - cloudformation:ListTypes
+                  - cloudformation:DeactivateType
+                  - cloudformation:SetTypeConfiguration
+                  - cloudformation:DeregisterType
+                  - cloudformation:ListResourceScanResources
+                  - cloudformation:ListTypeRegistrations
+                  - cloudformation:EstimateTemplateCost
+                  - cloudformation:StartResourceScan
+                  - cloudformation:DescribeAccountLimits
+                  - cloudformation:BatchDescribeTypeConfigurations
+                  - cloudformation:DeleteGeneratedTemplate
+                  - cloudformation:CreateStackSet
+                  - cloudformation:ListResourceScans
+                  - cloudformation:ListStacks
+                  - cloudformation:DescribeType
+                  - cloudformation:ListImports
+                  - cloudformation:DeactivateOrganizationsAccess
+                  - cloudformation:PublishType
+                  - cloudformation:DescribePublisher
+                  - cloudformation:DescribeTypeRegistration
+                  - cloudformation:ListGeneratedTemplates
+                  - cloudformation:GetGeneratedTemplate
+                  - cloudformation:CreateGeneratedTemplate
+                  - cloudformation:UpdateGeneratedTemplate
+                  - cloudformation:ListStackSets
+                  - cloudformation:ActivateOrganizationsAccess
+                  - cloudformation:DescribeResourceScan
+                  - cloudformation:DescribeGeneratedTemplate
+                  - cloudformation:TestType
+                  - cloudformation:ValidateTemplate
+                  - cloudformation:ListTypeVersion
+                Resource: "*"
+        - PolicyName: GetTemplateAllow
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudformation:GetTemplate
+                Resource:
+                  - !Sub arn:aws:cloudformation:*:${AWS::AccountId}:stack/*/*
+        - PolicyName: GetTemplateAllow
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudformation:*
+                Resource:
+                  - !Sub arn:aws:cloudformation:*:${AWS::AccountId}:stack/*/*
+                  - !Sub arn:aws:cloudformation:*:${AWS::AccountId}:changeSet/*/*"
+                  - !Sub arn:aws:cloudformation:*:${AWS::AccountId}:stackset-target/*"
+                  - !Sub arn:aws:cloudformation:*:${AWS::AccountId}:stack/*/*"
+                  - !Sub arn:aws:cloudformation:*:${AWS::AccountId}:type/resource/*"
+                  - !Sub arn:aws:cloudformation:*:${AWS::AccountId}:stackset/*:*
+        - PolicyName: CloudformationCalledViaAllow
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: "*"
+                Resource: "*"
+                Condition:
+                  "ForAnyValue:StringEquals":
+                    "aws:CalledVia": "cloudformation.amazonaws.com"
