@@ -182,7 +182,7 @@ Resources:
                   - cloudformation:GetTemplate
                 Resource:
                   - !Sub arn:aws:cloudformation:*:${AWS::AccountId}:stack/*/*
-        - PolicyName: GetTemplateAllow
+        - PolicyName: CloudformationStackAllow
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
