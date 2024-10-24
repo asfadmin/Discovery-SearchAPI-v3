@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: GitHub OIDC for when GitHub wants to communicate with AWS EDC Test Account
 Parameters:
   ActionsRoleName:
-    NoEcho: true
+    NoEcho: false
     Description: The role name for the oidc github actions role
     Type: String
     MinLength: 1
