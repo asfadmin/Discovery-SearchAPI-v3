@@ -16,8 +16,6 @@ class SearchAPIStack(Stack):
         subnet_ids = self.node.try_get_context('subnet_ids').split(',')
         security_group = self.node.try_get_context('security_group')
 
-        print(vpc_id, subnet_ids, security_group)
-
         vpc = ec2.Vpc.from_lookup(self, "EDCVPC", vpc_id=vpc_id)
         subnet_selection = ec2.SubnetSelection(
             subnet_filters=[
