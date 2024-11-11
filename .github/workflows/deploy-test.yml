@@ -21,3 +21,6 @@ jobs:
         uses: ./.github/workflows/search-api-composite
         with:
           aws-account-id: ${{ secrets.AWS_ACCOUNT_ID }}
+          vpc-id: ${{ secrets.VPC_ID }}
+          subnet-ids: ${{ secrets.SUBNET_IDS }}
+          security-group: ${{ secrets.SECURITY_GROUP }}

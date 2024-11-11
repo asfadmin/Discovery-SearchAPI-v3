@@ -4,6 +4,15 @@ inputs:
   aws-account-id:
     required: true
     type: string
+  vpc-id:
+    required: true
+    type: string
+  subnet-ids:
+    required: true
+    type: string
+  security-group:
+    required: true
+    type: string
 
 runs:
   using: "composite"
@@ -39,4 +48,7 @@ runs:
       shell: bash
       run: |
         cd cdk
-        cdk deploy --require-approval=never
+        cdk deploy --require-approval=never \
+          --context vpc_id=${{ inputs.vpc-id }} \
+          --context subnet_ids=${{ inputs.subnet-ids }} \
+          --context security-group=${{ inputs.security-group }}
