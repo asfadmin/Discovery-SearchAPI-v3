@@ -51,4 +51,4 @@ runs:
         cdk deploy --require-approval=never \
           --context vpc_id=${{ inputs.vpc-id }} \
           --context subnet_ids=${{ inputs.subnet-ids }} \
-          --context security-group=${{ inputs.security-group }}
+          --context security_group=${{ inputs.security-group }}
