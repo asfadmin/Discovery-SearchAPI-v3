@@ -82,6 +82,16 @@ Resources:
                   - ec2:DescribeSecurityGroups
                   - ec2:DescribeSubnets
                 Resource: "*"
+        - PolicyName: VpcAllow
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ec2:DescribeVpcs
+                  - ec2:DescribeRouteTables
+                  - ec2:DescribeVpnGateways
+                Resource: "*"
         - PolicyName: SSMAllow
           PolicyDocument:
             Version: '2012-10-17'
@@ -123,6 +133,8 @@ Resources:
                   - ecr:CompleteLayerUpload
                   - ecr:BatchCheckLayerAvailability
                   - ecr:PutImage
+                  - ecr:TagResource,
+                  - ecr:PutImageScanningConfiguration
                 Resource:
                   - !Sub arn:aws:ecr:*:${AWS::AccountId}:repository/*
         - PolicyName: CloudformationAllow
