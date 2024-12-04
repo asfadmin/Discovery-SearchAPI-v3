@@ -133,7 +133,7 @@ Resources:
                   - ecr:CompleteLayerUpload
                   - ecr:BatchCheckLayerAvailability
                   - ecr:PutImage
-                  - ecr:TagResource,
+                  - ecr:TagResource
                   - ecr:PutImageScanningConfiguration
                 Resource:
                   - !Sub arn:aws:ecr:*:${AWS::AccountId}:repository/*
