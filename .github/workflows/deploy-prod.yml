@@ -3,7 +3,7 @@ name: SearchAPI deploy action (prod)
 on:
   push:
     branches:
-      - cdk
+      - prod
 
 jobs:
   deploy:

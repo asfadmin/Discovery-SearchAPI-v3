@@ -3,7 +3,7 @@ name: SearchAPI deploy action (test)
 on:
   push:
     branches:
-      - cdk
+      - test
 
 jobs:
   deploy:
