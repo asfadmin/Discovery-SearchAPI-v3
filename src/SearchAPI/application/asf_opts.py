@@ -1,15 +1,18 @@
-
 import collections
 import re
 from typing import Union
 
 from fastapi import HTTPException, Request
 from pydantic import ValidationError
-from SearchAPI.application.models import BaselineSearchOptsModel, SearchOptsModel
-import asf_search as asf
-from .asf_env import load_config_maturity
+from application.models import BaselineSearchOptsModel, SearchOptsModel
 
-from SearchAPI import api_logger
+import asf_search as asf
+from asf_search.ASFSearchOptions import validator_map
+
+from application.asf_env import load_config_maturity
+
+from .logger import api_logger
+
 
 def string_to_range(v: Union[str, list]) -> tuple:
     if isinstance(v, list):
@@ -28,11 +31,13 @@ def string_to_range(v: Union[str, list]) -> tuple:
         raise ValueError(f'Invalid range: {exc}') from exc
     return a
 
+
 def string_to_list(v: Union[str, list[str]]) -> list:
     # v = v.replace(" ", "")
     if isinstance(v, str):
         v = v.split(",")
     return v
+
 
 def parse_number_or_range(v: Union[str, list]):
     m = re.search(r'^(-?\d+(\.\d*)?)$', v)
@@ -42,10 +47,11 @@ def parse_number_or_range(v: Union[str, list]):
     # Else it's a range:
     return string_to_range(v)
 
+
 def string_to_num_or_range_list(v: Union[str, list]):
     if isinstance(v, list):
         return v
-    
+
     v_list = string_to_list(v)
     v_list = [parse_number_or_range(i) for i in v_list]
     return v_list
@@ -60,13 +66,15 @@ string_to_obj_map = {
     asf.validators.parse_string_list:           string_to_list,
     asf.validators.parse_int_list:              string_to_list,
     asf.validators.parse_float_list:            string_to_list,
-    asf.validators.parse_circle:                string_to_list,
-    asf.validators.parse_linestring:            string_to_list,
-    asf.validators.parse_point:                 string_to_list,
+    # asf.validators.parse_circle:                string_to_list,
+    # asf.validators.parse_linestring:            string_to_list,
+    # asf.validators.parse_point:                 string_to_list,
+
     # Number or Range-list:
     asf.validators.parse_int_or_range_list:     string_to_num_or_range_list,
     asf.validators.parse_float_or_range_list:   string_to_num_or_range_list,
 }
+
 
 class ValidatorMap(collections.UserDict):
     """
@@ -94,31 +102,36 @@ class ValidatorMap(collections.UserDict):
 
     def __init__(self):
         # This sets self.data:
-        super().__init__(asf.validator_map.validator_map)
+        super().__init__(validator_map.validator_map)
         # value is the normalized key, key is the lower-key
         self.lower_lookup = {k.lower(): k for k in self.data.keys()}
+
     def __contains__(self, k) -> bool:
-        return k.lower() in [*self.lower_lookup.keys(), *self.ALIASED_KEYWORDS.keys()] 
+        return k.lower() in [*self.lower_lookup.keys(), *self.ALIASED_KEYWORDS.keys()]
+
     def __getitem__(self, k):
         key = self.ALIASED_KEYWORDS.get(k.lower(), k)
         api_logger.debug(f"Keyword {key}")
         corrected_case_key = self.actual_key_case(key)
         return self.data[corrected_case_key]
+
     def actual_key_case(self, k):
         # This should raise keyerror if not found:
         return self.lower_lookup[k.lower()]
+
     def alias_params(self, params: dict) -> dict:
             return {
                 self.ALIASED_KEYWORDS.get(k.lower(), k): v
-                for k,v in params.items()
+                for k, v in params.items()
             }
+
 
 async def get_body(request: Request):
     """
     Can remove when ASFSearchOptions uses Pydantic Model
     """
     if (content_type := request.headers.get('content-type')) is not None:
-        try: 
+        try:
             if content_type == 'application/json':
                 data = await request.json()
                 return data
@@ -127,11 +140,13 @@ async def get_body(request: Request):
                 return dict(data)
         except Exception as exc:
             raise HTTPException(detail=repr(exc), status_code=400) from exc
+
     return {}
+
 
 async def process_search_request(request: Request) -> SearchOptsModel:
     """
-    Extracts the request's query+body params, returns ASFSearchOptions, request method, output format, and a dictionary 
+    Extracts the request's query+body params, returns ASFSearchOptions, request method, output format, and a dictionary
     of the merged request args wrapped in a pydantic model (SearchOptsModel)
     This entire process can be avoided once ASFSearchOptions uses pydantic's BaseModel as a class,
     then it's a matter of using @model_validator to pre-process stringified lists
@@ -142,7 +157,7 @@ async def process_search_request(request: Request) -> SearchOptsModel:
 
     body = await get_body(request)
     body_opts = get_asf_opts(body)
-    
+
     query_opts.merge_args(**dict(body_opts))
 
     merged_args = {**query_params, **body}
@@ -151,7 +166,7 @@ async def process_search_request(request: Request) -> SearchOptsModel:
         session = asf.ASFSession()
         session.headers.update({'Authorization': 'Bearer {0}'.format(token)})
         query_opts.session = session
-    
+
     output = merged_args.get('output', 'metalink')
     maturity = merged_args.get('maturity', 'prod')
     config = load_config_maturity(maturity=maturity)
@@ -164,14 +179,15 @@ async def process_search_request(request: Request) -> SearchOptsModel:
                 query_opts.maxResults = asf.search_count(opts=query_opts)
             elif query_opts.maxResults <= 0:
                 raise ValueError(f'Search keyword "maxResults" must be greater than 0')
-        
+
             query_opts.maxResults = min(1500, query_opts.maxResults)
 
         searchOpts = SearchOptsModel(opts=query_opts, output=output, merged_args=merged_args, request_method=request.method)
     except (ValueError, ValidationError) as exc:
         raise HTTPException(detail=repr(exc), status_code=400) from exc
-    
+
     return searchOpts
+
 
 async def process_baseline_request(request: Request) -> BaselineSearchOptsModel:
     """Processes request to baseline endpoint"""
@@ -181,8 +197,9 @@ async def process_baseline_request(request: Request) -> BaselineSearchOptsModel:
         baselineSearchOpts = BaselineSearchOptsModel(**searchOpts.model_dump(), reference=reference)
     except (ValueError, ValidationError) as exc:
         raise HTTPException(detail=repr(exc), status_code=400) from exc
-    
+
     return baselineSearchOpts
+
 
 def get_asf_opts(params: dict) -> asf.ASFSearchOptions:
     """
@@ -194,20 +211,20 @@ def get_asf_opts(params: dict) -> asf.ASFSearchOptions:
                 raise ValueError(f'Empty value passed to search keyword "{param}"')
     except ValueError as exc:
         raise HTTPException(detail=repr(exc), status_code=400) from exc
-    
-    ### If your key is in validator map, make it match case sensitivity:
+
+    # If your key is in validator map, make it match case sensitivity:
     validatorMap = ValidatorMap()
     params = validatorMap.alias_params(params)
     # You have to rebuild the dict, since you can't change keys in place
     params = {
         validatorMap.actual_key_case(k)
-            if k in validatorMap
-            else k:v
-        for k,v in params.items()
+        if k in validatorMap
+        else k: v
+        for k, v in params.items()
     }
 
-    ### De-stringify the values if we know how:
-    for k,v in params.items():
+    # De-stringify the values if we know how:
+    for k, v in params.items():
         if k in validatorMap:
             validator_method = validatorMap[k]
             # If the method is in our map, de-stringify it:
@@ -216,18 +233,17 @@ def get_asf_opts(params: dict) -> asf.ASFSearchOptions:
                     params[k] = string_to_obj_map[validator_method](v)
             except ValueError as exc:
                 raise HTTPException(detail=repr(exc), status_code=400) from exc
-    
-    ### SearchOpts doesn't know how to handle these keys, but other methods need them
+
+    # SearchOpts doesn't know how to handle these keys, but other methods need them
     # (We still want to throw on any UNKNOWN keys)
     ignore_keys_lower = ["output", "reference", "maturity", "cmr_keywords", "cmr_token"]
     params = {k: params[k] for k in params.keys() if k.lower() not in ignore_keys_lower}
-
 
     try:
         if "granule_list" in params or "product_list" in params:
             if len([param for param in params if param not in ["collections", "maxResults"]]) > 1:
                 raise ValueError(f'Cannot use search keywords "granule_list/product_list" with other search params')
-        
+
         if (flight_direction := params.get('flightDirection')) is not None:
             if isinstance(flight_direction, str) and len(flight_direction):
                 params['flightDirection'] = ValidatorMap.FLIGHT_DIRECTIONS.get(flight_direction.upper()[0], None)
@@ -239,14 +255,13 @@ def get_asf_opts(params: dict) -> asf.ASFSearchOptions:
                 if params['lookDirection'] is None:
                     raise ValueError(f'Invalid value passed to search keyword "lookDirection": "{lookDirection}". Valid directions are "R" or "L"')
     except ValueError as exc:
-        raise HTTPException(detail=repr(exc), status_code=400) from exc 
-
+        raise HTTPException(detail=repr(exc), status_code=400) from exc
 
     # assumes passed token is valid. May want to consider running auth_with_token(), or try passing request cookiejar??
     try:
         opts = asf.ASFSearchOptions(**params)
-
     except (KeyError, ValueError) as exc:
         raise HTTPException(detail=repr(exc), status_code=400) from exc
     api_logger.debug(f"asf.ASFSearchOptions object constructed: {opts})")
+
     return opts

@@ -1,6 +1,6 @@
-
 import logging
 import os
+
 from pythonjsonlogger import jsonlogger
 
 
@@ -77,6 +77,7 @@ class AwsStreamFormatter(logging.Formatter):
         )
         return formatter.format(record)
 
+
 def get_logger(name: str, level: int=logging.DEBUG) -> logging.Logger:
     """
     Builds and returns our custom logger for each sub-module
@@ -105,3 +106,6 @@ def get_logger(name: str, level: int=logging.DEBUG) -> logging.Logger:
     asf_logger.addHandler(stream_handle)
     asf_logger.setLevel(level)
     return logger
+
+
+api_logger = get_logger(__name__, logging.DEBUG)
