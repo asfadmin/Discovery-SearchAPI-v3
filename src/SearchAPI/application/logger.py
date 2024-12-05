@@ -1,6 +1,6 @@
-
 import logging
 import os
+
 from pythonjsonlogger import jsonlogger
 
 
@@ -40,11 +40,10 @@ class ConsoleStreamFormatter(logging.Formatter):
         # If it's bytes, turn it to a string:
         if isinstance(record.msg, bytes):
             record.msg = record.msg.decode("utf-8")
-        # IF the message is bigger than one line, give it it's own block, and indent a bit:
+        # If the message is bigger than one line, give it it's own block, and indent a bit:
         if isinstance(record.msg, str) and record.msg.count('\n') > 0:
             msg_list = record.msg.split("\n")
-            msg_list = [f"       {msg}" for msg in msg_list]
-            record.msg = "<multi-line>:\n" + "\n".join(msg_list)
+            record.msg = "<multi-line>:\n\t" + "\n\t".join(msg_list)
 
         # Add color to each of the logging formats:
         log_fmt = self.FORMATS.get(record.levelno)
@@ -78,6 +77,7 @@ class AwsStreamFormatter(logging.Formatter):
         )
         return formatter.format(record)
 
+
 def get_logger(name: str, level: int=logging.DEBUG) -> logging.Logger:
     """
     Builds and returns our custom logger for each sub-module
@@ -106,3 +106,6 @@ def get_logger(name: str, level: int=logging.DEBUG) -> logging.Logger:
     asf_logger.addHandler(stream_handle)
     asf_logger.setLevel(level)
     return logger
+
+
+api_logger = get_logger(__name__, logging.DEBUG)

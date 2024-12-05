@@ -1,29 +1,12 @@
 FROM public.ecr.aws/lambda/python:3.10
 
-# Work from this location:
-WORKDIR ${LAMBDA_TASK_ROOT}
+# Add function code
+ADD src/SearchAPI ${LAMBDA_TASK_ROOT}
 
-### GENERIC INSTALLS:
 # Install the function's dependencies using file requirements.txt
 # from your project folder.
-COPY SearchAPI/requirements.txt  .
-# Setup wheel first so it can be used for the rest of the installs:
-RUN  python3 -m pip install -U --no-cache-dir wheel
-RUN  python3 -m pip install -U --no-cache-dir -r requirements.txt
+COPY requirements.txt .
+RUN pip3 install -r requirements.txt --target "${LAMBDA_TASK_ROOT}" -U --no-cache-dir
 
-### OUR FILES:
-# Install our SearchAPI
-COPY README.md ./README.md
-COPY setup.py ./setup.py
-COPY SearchAPI ./SearchAPI
-RUN python3 -m pip install -U --no-cache-dir .
-
-### NETORKING:
-# What to open host too.
-#    - localhost [default] = 127.0.0.1
-#    - outside_world = 0.0.0.0
-ENV OPEN_TO_IP="127.0.0.1"
-ENV OPEN_TO_PORT=9000
-EXPOSE ${OPEN_TO_PORT}
-
-ENTRYPOINT [ "python3", "SearchAPI/main.py" ]
+# Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
+CMD [ "main.handler" ]

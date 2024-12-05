@@ -1,4 +1,3 @@
-
 from typing import Callable
 import time
 import logging
@@ -6,7 +5,7 @@ import logging
 from fastapi import Response, Request
 from fastapi.routing import APIRoute
 
-from . import api_logger
+from .logger import api_logger
 
 
 class LoggingRoute(APIRoute):
@@ -40,22 +39,32 @@ class LoggingRoute(APIRoute):
 
         async def custom_route_handler(request: Request) -> Response:
             # Grab the AWS UUID and set it for every log:
-            self.aws_request_id = request.scope["aws.context"].aws_request_id
+            context = request.scope.get("aws.context")
+            if context is not None:
+                self.aws_request_id = context.aws_request_id
             logging.setLogRecordFactory(self.record_factory)
             # Time the request itself:
             before = time.time()
             try:
                 response: Response = await original_route_handler(request)
             finally:
+                # What to ALWAYS log:
                 duration = time.time() - before
                 api_logger.info(
-                    "Query finished running!",
+                    "Query finished running.",
                     extra={
                         "QueryTime": duration,
                         "QueryParams": dict(request.query_params),
-                        "Endpoint": request.scope['path']
+                        "Endpoint": request.scope['path'],
                     }
                 )
+            # What to log if the query was successful:
+            api_logger.info(
+                "Query was successful!",
+                extra={
+                    "media_type": response.media_type,
+                }
+            )
             # An example on adding headers. IDK if we actually need this one:
             response.headers["X-Response-Time"] = str(duration)
             return response

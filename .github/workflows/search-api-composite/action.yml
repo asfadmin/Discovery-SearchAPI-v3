@@ -1,0 +1,54 @@
+name: Composite Search API deploy
+
+inputs:
+  aws-account-id:
+    required: true
+    type: string
+  vpc-id:
+    required: true
+    type: string
+  subnet-ids:
+    required: true
+    type: string
+  security-group:
+    required: true
+    type: string
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS OIDC credentials
+      uses: aws-actions/configure-aws-credentials@v3
+      with:
+        role-to-assume: arn:aws:iam::${{ inputs.aws-account-id }}:role/SearchAPIActionsOIDCRole
+        aws-region: us-west-2
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -r requirements.txt
+        python -m pip install -r cdk/requirements.txt
+        npm install -g aws-cdk
+
+    - name: Deploy to AWS
+      shell: bash
+      run: |
+        cd cdk
+        cdk deploy --require-approval=never \
+          --context vpc_id=${{ inputs.vpc-id }} \
+          --context subnet_ids=${{ inputs.subnet-ids }} \
+          --context security_group=${{ inputs.security-group }}
