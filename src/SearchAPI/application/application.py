@@ -148,18 +148,21 @@ async def query_mission_list(platform: str | None = None):
     )
 
 
-@router.api_route("/services/utils/wkt", methods=["GET", "POST"])
-async def query_wkt_validation(body: WKTModel, wkt: str=''):
-    if len(wkt) == 0:
-        wkt = body.wkt
+@router.post("/services/utils/wkt")
+async def post_wkt_validation(body: WKTModel):
+    return _wkt_response(body.wkt)
 
+@router.get("/services/utils/wkt")
+async def query_wkt_validation(wkt: str):
+    return _wkt_response(wkt)
+
+def _wkt_response(wkt: str):
     return Response(
         content=json.dumps(validate_wkt(wkt)),
         status_code=200,
         media_type='application/json; charset=utf-8',
         headers=constants.DEFAULT_HEADERS
     )
-
 
 @router.post('/services/utils/files_to_wkt')
 async def file_to_wkt(files: list[UploadFile]):
@@ -179,7 +182,7 @@ async def file_to_wkt(files: list[UploadFile]):
 def validate_wkt(wkt: str):
     try:
         wrapped, unwrapped, reports = asf.validate_wkt(wkt)
-        repairs = [{'type': report.report_type, 'report': report.report} for report in reports]
+        repairs = [{'type': report.report_type, 'report': report.report} for report in reports if report.report_type != "'type': 'WRAP'"]
     except Exception as exc:
         raise HTTPException(detail=f"Failed to validate wkt: {exc}", status_code=400) from exc
 
