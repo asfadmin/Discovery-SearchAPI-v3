@@ -1,5 +1,6 @@
 from aws_cdk import (
     Stack,
+    Duration,
     aws_lambda as lambda_,
     aws_apigateway as apigateway,
     aws_ec2 as ec2
@@ -33,6 +34,7 @@ class SearchAPIStack(Stack):
         search_api_lambda = lambda_.DockerImageFunction(
             self,
             "SearchAPIFunction",
+            timeout=Duration.seconds(30),
             code=lambda_.DockerImageCode.from_image_asset(
                 directory='..'
                 ),
@@ -43,7 +45,7 @@ class SearchAPIStack(Stack):
         )
 
         api = apigateway.LambdaRestApi(
-            self,
+            self,   
             "search-api-gateway",
             handler=search_api_lambda,
             endpoint_configuration=apigateway.EndpointConfiguration(
