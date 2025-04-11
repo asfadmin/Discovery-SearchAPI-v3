@@ -8,7 +8,7 @@ from fastapi import Depends, FastAPI, Request, HTTPException, APIRouter, UploadF
 from fastapi.responses import Response, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from application.log_router import LoggingRoute
+from .log_router import LoggingRoute
 
 from .asf_env import load_config_maturity
 from .asf_opts import process_baseline_request, process_search_request
