@@ -135,7 +135,7 @@ async def get_body(request: Request):
             if content_type == 'application/json':
                 data = await request.json()
                 return data
-            elif content_type in ['application/x-www-form-urlencoded', 'multipart/form-data']:
+            elif content_type == 'application/x-www-form-urlencoded' or content_type.startswith('multipart/form-data;'):
                 data = await request.form()
                 return dict(data)
         except Exception as exc:
