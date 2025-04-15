@@ -69,6 +69,7 @@ string_to_obj_map = {
     asf.validators.parse_circle:                string_to_list,
     asf.validators.parse_linestring:            string_to_list,
     asf.validators.parse_point:                 string_to_list,
+    asf.validators.parse_bbox:                  string_to_list,
 
     # Number or Range-list:
     asf.validators.parse_int_or_range_list:     string_to_num_or_range_list,
