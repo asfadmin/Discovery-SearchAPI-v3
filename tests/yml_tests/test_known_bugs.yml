@@ -1,0 +1,92 @@
+
+## This file contains test cases with known bugs. Bug is listed above each group. These will fail if run, and will block the AWS pipeline
+
+tests:
+#DS-2766 / DS-3194 open bug for absoluteOrbit - GRFN scenes search correct range, but file returns different value for absoluteOrbit
+#Note: This will fail on prod only, due to GRFN data differences in api-test
+#Note: This is because OrbitCalculatedSpatialDomains has 2 OrbitNumber fields for GRFN products. This can be ignored
+- absoluteOrbit range:
+    absoluteOrbit: 5000-6000
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+#WEB2-1956 open bug for asfframe - for R1, frame in file will not match frame in query
+#tests that will fail: asfframe R1 single, asfframe R1 list, asfframe R1 range
+# Need to grab FRAME_NUMBER instead of ESA_FRAME for radatasat products to pass these 3 asfframe tests
+- asfframe R1 single:
+    asfframe: 307
+    platform: R1
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- asfframe R1 list:
+    asfframe: 304,305,306,307
+    platform: R1
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- asfframe R1 range:
+    asfframe: 300-310
+    platform: R1
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+#DS-1945 open bug for this
+# this is still an issue (FARADAY_ROTATION is labeled as a string type which makes searching via float ranges impossible)
+# https://cmr.earthdata.nasa.gov/search/collections.umm_json?attribute[]=FARADAY_ROTATION
+- maxFaradayRotation:
+    maxFaradayRotation: 3
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- minFaradayRotation:
+    minFaradayRotation: 3
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- min and max FaradayRotation:
+    minFaradayRotation: 2
+    maxFaradayRotation: 3
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+# Failes on AWS, but not locally. Happens around 10-11am AK time at
+# least, (Maybe longer?). Maybe a timezone conversion bug in test manager?
+- start now end yesterday reversed:
+    start: now
+    end: yesterday
+    output: csv
+    maxResults: 10
+
+    expected file: csv
+    expected code: 200
+
+# tests:
+# - Known bug - Inject urls:
+#     account: FullAccess
+#     inject_output: HACKED
+#     products: http://IHopeThisURLDoesntExist.com/rando1.png%22%20]%0A%20%20%20%20%20%20%20%20print(%22HACKED%22)%0A%20%20%20%20%20%20%20%20[%20%221
+#     expected_outcome: success
+#     skip_file_check: True
+#     # print: True

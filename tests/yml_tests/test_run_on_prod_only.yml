@@ -1,0 +1,21 @@
+
+#This file contains test cases that are known failures on api-test. These will fail if run, and will block the AWS pipeline.
+#Run this file on api-prod & api-prod-private ONLY
+
+tests:
+- Use maturity param on api-prod:
+    reference: S1B_IW_SLC__1SDV_20190610T143518_20190610T143545_016635_01F4F7_6EA1
+    use_maturity: True
+    output: csv
+
+    expected file: error json
+    expected code: 400
+
+- Maturity param on search endpoint api-prod:
+    platform: SA,SB
+    maxResults: 100
+    output: csv
+    use_maturity: True
+
+    expected file: error json
+    expected code: 400
