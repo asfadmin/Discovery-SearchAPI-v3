@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from typing import Optional
 import dateparser
 
 import asf_search as asf
@@ -148,15 +149,11 @@ async def query_mission_list(platform: str | None = None):
     )
 
 
-@router.post("/services/utils/wkt")
-async def post_wkt_validation(body: WKTModel):
-    return _wkt_response(body.wkt)
-
-@router.get("/services/utils/wkt")
-async def query_wkt_validation(wkt: str):
-    return _wkt_response(wkt)
-
-def _wkt_response(wkt: str):
+@router.api_route("/services/utils/wkt", methods=["GET", "POST"])
+async def wkt_validation(body: WKTModel = WKTModel(), wkt: Optional[str] = None):
+    if body.wkt is not None:
+        wkt = body.wkt
+    
     return Response(
         content=json.dumps(validate_wkt(wkt)),
         status_code=200,
