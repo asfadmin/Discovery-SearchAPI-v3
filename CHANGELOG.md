@@ -26,6 +26,13 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 -->
 ------
+## [0.1.0](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v0.0.0...v0.0.1)
+
+### Added
+- Legacy API V2 Pytest suite Added, all tests passing
+
+------
+
 ## [0.0.1](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v0.0.0...v0.0.1)
 
 ### Added

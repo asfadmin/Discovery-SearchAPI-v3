@@ -35,4 +35,4 @@ class BaselineSearchOptsModel(SearchOptsModel):
 
 
 class WKTModel(BaseModel):
-    wkt: str = Field(default='')
+    wkt: Optional[str] = None

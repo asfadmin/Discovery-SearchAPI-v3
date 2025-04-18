@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from typing import Optional
 import dateparser
 
 import asf_search as asf
@@ -8,7 +9,7 @@ from fastapi import Depends, FastAPI, Request, HTTPException, APIRouter, UploadF
 from fastapi.responses import Response, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from application.log_router import LoggingRoute
+from .log_router import LoggingRoute
 
 from .asf_env import load_config_maturity
 from .asf_opts import process_baseline_request, process_search_request
@@ -149,17 +150,16 @@ async def query_mission_list(platform: str | None = None):
 
 
 @router.api_route("/services/utils/wkt", methods=["GET", "POST"])
-async def query_wkt_validation(body: WKTModel, wkt: str=''):
-    if len(wkt) == 0:
+async def wkt_validation(body: WKTModel = WKTModel(), wkt: Optional[str] = None):
+    if body.wkt is not None:
         wkt = body.wkt
-
+    
     return Response(
         content=json.dumps(validate_wkt(wkt)),
         status_code=200,
         media_type='application/json; charset=utf-8',
         headers=constants.DEFAULT_HEADERS
     )
-
 
 @router.post('/services/utils/files_to_wkt')
 async def file_to_wkt(files: list[UploadFile]):
@@ -179,7 +179,7 @@ async def file_to_wkt(files: list[UploadFile]):
 def validate_wkt(wkt: str):
     try:
         wrapped, unwrapped, reports = asf.validate_wkt(wkt)
-        repairs = [{'type': report.report_type, 'report': report.report} for report in reports]
+        repairs = [{'type': report.report_type, 'report': report.report} for report in reports if report.report_type != "'type': 'WRAP'"]
     except Exception as exc:
         raise HTTPException(detail=f"Failed to validate wkt: {exc}", status_code=400) from exc
 
