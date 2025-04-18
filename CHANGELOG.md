@@ -26,7 +26,13 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 -->
 ------
-## [0.1.0](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v0.0.0...v0.0.1)
+## [0.1.1](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v0.1.0...v0.1.1)
+
+### Added
+- Added non-edc deployments, tweaked CDK definition to accommodate
+
+------
+## [0.1.0](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v0.0.1...v0.1.0)
 
 ### Added
 - Legacy API V2 Pytest suite Added, all tests passing
