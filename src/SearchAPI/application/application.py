@@ -45,7 +45,7 @@ async def query_params(searchOptions: SearchOptsModel = Depends(process_search_r
     if output.lower() == 'count':
         start = time.perf_counter()
         count=asf.search_count(opts=opts)
-        logging.info(f'/services/search/param count query time {time.perf_counter()-start}')
+        logging.debug(f'/services/search/param count query time {time.perf_counter()-start}')
         return Response(
             content=str(count),
             status_code=200,
@@ -56,7 +56,7 @@ async def query_params(searchOptions: SearchOptsModel = Depends(process_search_r
     try:
         start = time.perf_counter()
         results = asf.search(opts=opts)
-        logging.info(f'/services/search/param query time {time.perf_counter()-start}')
+        logging.debug(f'/services/search/param query time {time.perf_counter()-start}')
         response_info = as_output(results, output)
         return Response(**response_info)
 
@@ -78,7 +78,7 @@ async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(proces
     try:
         start = time.perf_counter()
         reference_product = asf.granule_search(granule_list=[reference], opts=opts)[0]
-        logging.info(f'/services/search/baseline reference query time {time.perf_counter()-start}')
+        logging.debug(f'/services/search/baseline reference query time {time.perf_counter()-start}')
     except (KeyError, IndexError, ValueError) as exc:
         raise HTTPException(detail=f"Reference scene not found: {reference}", status_code=400) from exc
 
@@ -110,7 +110,7 @@ async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(proces
         stack_opts = reference_product.get_stack_opts()
         start = time.perf_counter()
         count = asf.search_count(opts=stack_opts)
-        logging.info(f'/services/search/baseline count stack query time {time.perf_counter()-start}')
+        logging.debug(f'/services/search/baseline count stack query time {time.perf_counter()-start}')
 
         return Response(
             content=str(count),
@@ -123,7 +123,7 @@ async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(proces
     try:
         start = time.perf_counter()
         stack = reference_product.stack(opts=opts)
-        logging.info(f'/services/search/baseline stack query time {time.perf_counter()-start}')
+        logging.debug(f'/services/search/baseline stack query time {time.perf_counter()-start}')
         response_info = as_output(stack, output)
         return Response(**response_info)
 
