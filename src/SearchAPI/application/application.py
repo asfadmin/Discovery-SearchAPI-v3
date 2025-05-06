@@ -9,7 +9,7 @@ from fastapi import Depends, FastAPI, Request, HTTPException, APIRouter, UploadF
 from fastapi.responses import Response, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from .log_router import api_loggerRoute
+from .log_router import LoggingRoute
 from .logger import api_logger
 from .asf_env import load_config_maturity
 from .asf_opts import process_baseline_request, process_search_request
@@ -22,7 +22,7 @@ import time
 
 
 asf.REPORT_ERRORS = False
-router = APIRouter(route_class=api_loggerRoute)
+router = APIRouter(route_class=LoggingRoute)
 app = FastAPI()
 
 app.add_middleware(
