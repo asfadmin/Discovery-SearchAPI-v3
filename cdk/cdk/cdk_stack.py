@@ -61,7 +61,7 @@ class SearchAPIStack(Stack):
                 ),
             **lambda_vpc_kwargs,
         )
-
+        
         api = apigateway.LambdaRestApi(
             self,   
             "search-api-gateway",
@@ -69,31 +69,6 @@ class SearchAPIStack(Stack):
             proxy=True,
             default_cors_preflight_options=apigateway.CorsOptions(
                 allow_origins=apigateway.Cors.ALL_ORIGINS, allow_methods=apigateway.Cors.ALL_METHODS
-            ),
-            deploy_options=apigateway.StageOptions(
-                access_log_destination=apigateway.LogGroupLogDestination(
-                    logs.LogGroup(
-                        self,
-                        'SearchApiV3LogGroup',
-                        retention=logs.RetentionDays.THREE_MONTHS,
-                    )
-                ), # type: ignore
-                access_log_format=apigateway.AccessLogFormat.custom(
-                    json.dumps(
-                        {
-                            'sourceIp': '$context.identity.sourceIp',
-                            'httpMethod': '$context.httpMethod',
-                            'path': '$context.path',
-                            'status': '$context.status',
-                            'responseLength': '$context.responseLength',
-                            'responseLatency': '$context.responseLatency',
-                            'requestTime': '$context.requestTime',
-                            'protocol': '$context.protocol',
-                            'userAgent': '$context.identity.userAgent',
-                            'requestId': '$context.requestId',
-                        }
-                    )
-                ),
             ),
             **apigateway_kwargs,
             # endpoint_configuration=apigateway.EndpointConfiguration(
