@@ -1,5 +1,5 @@
 import json
-import logging
+
 import os
 from typing import Optional
 import dateparser
@@ -9,8 +9,8 @@ from fastapi import Depends, FastAPI, Request, HTTPException, APIRouter, UploadF
 from fastapi.responses import Response, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from .log_router import LoggingRoute
-
+from .log_router import api_loggerRoute
+from .logger import api_logger
 from .asf_env import load_config_maturity
 from .asf_opts import process_baseline_request, process_search_request
 from .health import get_cmr_health
@@ -22,7 +22,7 @@ import time
 
 
 asf.REPORT_ERRORS = False
-router = APIRouter(route_class=LoggingRoute)
+router = APIRouter(route_class=api_loggerRoute)
 app = FastAPI()
 
 app.add_middleware(
@@ -45,7 +45,7 @@ async def query_params(searchOptions: SearchOptsModel = Depends(process_search_r
     if output.lower() == 'count':
         start = time.perf_counter()
         count=asf.search_count(opts=opts)
-        logging.debug(f'/services/search/param count query time {time.perf_counter()-start}')
+        api_logger.info(f'/services/search/param count query time {time.perf_counter()-start}')
         return Response(
             content=str(count),
             status_code=200,
@@ -56,7 +56,7 @@ async def query_params(searchOptions: SearchOptsModel = Depends(process_search_r
     try:
         start = time.perf_counter()
         results = asf.search(opts=opts)
-        logging.debug(f'/services/search/param query time {time.perf_counter()-start}')
+        api_logger.info(f'/services/search/param query time {time.perf_counter()-start}')
         response_info = as_output(results, output)
         return Response(**response_info)
 
@@ -78,7 +78,7 @@ async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(proces
     try:
         start = time.perf_counter()
         reference_product = asf.granule_search(granule_list=[reference], opts=opts)[0]
-        logging.debug(f'/services/search/baseline reference query time {time.perf_counter()-start}')
+        api_logger.info(f'/services/search/baseline reference query time {time.perf_counter()-start}')
     except (KeyError, IndexError, ValueError) as exc:
         raise HTTPException(detail=f"Reference scene not found: {reference}", status_code=400) from exc
 
@@ -110,7 +110,7 @@ async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(proces
         stack_opts = reference_product.get_stack_opts()
         start = time.perf_counter()
         count = asf.search_count(opts=stack_opts)
-        logging.debug(f'/services/search/baseline count stack query time {time.perf_counter()-start}')
+        api_logger.info(f'/services/search/baseline count stack query time {time.perf_counter()-start}')
 
         return Response(
             content=str(count),
@@ -123,7 +123,7 @@ async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(proces
     try:
         start = time.perf_counter()
         stack = reference_product.stack(opts=opts)
-        logging.debug(f'/services/search/baseline stack query time {time.perf_counter()-start}')
+        api_logger.info(f'/services/search/baseline stack query time {time.perf_counter()-start}')
         response_info = as_output(stack, output)
         return Response(**response_info)
 
@@ -215,7 +215,7 @@ async def health_check():
         with open(version_path, 'r', encoding="utf-8") as version_file:
             api_version = json.load(version_file)
     except Exception as exc:
-        logging.debug(exc)
+        api_logger.info(exc)
         api_version = {'version': 'unknown'}
 
     cfg = load_config_maturity()
