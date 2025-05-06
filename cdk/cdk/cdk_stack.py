@@ -1,9 +1,11 @@
+import json
 from aws_cdk import (
     Stack,
     Duration,
     aws_lambda as lambda_,
     aws_apigateway as apigateway,
-    aws_ec2 as ec2
+    aws_ec2 as ec2,
+    aws_logs as logs,
 )
 from constructs import Construct
 
@@ -64,6 +66,35 @@ class SearchAPIStack(Stack):
             self,   
             "search-api-gateway",
             handler=search_api_lambda,
+            proxy=True,
+            default_cors_preflight_options=apigateway.CorsOptions(
+                allow_origins=apigateway.Cors.ALL_ORIGINS, allow_methods=apigateway.Cors.ALL_METHODS
+            ),
+            deploy_options=apigateway.StageOptions(
+                access_log_destination=apigateway.LogGroupLogDestination(
+                    logs.LogGroup(
+                        self,
+                        'SearchApiV3LogGroup',
+                        retention=logs.RetentionDays.THREE_MONTHS,
+                    )
+                ), # type: ignore
+                access_log_format=apigateway.AccessLogFormat.custom(
+                    json.dumps(
+                        {
+                            'sourceIp': '$context.identity.sourceIp',
+                            'httpMethod': '$context.httpMethod',
+                            'path': '$context.path',
+                            'status': '$context.status',
+                            'responseLength': '$context.responseLength',
+                            'responseLatency': '$context.responseLatency',
+                            'requestTime': '$context.requestTime',
+                            'protocol': '$context.protocol',
+                            'userAgent': '$context.identity.userAgent',
+                            'requestId': '$context.requestId',
+                        }
+                    )
+                ),
+            ),
             **apigateway_kwargs,
             # endpoint_configuration=apigateway.EndpointConfiguration(
             #     # https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_apigateway.EndpointConfiguration.html
