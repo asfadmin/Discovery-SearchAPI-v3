@@ -56,7 +56,7 @@ class SearchAPIStack(Stack):
             self,
             "SearchAPIFunction",
             timeout=Duration.seconds(30),
-            memory_size=3009,
+            memory_size=5308,
             code=lambda_.DockerImageCode.from_image_asset(
                 directory='..'
                 ),
