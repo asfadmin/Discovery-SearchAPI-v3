@@ -54,7 +54,7 @@ class SearchAPIStack(Stack):
 
         search_api_lambda = lambda_.DockerImageFunction(
             self,
-            "SearchAPIFunction",
+            id="SearchAPI-V3-Lambda-Function",
             timeout=Duration.seconds(30),
             memory_size=5308,
             code=lambda_.DockerImageCode.from_image_asset(
@@ -65,7 +65,7 @@ class SearchAPIStack(Stack):
         
         api = apigateway.LambdaRestApi(
             self,   
-            "search-api-gateway",
+            id="SearchAPI-V3-RestAPI",
             handler=search_api_lambda,
             proxy=True,
             default_cors_preflight_options=apigateway.CorsOptions(
