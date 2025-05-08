@@ -1,4 +1,6 @@
 name: SearchAPI pytest suite
+permissions:
+  contents: read
 on:
     pull_request:
       branches:
@@ -33,5 +35,5 @@ jobs:
         
         - name: run tests
           shell: bash
-          run: "pytest --api=http://127.0.0.1:8080 tests/yml_tests/ --df bugs --df prod_only"
+          run: "pytest tests/yml_tests/ --df bugs --df prod_only"
   
