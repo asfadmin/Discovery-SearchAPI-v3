@@ -123,6 +123,7 @@ tests:
 - beamMode list S1B 100:
     beamMode: EW,IW,S1,S2,S3,S4,S5,S6,WV
     platform: Sentinel-1B
+    dataset: SENTINEL-1
     maxresults: 100
     output: csv
 

@@ -1,5 +1,6 @@
 import logging
-import requests, urllib     # For talking w/ API
+from fastapi.testclient import TestClient
+import urllib     # For talking w/ API
 import json, csv            # File stuff
 import re                   # Opening/Reading the file stuff
 from io import StringIO     # Opening/Reading the file stuff
@@ -9,8 +10,8 @@ from SearchAPI.application.asf_opts import string_to_obj_map
 import asf_search
 
 class test_baseline():
-    def __init__(self, **args):
-
+    def __init__(self, client: TestClient, **args):
+        self.client = client
         test_info = args["test_info"]
         api_info = args["config"].getoption("--api")
         test_api = api_info["this_api"]
@@ -128,9 +129,9 @@ class test_baseline():
             file_content["count"] = count
             return file_content
 
-        h = requests.head(self.query)
+        h = self.client.head(self.query)
         content_header = h.headers.get('content-type')
-        file_content = requests.get(self.query).content.decode("utf-8")
+        file_content = self.client.get(self.query).content.decode("utf-8")
         
         # text/csv; charset=utf-8
         try:

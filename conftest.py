@@ -34,21 +34,22 @@ def api_type(user_input: str) -> str:
         api_info = maturities["default"]
         api_info["this_api"] = user_input
 
+    return api_info
     # Assume it's a url now, and try to connect:
     # Try for a bit. It's possible lambda isn't up yet or something
-    endTime = datetime.datetime.now() + datetime.timedelta(minutes=2)
-    while datetime.datetime.now() < endTime:
-        try:
-            r = requests.get(api_info["this_api"], timeout=30)
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            # If it throws instantly, don't bombard the API:
-            time.sleep(2.0)
-            # Jump back up to the top and try again:
-            continue
-        if r.status_code == 200:
-            # It connected!! You're good:
-            return api_info
-    raise argparse.ArgumentTypeError(f"ERROR: Could not connect to url '{user_input}'.")
+    # endTime = datetime.datetime.now() + datetime.timedelta(minutes=2)
+    # while datetime.datetime.now() < endTime:
+    #     try:
+    #         r = requests.get(api_info["this_api"], timeout=30)
+    #     except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+    #         # If it throws instantly, don't bombard the API:
+    #         time.sleep(2.0)
+    #         # Jump back up to the top and try again:
+    #         continue
+    #     if r.status_code == 200:
+    #         # It connected!! You're good:
+    #         return api_info
+    # raise argparse.ArgumentTypeError(f"ERROR: Could not connect to url '{user_input}'.")
 
 def string_to_bool(user_input: str) -> bool:
     user_input = str(user_input).upper()

@@ -12,12 +12,14 @@ from tzlocal import get_localzone
 from zoneinfo import ZoneInfo
 # from pytz import timezone
 
+from fastapi.testclient import TestClient
 # from SearchAPI.CMR import Input as test_input
 from SearchAPI.application.asf_opts import string_to_obj_map
 import asf_search
 
 class test_URL_Manager():
-    def __init__(self, **args):
+    def __init__(self, client: TestClient, **args):
+        self.client = client
         self.error_msg = "Reason: {0}\n"
         test_info = args["test_info"]
         test_vars = args["test_type_vars"]
@@ -138,10 +140,10 @@ class test_URL_Manager():
             file_content["count"] = count
             return file_content
 
-        h = requests.head(self.query)
+        h = self.client.head(self.query)
         content_header = h.headers.get('content-type')
         try:
-            file_content = requests.get(self.query).content.decode("utf-8")
+            file_content = self.client.get(self.query).content.decode("utf-8")
         except requests.exceptions.ChunkedEncodingError:
             assert False, self.error_msg.format("Server returned no info. Normally means it's overloaded.")
         # text/csv; charset=utf-8

@@ -1,12 +1,25 @@
 name: SearchAPI deploy action (test)
 
 on:
-  push:
-    branches:
-      - test
+    pull_request:
+      branches:
+        - test
+      types:
+        - opened
+        - reopened
+        - synchronize
+      paths:
+        - '**.py'
 
 jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: run test suite
+        uses: ./.github/workflows/run-pytest
+        
   deploy-edc-test:
+    needs: run-tests
     runs-on: ubuntu-latest
     environment: edc-test
     permissions:
@@ -26,6 +39,7 @@ jobs:
           security-group: ${{ secrets.SECURITY_GROUP }}
 
   deploy-test:
+    needs: run-tests
     runs-on: ubuntu-latest
     environment: test
     permissions:
