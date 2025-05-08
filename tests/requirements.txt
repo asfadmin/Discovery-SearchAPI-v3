@@ -6,3 +6,4 @@ httpx
 pytest-automation
 pytest-xdist
 pytest-cov
+pytest-rerunfailures

@@ -7,6 +7,10 @@ from fastapi.testclient import TestClient
 
 from SearchAPI.application.application import app
 
+import asf_search
+
+asf_search.INTERNAL.CMR_TIMEOUT = 60
+
 client = TestClient(app=app, base_url='http://127.0.0.1:8080')
 ##########################
 ## SearchAPI Main tests ##
