@@ -5,3 +5,4 @@ requests-mock
 httpx
 pytest-automation
 pytest-xdist
+pytest-cov
