@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: run test suite
-        uses: ./.github/workflows/run-pytest
+        uses: ./.github/workflows/pytest-composite
         
   deploy-edc-test:
     needs: run-tests
