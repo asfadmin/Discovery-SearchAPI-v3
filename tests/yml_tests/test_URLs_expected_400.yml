@@ -750,7 +750,7 @@ tests:
 
 - processingDate specchar invalid:
     processingDate: ~
-    maxResults: 1200
+    maxResults: 250
     output: csv
 
     expected file: error json
