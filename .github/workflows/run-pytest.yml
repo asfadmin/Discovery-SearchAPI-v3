@@ -35,5 +35,5 @@ jobs:
         
         - name: run tests
           shell: bash
-          run: "pytest tests/yml_tests/ --df bugs --df prod_only"
+          run: "pytest -n auto tests/yml_tests/ --df bugs --df prod_only"
   
