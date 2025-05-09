@@ -1,9 +1,9 @@
 name: SearchAPI deploy action (test)
 
 on:
-  push:
-    branches:
-      - test
+    push:
+      branches:
+        - test
 
 jobs:
   deploy-edc-test:

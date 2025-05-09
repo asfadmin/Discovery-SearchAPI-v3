@@ -3,3 +3,7 @@ boto3
 requests
 requests-mock
 httpx
+pytest-automation
+pytest-xdist
+pytest-cov
+pytest-rerunfailures

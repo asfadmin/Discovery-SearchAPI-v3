@@ -318,7 +318,7 @@ tests:
     platform: SENTI
     start: 3+year+ago
     end: now
-    maxResults: 2000
+    maxResults: 1000
     output: csv
 
     expected file: blank csv
