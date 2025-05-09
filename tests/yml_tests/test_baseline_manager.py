@@ -16,6 +16,7 @@ class test_baseline():
         api_info = args["config"].getoption("--api")
         test_api = api_info["this_api"]
 
+        self.output_type = None
         if test_info.get('output') is not None:
             self.output_type = test_info['output']
 

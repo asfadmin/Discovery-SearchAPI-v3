@@ -24,6 +24,7 @@ class test_URL_Manager():
         self.error_msg = "Reason: {0}\n"
         test_info = args["test_info"]
 
+        self.output_type = None
         if test_info.get('output') is not None:
             self.output_type = test_info['output']
 
