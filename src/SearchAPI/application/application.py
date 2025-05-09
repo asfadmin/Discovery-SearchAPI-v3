@@ -53,7 +53,7 @@ async def query_params(searchOptions: SearchOptsModel = Depends(process_search_r
             headers=constants.DEFAULT_HEADERS
         )
 
-    if output.lower() == 'asf-search':
+    if output.lower() == 'python':
         start = time.perf_counter()
         file_name, search_script = get_asf_search_script(opts)
         
@@ -90,7 +90,7 @@ async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(proces
     request_method = searchOptions.request_method
     # Load the reference scene:
 
-    if output.lower() == 'asf-search':
+    if output.lower() == 'python':
         start = time.perf_counter()
         file_name, search_script = get_asf_search_script(opts, reference=reference, search_endpoint='baseline')
         
