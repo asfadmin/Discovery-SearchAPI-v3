@@ -1,3 +1,4 @@
+from typing import Literal
 import requests
 import json
 import asf_search as asf
@@ -9,6 +10,59 @@ from datetime import datetime
 from . import constants
 from . import asf_env
 
+asf_search_script_template = '''## This script requires that the asf-search python module is installed
+## to install, run the following in a terminal
+## `pip install asf-search`
+## Then from the correct folder in your terminal run:
+## `python {0}`
+## 
+## For more information, see the official documentation
+## https://docs.asf.alaska.edu/asf_search/basics/
+import asf_search as asf
+import pprint
+
+opts=asf.ASFSearchOptions(**{1})
+
+## if the search requires authentication, uncomment
+## the lines below, and enter your EDL credentials when prompted
+## (use `session.auth_with_token(getpass('EDL Token'))` instead if a CMR bearer token is required)
+# from get_pass import get_pass
+# session=asf.ASFSession()
+# session.auth_with_creds(input('EDL Username'), getpass('EDL Password'))
+# opts.session = session
+
+results=asf.search(opts=opts)
+pprint.pp(results.geojson())
+
+'''
+
+asf_search_baseline_script_template= '''## This script requires that the asf-search python module is installed
+## to install, run the following in a terminal
+## `pip install asf-search`
+## Then from the correct folder in your terminal run:
+## `python {0}`
+
+## For more information, see the official documentation
+## https://docs.asf.alaska.edu/asf_search/basics/
+import asf_search as asf
+import pprint
+
+opts=asf.ASFSearchOptions(**{2})
+
+## if the search requires authentication, uncomment
+## the lines below, and enter your EDL credentials when prompted
+## (use `session.auth_with_token(getpass('EDL Token'))` instead if a CMR bearer token is required)
+# from get_pass import get_pass
+# session=asf.ASFSession()
+# session.auth_with_creds(input('EDL Username'), getpass('EDL Password'))
+# opts.session = session
+
+reference_product = asf.granule_search(granule_list=['{1}'], opts=opts)[0]
+stack = reference_product.stack(opts=opts)
+
+pprint.pp(stack.geojson())
+
+'''
 
 def as_output(results: asf.ASFSearchResults, output: str) -> dict:
     output_format = output.lower()
@@ -107,6 +161,19 @@ def get_download(results: asf.ASFSearchResults, filename=None):
     script_request = requests.post(script_url, data=script_data, timeout=30)
     return script_request.text
 
+def get_asf_search_script(
+        opts: asf.ASFSearchOptions,
+        reference: str = None,
+        search_endpoint: Literal['param', 'baseline'] = 'param'
+        ) -> tuple[str, str]:
+    
+    if search_endpoint == 'param':
+        file_name=make_filename('py', prefix='asf-search-script')
+        output_script = asf_search_script_template.format(file_name, str(opts))
+    else:
+        file_name=make_filename('py', prefix='asf-search-baseline-script')
+        output_script = asf_search_baseline_script_template.format(file_name, reference, str(opts))
+    return file_name, output_script
 
-def make_filename(suffix):
-    return f'asf-results-{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}.{suffix}'
+def make_filename(suffix, prefix:str = 'asf-results'):
+    return f'{prefix}-{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}.{suffix}'

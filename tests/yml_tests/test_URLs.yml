@@ -936,6 +936,22 @@ tests:
     expected file: x-python
     expected code: 200
 
+- output asf-search Sentinel:
+    platform: SB
+    maxResults: 200
+    output: asf-search
+
+    expected file: geojson
+    expected code: 200
+
+- output asf-search OPERA-S1:
+    dataset: OPERA-S1
+    maxResults: 100
+    output: asf-search
+
+    expected file: geojson
+    expected code: 200
+
 - output download Avnir:
     platform: Alos
     instrument: Avnir-2

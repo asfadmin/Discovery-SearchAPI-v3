@@ -14,6 +14,14 @@ tests:
     expected file: csv
     expected code: 200
 
+- baseline Sentinel asf-search:
+    reference: S1B_IW_SLC__1SDV_20190610T143518_20190610T143545_016635_01F4F7_6EA1
+    # use_maturity: True
+    output: asf-search
+
+    expected file: x-python
+    expected code: 200
+
 - baseline E1:
     reference: E1_23942_STD_F155
     output: csv
@@ -43,6 +51,13 @@ tests:
     output: csv
 
     expected file: csv
+    expected code: 200
+
+- baseline ALOS asf-search:
+    reference: ALPSRP279071320
+    output: asf-search
+
+    expected file: x-python
     expected code: 200
 
 - baseline count:

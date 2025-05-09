@@ -17,11 +17,16 @@ from fastapi.testclient import TestClient
 from SearchAPI.application.asf_opts import string_to_obj_map
 import asf_search
 
+
 class test_URL_Manager():
     def __init__(self, client: TestClient, **args):
         self.client = client
         self.error_msg = "Reason: {0}\n"
         test_info = args["test_info"]
+
+        if test_info.get('output') is not None:
+            self.output_type = test_info['output']
+
         test_vars = args["test_type_vars"]
 
         api_info = args["config"].getoption("--api")
@@ -121,6 +126,25 @@ class test_URL_Manager():
             file_content["files"] = files
             return file_content
 
+        def asfSearchToDict(asf_search_file):
+            # Run the script and compare to results
+            try:
+                data = ast.parse(asf_search_file)
+            except SyntaxError:
+                return ValueError('Failed to parse generated asf-search script')
+            
+            outputs = {}
+            compiled_data = compile(data, filename='<string>', mode='exec')
+            exec(compiled_data, None, outputs)
+            geojson_data = outputs.get('results', outputs.get('stack', asf_search.ASFSearchResults([]))).geojson()
+
+            geojson_query = self.query.replace('asf-search', 'geojson')
+            geojson_api = json.loads(self.client.get(geojson_query).content.decode("utf-8"))
+            
+            script_geojson = str(geojson_data)
+            assert script_geojson == str(geojson_api), 'asf-search file output differed from equivalent api geojson output'
+            return script_geojson
+
         def jsonToDict(json_data):
             # Combine all matching key-value pairs, to-> key: [list of vals]
             file_content = {}
@@ -171,12 +195,17 @@ class test_URL_Manager():
                 content_type = "blank csv"
         ## DOWNLOAD / PLAIN
         elif content_type == "plain" or content_type == "x-python":
-            file_content = downloadToDict(file_content)
-            # how many granules are in the script:
-            if file_content["count"] == 0:
-                content_type = "blank download"
+            if self.output_type == 'download':
+                file_content = downloadToDict(file_content)
+                if file_content["count"] == 0:
+                    content_type = "blank download"
+                else:
+                    content_type = "x-python"
             else:
-                content_type = "x-python"
+                file_content = asfSearchToDict(file_content)
+                content_type = 'geojson'
+            # how many granules are in the script:
+
         ## GEOJSON
         elif content_type == "geo+json":
             content_type = "geojson"

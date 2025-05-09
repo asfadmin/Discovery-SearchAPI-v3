@@ -15,7 +15,7 @@ from .asf_env import load_config_maturity
 from .asf_opts import process_baseline_request, process_search_request
 from .health import get_cmr_health
 from .models import BaselineSearchOptsModel, SearchOptsModel, WKTModel
-from .output import as_output
+from .output import as_output, get_asf_search_script
 from .files_to_wkt import FilesToWKT
 from . import constants
 import time
@@ -53,6 +53,20 @@ async def query_params(searchOptions: SearchOptsModel = Depends(process_search_r
             headers=constants.DEFAULT_HEADERS
         )
 
+    if output.lower() == 'asf-search':
+        start = time.perf_counter()
+        file_name, search_script = get_asf_search_script(opts)
+        
+        api_logger.info(f'/services/search/param count query time {time.perf_counter()-start}')
+        return Response(
+            content=search_script,
+            status_code=200,
+            media_type='text/x-python',
+            headers= {
+                    **constants.DEFAULT_HEADERS,
+                    'Content-Disposition': f"attachment; filename={file_name}",
+                }
+        )
     try:
         start = time.perf_counter()
         results = asf.search(opts=opts)
@@ -75,6 +89,21 @@ async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(proces
     reference = searchOptions.reference
     request_method = searchOptions.request_method
     # Load the reference scene:
+
+    if output.lower() == 'asf-search':
+        start = time.perf_counter()
+        file_name, search_script = get_asf_search_script(opts, reference=reference, search_endpoint='baseline')
+        
+        api_logger.info(f'/services/search/param count query time {time.perf_counter()-start}')
+        return Response(
+            content=search_script,
+            status_code=200,
+            media_type='text/x-python',
+            headers= {
+                    **constants.DEFAULT_HEADERS,
+                    'Content-Disposition': f"attachment; filename={file_name}",
+                }
+        )
     try:
         start = time.perf_counter()
         reference_product = asf.granule_search(granule_list=[reference], opts=opts)[0]

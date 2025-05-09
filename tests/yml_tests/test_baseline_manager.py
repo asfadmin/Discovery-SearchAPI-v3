@@ -16,6 +16,8 @@ class test_baseline():
         api_info = args["config"].getoption("--api")
         test_api = api_info["this_api"]
 
+        if test_info.get('output') is not None:
+            self.output_type = test_info['output']
 
         url_parts = [test_api, args["test_type_vars"]["endpoint"]+"?"]
         full_url = '/'.join(s.strip('/') for s in url_parts) # If both/neither have '/' between them, this still joins them correctly
@@ -110,6 +112,25 @@ class test_baseline():
             file_content["files"] = files
             return file_content
 
+        def asfSearchToDict(asf_search_file):
+            # Run the script and compare to results
+            try:
+                data = ast.parse(asf_search_file)
+            except SyntaxError:
+                return ValueError('Failed to parse generated asf-search script')
+            
+            outputs = {}
+            compiled_data = compile(data, filename='<string>', mode='exec')
+            exec(compiled_data, None, outputs)
+            geojson_data = outputs.get('results', outputs.get('stack', asf_search.ASFSearchResults([]))).geojson()
+
+            geojson_query = self.query.replace('asf-search', 'geojson')
+            geojson_api = json.loads(self.client.get(geojson_query).content.decode("utf-8"))
+            
+            script_geojson = str(geojson_data)
+            assert script_geojson == str(geojson_api), 'asf-search file output differed from equivalent api geojson output'
+            return script_geojson
+
         def jsonToDict(json_data):
             # Combine all matching key-value pairs, to-> key: [list of vals]
             file_content = {}
@@ -162,6 +183,10 @@ class test_baseline():
                 content_type = "blank download"
             else:
                 content_type = "download"
+
+        elif self.output_type == 'x-python':
+            file_content = asfSearchToDict(file_content)
+            content_type = 'geojson'
         ## GEOJSON
         elif content_type == "geo+json":
             content_type = "geojson"

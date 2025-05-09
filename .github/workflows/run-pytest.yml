@@ -39,7 +39,7 @@ jobs:
           run: |
             pytest -n auto tests/yml_tests/ \
             --df bugs --df prod_only --cov \
-            --reruns 3 --reruns-delay 10 --only-rerun CMR_TIMEOUT
+            --reruns 3 --reruns-delay 10 --only-rerun CMR_TIMEOUT \
             --cov-branch --cov-report=xml
   
         - name: Upload coverage to Codecov
