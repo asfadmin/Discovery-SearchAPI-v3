@@ -32,7 +32,3 @@ class BaselineSearchOptsModel(SearchOptsModel):
     Baseline search request model
     """
     reference: str
-
-
-class WKTModel(BaseModel):
-    wkt: Optional[str] = None
