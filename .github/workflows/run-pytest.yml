@@ -11,7 +11,8 @@ on:
         - reopened
         - synchronize
       paths:
-        - '**.py'
+        - 'src/**.py'
+        # - 'cdk/**.py'
 
 
 jobs:

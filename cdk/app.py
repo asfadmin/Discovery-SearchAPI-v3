@@ -29,7 +29,7 @@ SearchAPIStack(app, f"SearchAPIStack{suffix}",
         region=os.getenv('CDK_DEFAULT_REGION')
     ),
     description=f'SearchAPI V3 CDK Lambda Stack{" (staging)" if staging else ""}',
-    stack_name='SearchAPI-V3-Stack{suffix}',
+    stack_name=f'SearchAPI-V3-Stack{suffix}',
     # Uncomment the next line if you know exactly what Account and Region you
     # want to deploy the stack to. */
 
