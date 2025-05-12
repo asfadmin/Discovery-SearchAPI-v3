@@ -79,6 +79,9 @@ jobs:
       needs: [deploy-edc-test-staging]
       runs-on: ubuntu-latest
       environment: edc-test
+      permissions:
+        id-token: write
+        contents: read
       steps:
         - name: Checkout code
           uses: actions/checkout@v4
@@ -128,6 +131,9 @@ jobs:
       needs: [deploy-test-staging]
       runs-on: ubuntu-latest
       environment: test
+      permissions:
+        id-token: write
+        contents: read
       steps:
         - name: Checkout code
           uses: actions/checkout@v4
