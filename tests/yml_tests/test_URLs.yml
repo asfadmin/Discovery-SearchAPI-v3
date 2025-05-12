@@ -1041,7 +1041,7 @@ tests:
 - platform SB:
     platform: SB
     start: "2016-01-01T00:00:00Z"
-    end: "2017-01-02T00:00:00Z"
+    end: "2016-11-02T00:00:00Z"
     maxResults: 200
     output: csv
 
