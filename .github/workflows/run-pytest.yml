@@ -106,7 +106,7 @@ jobs:
         - name: run tests
           shell: bash
           run: |
-            pytest tests/yml_tests/test_stack.py \
+            pytest tests/integration/test_stack.py \
             --reruns 3 --reruns-delay 10
 
     deploy-test-staging:
@@ -159,5 +159,5 @@ jobs:
         - name: run tests
           shell: bash
           run: |
-            pytest tests/yml_tests/test_stack.py \
+            pytest tests/integration/test_stack.py \
             --reruns 3 --reruns-delay 10
