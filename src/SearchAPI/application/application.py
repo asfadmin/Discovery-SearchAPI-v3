@@ -12,9 +12,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from .log_router import LoggingRoute
 from .logger import api_logger
 from .asf_env import load_config_maturity
-from .asf_opts import process_baseline_request, process_search_request
+from .asf_opts import process_baseline_request, process_search_request, process_wkt_request
 from .health import get_cmr_health
-from .models import BaselineSearchOptsModel, SearchOptsModel, WKTModel
+from .models import BaselineSearchOptsModel, SearchOptsModel
 from .output import as_output, get_asf_search_script
 from .files_to_wkt import FilesToWKT
 from . import constants
@@ -53,7 +53,7 @@ async def query_params(searchOptions: SearchOptsModel = Depends(process_search_r
             headers=constants.DEFAULT_HEADERS
         )
 
-    if output.lower() == 'asf-search':
+    if output.lower() == 'python':
         start = time.perf_counter()
         file_name, search_script = get_asf_search_script(opts)
         
@@ -90,7 +90,7 @@ async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(proces
     request_method = searchOptions.request_method
     # Load the reference scene:
 
-    if output.lower() == 'asf-search':
+    if output.lower() == 'python':
         start = time.perf_counter()
         file_name, search_script = get_asf_search_script(opts, reference=reference, search_endpoint='baseline')
         
@@ -194,10 +194,7 @@ async def query_mission_list(platform: str | None = None):
 
 
 @router.api_route("/services/utils/wkt", methods=["GET", "POST"])
-async def wkt_validation(body: WKTModel = WKTModel(), wkt: Optional[str] = None):
-    if body.wkt is not None:
-        wkt = body.wkt
-    
+async def wkt_validation(wkt: str = Depends(process_wkt_request)):
     return Response(
         content=json.dumps(validate_wkt(wkt)),
         status_code=200,

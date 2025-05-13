@@ -1,0 +1,66 @@
+{
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              178.996918,
+              -77.640137
+            ],
+            [
+              -172.952576,
+              -74.445
+            ],
+            [
+              -159.567245,
+              -75.780891
+            ],
+            [
+              -164.667725,
+              -79.350601
+            ],
+            [
+              178.996918,
+              -77.640137
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "beamModeType": "EW",
+        "browse": [
+          "https://datapool.asf.alaska.edu/BROWSE/SA/S1A_EW_GRDM_1SDH_20250408T093945_20250408T094045_058663_07437D_391D.jpg"
+        ],
+        "bytes": "253460014",
+        "centerLat": "-76.9302",
+        "centerLon": "-169.5545",
+        "faradayRotation": null,
+        "fileID": "S1A_EW_GRDM_1SDH_20250408T093945_20250408T094045_058663_07437D_391D-GRD_MD",
+        "fileName": "S1A_EW_GRDM_1SDH_20250408T093945_20250408T094045_058663_07437D_391D.zip",
+        "flightDirection": "DESCENDING",
+        "frameNumber": "900",
+        "granuleType": "SENTINEL_1A_FRAME",
+        "groupID": "S1A_EWDH_0899_0913_058663_141",
+        "insarStackId": null,
+        "md5sum": "d5027371042696fb884edce1099bc883",
+        "offNadirAngle": null,
+        "orbit": "58663",
+        "pathNumber": "141",
+        "platform": "Sentinel-1A",
+        "pointingAngle": null,
+        "polarization": "HH+HV",
+        "processingDate": "2025-04-08T09:39:45.287665Z",
+        "processingLevel": "GRD_MD",
+        "sceneName": "S1A_EW_GRDM_1SDH_20250408T093945_20250408T094045_058663_07437D_391D",
+        "sensor": "C-SAR",
+        "startTime": "2025-04-08T09:39:45.287665Z",
+        "stopTime": "2025-04-08T09:40:45.284269Z",
+        "url": "https://datapool.asf.alaska.edu/GRD_MD/SA/S1A_EW_GRDM_1SDH_20250408T093945_20250408T094045_058663_07437D_391D.zip"
+      },
+      "type": "Feature"
+    }
+  ],
+  "type": "FeatureCollection"
+}

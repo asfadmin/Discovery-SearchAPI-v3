@@ -17,7 +17,7 @@ tests:
 - baseline Sentinel asf-search:
     reference: S1B_IW_SLC__1SDV_20190610T143518_20190610T143545_016635_01F4F7_6EA1
     # use_maturity: True
-    output: asf-search
+    output: python
 
     expected file: x-python
     expected code: 200
@@ -55,7 +55,7 @@ tests:
 
 - baseline ALOS asf-search:
     reference: ALPSRP279071320
-    output: asf-search
+    output: python
 
     expected file: x-python
     expected code: 200

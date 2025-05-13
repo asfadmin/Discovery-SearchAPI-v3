@@ -118,14 +118,14 @@ class test_baseline():
             try:
                 data = ast.parse(asf_search_file)
             except SyntaxError:
-                return ValueError('Failed to parse generated asf-search script')
+                return ValueError('Failed to parse generated asf-search python script')
             
             outputs = {}
             compiled_data = compile(data, filename='<string>', mode='exec')
             exec(compiled_data, None, outputs)
             geojson_data = outputs.get('results', outputs.get('stack', asf_search.ASFSearchResults([]))).geojson()
 
-            geojson_query = self.query.replace('asf-search', 'geojson')
+            geojson_query = self.query.replace('python', 'geojson')
             geojson_api = json.loads(self.client.get(geojson_query).content.decode("utf-8"))
             
             script_geojson = str(geojson_data)

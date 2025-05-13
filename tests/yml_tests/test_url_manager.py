@@ -132,18 +132,18 @@ class test_URL_Manager():
             try:
                 data = ast.parse(asf_search_file)
             except SyntaxError:
-                return ValueError('Failed to parse generated asf-search script')
+                return ValueError('Failed to parse generated asf-search python script')
             
             outputs = {}
             compiled_data = compile(data, filename='<string>', mode='exec')
             exec(compiled_data, None, outputs)
             geojson_data = outputs.get('results', outputs.get('stack', asf_search.ASFSearchResults([]))).geojson()
 
-            geojson_query = self.query.replace('asf-search', 'geojson')
+            geojson_query = self.query.replace('python', 'geojson')
             geojson_api = json.loads(self.client.get(geojson_query).content.decode("utf-8"))
             
             script_geojson = str(geojson_data)
-            assert script_geojson == str(geojson_api), 'asf-search file output differed from equivalent api geojson output'
+            assert script_geojson == str(geojson_api), 'asf-search python file output differed from equivalent api geojson output'
             return script_geojson
 
         def jsonToDict(json_data):

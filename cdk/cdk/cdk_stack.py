@@ -12,7 +12,7 @@ from constructs import Construct
 
 class SearchAPIStack(Stack):
 
-    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, staging: bool = False, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         try:
@@ -52,9 +52,10 @@ class SearchAPIStack(Stack):
                 ),
             }
 
+        lambda_id = f'SearchAPI-V3{"-Staging" if staging else ""}-Lambda-Function'
         search_api_lambda = lambda_.DockerImageFunction(
             self,
-            id="SearchAPI-V3-Lambda-Function",
+            id=lambda_id,
             timeout=Duration.seconds(30),
             memory_size=5308,
             code=lambda_.DockerImageCode.from_image_asset(
@@ -63,9 +64,11 @@ class SearchAPIStack(Stack):
             **lambda_vpc_kwargs,
         )
         
+        staging
+        api_id = f'SearchAPI-V3{"-Staging" if staging else ""}-RestAPI'
         api = apigateway.LambdaRestApi(
             self,   
-            id="SearchAPI-V3-RestAPI",
+            id=api_id,
             handler=search_api_lambda,
             proxy=True,
             default_cors_preflight_options=apigateway.CorsOptions(
