@@ -51,7 +51,6 @@ runs:
       
     - name: Deploy to AWS
       shell: bash
-      if: ${{ inputs.staging }}
       run: |
         cd cdk
         cdk deploy --require-approval=never \
