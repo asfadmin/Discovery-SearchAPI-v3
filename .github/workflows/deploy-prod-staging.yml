@@ -2,20 +2,15 @@ name: SearchAPI Integration Deployment and Testing Suite
 permissions:
   contents: read
 on:
-    pull_request:
+    push:
       branches:
         - prod-staging
-      types:
-        - opened
-        - reopened
-        - synchronize
-
 
 jobs:
     # Deploy Staging
     deploy-edc-prod-staging:
       runs-on: ubuntu-latest
-      environment: edc-test
+      environment: edc-prod
       permissions:
         id-token: write
         contents: read
@@ -69,7 +64,7 @@ jobs:
 
     deploy-prod-staging:
       runs-on: ubuntu-latest
-      environment: test
+      environment: prod
       permissions:
         id-token: write
         contents: read
