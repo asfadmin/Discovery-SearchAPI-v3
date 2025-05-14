@@ -2,14 +2,9 @@ name: SearchAPI Integration Deployment and Testing Suite
 permissions:
   contents: read
 on:
-    pull_request:
+    push:
       branches:
         - prod-staging
-      types:
-        - opened
-        - reopened
-        - synchronize
-
 
 jobs:
     # Deploy Staging
