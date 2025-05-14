@@ -26,18 +26,18 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 -->
 ------
-## [1.0.0](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v0.1.1...v1.0.0)
+## [1.0.0](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v0.1.0...v1.0.0)
 
 ### Added
+- SearchAPI-V3 basic feature parity with SearchAPI-V2
+- Add `python` output type, generates equivalent asf-search code for results
+
+### Tests
+- Added non-edc deployments, tweaked CDK definition to accommodate
 - Added non-edc staging deployments, (test -> prod-staging -> prod)
 - legacy pytest suite tests working, using FastAPI TestClient
 - Adds integration tests for merges to test and prod-staging
 
-------
-## [0.1.1](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v0.1.0...v0.1.1)
-
-### Added
-- Added non-edc deployments, tweaked CDK definition to accommodate
 
 ------
 ## [0.1.0](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v0.0.1...v0.1.0)
