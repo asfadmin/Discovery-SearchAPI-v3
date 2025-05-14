@@ -123,6 +123,7 @@ tests:
 - beamMode list S1B 100:
     beamMode: EW,IW,S1,S2,S3,S4,S5,S6,WV
     platform: Sentinel-1B
+    dataset: SENTINEL-1
     maxresults: 100
     output: csv
 
@@ -935,6 +936,22 @@ tests:
     expected file: x-python
     expected code: 200
 
+- output python Sentinel:
+    platform: SB
+    maxResults: 200
+    output: python
+
+    expected file: geojson
+    expected code: 200
+
+- output python OPERA-S1:
+    dataset: OPERA-S1
+    maxResults: 100
+    output: python
+
+    expected file: geojson
+    expected code: 200
+
 - output download Avnir:
     platform: Alos
     instrument: Avnir-2
@@ -1024,7 +1041,7 @@ tests:
 - platform SB:
     platform: SB
     start: "2016-01-01T00:00:00Z"
-    end: "2017-01-02T00:00:00Z"
+    end: "2016-11-02T00:00:00Z"
     maxResults: 200
     output: csv
 

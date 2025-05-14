@@ -1,5 +1,5 @@
 import json
-import logging
+
 import os
 from typing import Optional
 import dateparser
@@ -10,14 +10,15 @@ from fastapi.responses import Response, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from .log_router import LoggingRoute
-
+from .logger import api_logger
 from .asf_env import load_config_maturity
-from .asf_opts import process_baseline_request, process_search_request
+from .asf_opts import process_baseline_request, process_search_request, process_wkt_request
 from .health import get_cmr_health
-from .models import BaselineSearchOptsModel, SearchOptsModel, WKTModel
-from .output import as_output
+from .models import BaselineSearchOptsModel, SearchOptsModel
+from .output import as_output, get_asf_search_script
 from .files_to_wkt import FilesToWKT
 from . import constants
+import time
 
 
 asf.REPORT_ERRORS = False
@@ -42,15 +43,34 @@ async def query_params(searchOptions: SearchOptsModel = Depends(process_search_r
     opts = searchOptions.opts
 
     if output.lower() == 'count':
+        start = time.perf_counter()
+        count=asf.search_count(opts=opts)
+        api_logger.info(f'/services/search/param count query time {time.perf_counter()-start}')
         return Response(
-            content=str(asf.search_count(opts=opts)),
+            content=str(count),
             status_code=200,
             media_type='text/html; charset=utf-8',
             headers=constants.DEFAULT_HEADERS
         )
 
+    if output.lower() == 'python':
+        start = time.perf_counter()
+        file_name, search_script = get_asf_search_script(opts)
+        
+        api_logger.info(f'/services/search/param count query time {time.perf_counter()-start}')
+        return Response(
+            content=search_script,
+            status_code=200,
+            media_type='text/x-python',
+            headers= {
+                    **constants.DEFAULT_HEADERS,
+                    'Content-Disposition': f"attachment; filename={file_name}",
+                }
+        )
     try:
+        start = time.perf_counter()
         results = asf.search(opts=opts)
+        api_logger.info(f'/services/search/param query time {time.perf_counter()-start}')
         response_info = as_output(results, output)
         return Response(**response_info)
 
@@ -69,8 +89,25 @@ async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(proces
     reference = searchOptions.reference
     request_method = searchOptions.request_method
     # Load the reference scene:
+
+    if output.lower() == 'python':
+        start = time.perf_counter()
+        file_name, search_script = get_asf_search_script(opts, reference=reference, search_endpoint='baseline')
+        
+        api_logger.info(f'/services/search/param count query time {time.perf_counter()-start}')
+        return Response(
+            content=search_script,
+            status_code=200,
+            media_type='text/x-python',
+            headers= {
+                    **constants.DEFAULT_HEADERS,
+                    'Content-Disposition': f"attachment; filename={file_name}",
+                }
+        )
     try:
+        start = time.perf_counter()
         reference_product = asf.granule_search(granule_list=[reference], opts=opts)[0]
+        api_logger.info(f'/services/search/baseline reference query time {time.perf_counter()-start}')
     except (KeyError, IndexError, ValueError) as exc:
         raise HTTPException(detail=f"Reference scene not found: {reference}", status_code=400) from exc
 
@@ -100,8 +137,12 @@ async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(proces
     # Figure out the response params:
     if output.lower() == 'count':
         stack_opts = reference_product.get_stack_opts()
+        start = time.perf_counter()
+        count = asf.search_count(opts=stack_opts)
+        api_logger.info(f'/services/search/baseline count stack query time {time.perf_counter()-start}')
+
         return Response(
-            content=str(asf.search_count(opts=stack_opts)),
+            content=str(count),
             status_code=200,
             media_type='text/html; charset=utf-8',
             headers=constants.DEFAULT_HEADERS
@@ -109,7 +150,10 @@ async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(proces
 
     # Finally stream everything back:
     try:
-        response_info = as_output(reference_product.stack(opts=opts), output)
+        start = time.perf_counter()
+        stack = reference_product.stack(opts=opts)
+        api_logger.info(f'/services/search/baseline stack query time {time.perf_counter()-start}')
+        response_info = as_output(stack, output)
         return Response(**response_info)
 
     except (asf.ASFSearchError, asf.CMRError, ValueError) as exc:
@@ -150,10 +194,7 @@ async def query_mission_list(platform: str | None = None):
 
 
 @router.api_route("/services/utils/wkt", methods=["GET", "POST"])
-async def wkt_validation(body: WKTModel = WKTModel(), wkt: Optional[str] = None):
-    if body.wkt is not None:
-        wkt = body.wkt
-    
+async def wkt_validation(wkt: str = Depends(process_wkt_request)):
     return Response(
         content=json.dumps(validate_wkt(wkt)),
         status_code=200,
@@ -200,7 +241,7 @@ async def health_check():
         with open(version_path, 'r', encoding="utf-8") as version_file:
             api_version = json.load(version_file)
     except Exception as exc:
-        logging.debug(exc)
+        api_logger.info(exc)
         api_version = {'version': 'unknown'}
 
     cfg = load_config_maturity()

@@ -1,5 +1,6 @@
 import logging
-import requests, urllib     # For talking w/ API
+from fastapi.testclient import TestClient
+import urllib     # For talking w/ API
 import json, csv            # File stuff
 import re                   # Opening/Reading the file stuff
 from io import StringIO     # Opening/Reading the file stuff
@@ -9,12 +10,15 @@ from SearchAPI.application.asf_opts import string_to_obj_map
 import asf_search
 
 class test_baseline():
-    def __init__(self, **args):
-
+    def __init__(self, client: TestClient, **args):
+        self.client = client
         test_info = args["test_info"]
         api_info = args["config"].getoption("--api")
         test_api = api_info["this_api"]
 
+        self.output_type = None
+        if test_info.get('output') is not None:
+            self.output_type = test_info['output']
 
         url_parts = [test_api, args["test_type_vars"]["endpoint"]+"?"]
         full_url = '/'.join(s.strip('/') for s in url_parts) # If both/neither have '/' between them, this still joins them correctly
@@ -109,6 +113,25 @@ class test_baseline():
             file_content["files"] = files
             return file_content
 
+        def asfSearchToDict(asf_search_file):
+            # Run the script and compare to results
+            try:
+                data = ast.parse(asf_search_file)
+            except SyntaxError:
+                return ValueError('Failed to parse generated asf-search python script')
+            
+            outputs = {}
+            compiled_data = compile(data, filename='<string>', mode='exec')
+            exec(compiled_data, None, outputs)
+            geojson_data = outputs.get('results', outputs.get('stack', asf_search.ASFSearchResults([]))).geojson()
+
+            geojson_query = self.query.replace('python', 'geojson')
+            geojson_api = json.loads(self.client.get(geojson_query).content.decode("utf-8"))
+            
+            script_geojson = str(geojson_data)
+            assert script_geojson == str(geojson_api), 'asf-search file output differed from equivalent api geojson output'
+            return script_geojson
+
         def jsonToDict(json_data):
             # Combine all matching key-value pairs, to-> key: [list of vals]
             file_content = {}
@@ -128,9 +151,9 @@ class test_baseline():
             file_content["count"] = count
             return file_content
 
-        h = requests.head(self.query)
+        h = self.client.head(self.query)
         content_header = h.headers.get('content-type')
-        file_content = requests.get(self.query).content.decode("utf-8")
+        file_content = self.client.get(self.query).content.decode("utf-8")
         
         # text/csv; charset=utf-8
         try:
@@ -161,6 +184,10 @@ class test_baseline():
                 content_type = "blank download"
             else:
                 content_type = "download"
+
+        elif self.output_type == 'x-python':
+            file_content = asfSearchToDict(file_content)
+            content_type = 'geojson'
         ## GEOJSON
         elif content_type == "geo+json":
             content_type = "geojson"

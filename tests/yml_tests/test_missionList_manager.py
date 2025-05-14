@@ -1,10 +1,11 @@
-import requests
+from fastapi.testclient import TestClient
 import json
 
 class test_mission_list():
-    def __init__(self, **args):
+    def __init__(self, client: TestClient, **args):
+        self.client = client
         self.test_info = args["test_info"]
-        test_api = args["config"].getoption("--api")["this_api"]
+        test_api = '/'
 
         # Craft the url, combining api's and entrypoint to test against:
         url_parts = [ test_api, args["test_type_vars"]["endpoint"], ]
@@ -17,7 +18,7 @@ class test_mission_list():
         self.runAssertTests(response_json)
 
     def makeRequest(self):
-        r = requests.get(self.full_url)
+        r = self.client.get(self.full_url)
         assert r.status_code == 200, "API returned code: {0}. Test: {1}. URL: {2}.".format(r.status_code, self.test_info["title"], self.full_url)
         content = r.content.decode("utf-8")
         try:

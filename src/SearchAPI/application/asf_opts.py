@@ -202,6 +202,24 @@ async def process_baseline_request(request: Request) -> BaselineSearchOptsModel:
 
     return baselineSearchOpts
 
+async def process_wkt_request(request: Request) -> str:
+    """
+    Extracts the request's query+body params, returns wkt string
+    """
+
+    query_params = dict(request.query_params)
+    wkt = query_params.get('wkt')
+
+    body = await get_body(request)
+    body_wkt = body.get('wkt')
+
+    if wkt is None:
+        wkt = body_wkt
+
+    if wkt is None:
+        raise HTTPException(500, 'Validation Error: `wkt` string required')
+
+    return wkt
 
 def get_asf_opts(params: dict) -> asf.ASFSearchOptions:
     """

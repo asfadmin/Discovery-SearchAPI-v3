@@ -1,10 +1,12 @@
 import os           # Generic imports
+from fastapi.testclient import TestClient
 import shapely.wkt, geomet.wkt      # For comparing wkt's
 
 from helpers import make_request, request_to_json
 
 class test_filesToWKT():
-    def __init__(self, **args):
+    def __init__(self, client: TestClient, **args):
+        self.client = client
         self.error_msg = "Reason: {0}"
 
         test_info = args["test_info"]
@@ -15,7 +17,7 @@ class test_filesToWKT():
         full_url = '/'.join(s.strip('/') for s in url_parts)
         test_info = self.applyDefaultValues(test_info)
         # Make a request, and turn it into json. Helpers should handle if something goes wrong:
-        response_server = make_request(full_url, files=test_info["file wkt"] ).content.decode("utf-8")
+        response_server = make_request(full_url, client=self.client, files=test_info["file wkt"] ).content.decode("utf-8")
         response_json = request_to_json(response_server, full_url, test_info["title"]) # The last two params are just for helpfull error messages        
 
         if test_info["print"] == True:
@@ -86,7 +88,8 @@ class test_filesToWKT():
 
 
 class test_repairWKT():
-    def __init__(self, **args):
+    def __init__(self, client: TestClient, **args):
+        self.client = client
         self.error_msg = "Reason: {0}"
 
         test_info = args["test_info"]
@@ -97,7 +100,7 @@ class test_repairWKT():
         full_url = '/'.join(s.strip('/') for s in url_parts)
         test_info = self.applyDefaultValues(test_info)
         # Make a request, and turn it into json. Helpers should handle if something goes wrong:
-        response_server = make_request(full_url, data={"wkt": test_info["test wkt"]} ).content.decode("utf-8")
+        response_server = make_request(full_url, client=self.client, data={"wkt": test_info["test wkt"]} ).content.decode("utf-8")
         response_json = request_to_json(response_server, full_url, test_info["title"]) # The last two params are just for helpfull error messages
         # Make sure the response matches what is expected from the test:
         self.runAssertTests(test_info, response_json)

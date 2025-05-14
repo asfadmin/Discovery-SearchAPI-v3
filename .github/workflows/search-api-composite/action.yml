@@ -13,6 +13,10 @@ inputs:
   security-group:
     required: true
     type: string
+  
+  staging:
+    required: false
+    type: boolean
 
 runs:
   using: "composite"
@@ -44,6 +48,7 @@ runs:
         python -m pip install -r cdk/requirements.txt
         npm install -g aws-cdk
 
+      
     - name: Deploy to AWS
       shell: bash
       run: |
@@ -51,4 +56,6 @@ runs:
         cdk deploy --require-approval=never \
           --context vpc_id=${{ inputs.vpc-id }} \
           --context subnet_ids=${{ inputs.subnet-ids }} \
-          --context security_group=${{ inputs.security-group }}
+          --context security_group=${{ inputs.security-group }} \
+          --context staging=${{ inputs.staging }}
+

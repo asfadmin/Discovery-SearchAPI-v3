@@ -17,7 +17,7 @@ class SearchOptsModel(BaseModel):
     output: Optional[str] = 'metalink'
     merged_args: dict = {}
 
-    output_types: ClassVar[list[str]] = ['metalink', 'csv', 'geojson', 'json', 'jsonlite', 'jsonlite2', 'kml', 'count', 'download']
+    output_types: ClassVar[list[str]] = ['metalink', 'csv', 'geojson', 'json', 'jsonlite', 'jsonlite2', 'kml', 'count', 'download', 'python']
 
     @field_validator("output")
     def validate_output_format(cls, v):
@@ -32,7 +32,3 @@ class BaselineSearchOptsModel(SearchOptsModel):
     Baseline search request model
     """
     reference: str
-
-
-class WKTModel(BaseModel):
-    wkt: Optional[str] = None

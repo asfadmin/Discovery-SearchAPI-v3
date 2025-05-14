@@ -1,9 +1,10 @@
-import requests
+from fastapi.testclient import TestClient
 import json
 from datetime import datetime
 
 class test_date_parser():
-    def __init__(self, **args):
+    def __init__(self, client: TestClient, **args):
+        self.client = client
         self.error_msg = "Reason: {0}"
         test_info = args["test_info"]
         test_api = args["config"].getoption("--api")["this_api"]
@@ -22,8 +23,8 @@ class test_date_parser():
         self.runAssertTests(status_code, content_type, content)
 
     def makeRequest(self):
-        r = requests.get(self.full_url)
-        h = requests.head(self.full_url)
+        r = self.client.get(self.full_url)
+        h = self.client.head(self.full_url)
         content = r.content.decode("utf-8")
         content_header = h.headers.get('content-type')
         try:

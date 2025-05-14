@@ -20,4 +20,4 @@ COPY ./src/SearchAPI ./SearchAPI
 LABEL maintainer="Alaska Satellite Facility Discovery Team <uaf-asf-discovery@alaska.edu>"
 
 # Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
-CMD ["uvicorn", "--host=$HOST", "--port=$PORT", "SearchAPI.application:app"]
+CMD exec uvicorn --host $HOST --port=$PORT SearchAPI.application:app
