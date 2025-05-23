@@ -163,16 +163,6 @@ async def process_search_request(request: Request) -> SearchOptsModel:
 
     query_opts.merge_args(**dict(body_opts))
 
-    try:
-        any_searchables = any([key.lower() not in non_search_param for key, _ in query_opts])
-        if not any_searchables:
-            raise ValueError(
-                'No searchable parameters specified, queries must include'
-                ' parameters besides output= and maxresults='
-            )
-    except ValueError as exc:
-        raise HTTPException(detail=repr(exc), status_code=400) from exc
-
     merged_args = {**query_params, **body}
 
     if (token := merged_args.get('cmr_token')):
