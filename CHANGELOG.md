@@ -30,6 +30,7 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 - Generic searches (non-search related params) no longer accepted, raise 400
+- Fixed string comparison of numbers in range filters
 
 ------
 ## [1.0.1](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.0...v1.0.1)
