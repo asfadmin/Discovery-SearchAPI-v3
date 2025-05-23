@@ -24,7 +24,7 @@ def string_to_range(v: Union[str, list]) -> tuple:
         if m is None:
             raise ValueError(f'Invalid range: {v}')
         a = (m.group(1), m.group(3))
-        if a[0] > a[1]:
+        if float(a[0]) > float(a[1]):
             raise ValueError()
         if a[0] == a[1]:
             a = a[0]
