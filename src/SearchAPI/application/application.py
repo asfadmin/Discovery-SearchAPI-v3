@@ -222,7 +222,7 @@ def validate_wkt(wkt: str):
         wrapped, unwrapped, reports = asf.validate_wkt(wkt)
         repairs = [{'type': report.report_type, 'report': report.report} for report in reports if report.report_type != "'type': 'WRAP'"]
     except Exception as exc:
-        raise HTTPException(detail=f"Failed to validate wkt: {exc}", status_code=400) from exc
+        raise HTTPException(detail=f"Failed to validate wkt {wkt}: {exc}", status_code=400) from exc
 
     return {
         'wkt': {
