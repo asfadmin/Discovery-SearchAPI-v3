@@ -42,6 +42,17 @@ async def query_params(searchOptions: SearchOptsModel = Depends(process_search_r
     output = searchOptions.output
     opts = searchOptions.opts
 
+    non_search_param = ['output', 'maxresults', 'pagesize', 'maturity']
+    try:
+        any_searchables = any([key.lower() not in non_search_param for key, _ in opts])
+        if not any_searchables:
+            raise ValueError(
+                'No searchable parameters specified, queries must include'
+                ' parameters besides output= and maxresults='
+            )
+    except ValueError as exc:
+        raise HTTPException(detail=repr(exc), status_code=400) from exc
+
     if output.lower() == 'count':
         start = time.perf_counter()
         count=asf.search_count(opts=opts)
@@ -222,7 +233,7 @@ def validate_wkt(wkt: str):
         wrapped, unwrapped, reports = asf.validate_wkt(wkt)
         repairs = [{'type': report.report_type, 'report': report.report} for report in reports if report.report_type != "'type': 'WRAP'"]
     except Exception as exc:
-        raise HTTPException(detail=f"Failed to validate wkt: {exc}", status_code=400) from exc
+        raise HTTPException(detail=f"Failed to validate wkt {wkt}: {exc}", status_code=400) from exc
 
     return {
         'wkt': {

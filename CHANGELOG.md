@@ -26,6 +26,16 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 -->
 ------
+## [1.0.2](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.1...v1.0.2)
+
+### Fixed
+- Generic searches (non-search related params) no longer accepted, raise 400
+- Fixed string comparison of numbers in range filters
+
+### Changed
+- Include wkt in error when raising in `validate_wkt()`
+
+------
 ## [1.0.1](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.0...v1.0.1)
 
 ### Added
