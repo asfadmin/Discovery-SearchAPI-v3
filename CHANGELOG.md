@@ -28,13 +28,20 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ------
 ## [1.0.1](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.0...v1.0.1)
 
+### Fixed
+- Generic searches (non-search related params) no longer accepted, raise 400
+- Fixed string comparison of numbers in range filters
+
+### Changed
+- Include wkt in error when raising in `validate_wkt()`
+
 ### Added
 - Add dedicated dev branch for test-staging deployment
    - Intended Dev->Release workflow
       - dev -> test -> prod-staging -> prod
 
 ### Changed
-- pin `asf-search` to v8.2.3, All basic Vertex dataset searches working
+- pin `asf-search` to v8.3.0, All basic Vertex dataset searches working
 
 ## [1.0.0](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v0.1.0...v1.0.0)
 

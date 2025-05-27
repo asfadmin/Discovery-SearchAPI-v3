@@ -13,6 +13,7 @@ from .asf_env import load_config_maturity
 
 from .logger import api_logger
 
+non_search_param = ['output', 'maxresults', 'pagesize', 'maturity']
 
 def string_to_range(v: Union[str, list]) -> tuple:
     if isinstance(v, list):
@@ -23,7 +24,7 @@ def string_to_range(v: Union[str, list]) -> tuple:
         if m is None:
             raise ValueError(f'Invalid range: {v}')
         a = (m.group(1), m.group(3))
-        if a[0] > a[1]:
+        if float(a[0]) > float(a[1]):
             raise ValueError()
         if a[0] == a[1]:
             a = a[0]
