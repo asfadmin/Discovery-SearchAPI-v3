@@ -41,7 +41,7 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
       - dev -> test -> prod-staging -> prod
 
 ### Changed
-- pin `asf-search` to v8.3.0, All basic Vertex dataset searches working
+- pin `asf-search` to v8.3.1, All basic Vertex dataset searches working
 
 ## [1.0.0](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v0.1.0...v1.0.0)
 
