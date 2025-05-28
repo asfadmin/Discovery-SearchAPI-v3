@@ -220,6 +220,7 @@ async def file_to_wkt(files: list[UploadFile]):
 
     data = FilesToWKT([file.file for file in files]).getWKT()
 
+    data['error'] = [file.file.filename for file in files]
     return JSONResponse(content={
         ** data,
         ** validate_wkt(data["parsed wkt"])},
