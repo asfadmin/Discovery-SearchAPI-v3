@@ -42,7 +42,7 @@ class LoggingRoute(APIRoute):
             
             if context := request.headers.get('x-amzn-request-context'):
                 context_object = json.loads(context)
-                self.aws_request_id = context_object.get('aws_request_id')
+                self.aws_request_id = context_object.get('requestId')
             
             logging.setLogRecordFactory(self.record_factory)
             # Time the request itself:
