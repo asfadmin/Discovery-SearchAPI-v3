@@ -70,6 +70,7 @@ class SearchAPIStack(Stack):
             id=api_id,
             handler=search_api_lambda,
             proxy=True,
+            binary_media_types=['multipart/form-data', 'application/octet-stream'],
             default_cors_preflight_options=apigateway.CorsOptions(
                 allow_origins=apigateway.Cors.ALL_ORIGINS, allow_methods=apigateway.Cors.ALL_METHODS
             ),
