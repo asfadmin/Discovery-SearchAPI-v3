@@ -60,7 +60,7 @@ class SearchAPIStack(Stack):
             memory_size=5308,
             code=lambda_.DockerImageCode.from_image_asset(
                 directory='..',
-                build_args={'MATURITY': }
+                # build_args={'MATURITY': }
                 ),
             **lambda_vpc_kwargs,
         )
