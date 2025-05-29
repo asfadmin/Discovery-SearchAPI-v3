@@ -57,6 +57,7 @@ class LoggingRoute(APIRoute):
                     extra={
                         "QueryTime": duration,
                         "QueryParams": dict(request.query_params),
+                        "QueryBody": dict(await request.json()),
                         "Endpoint": request.scope['path'],
                     }
                 )
