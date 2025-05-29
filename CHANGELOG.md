@@ -34,11 +34,13 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 - Include wkt in error when raising in `validate_wkt()`
+- Specify which binary file types are allowed to be passed to lambda
 
 ### Added
 - Add dedicated dev branch for test-staging deployment
    - Intended Dev->Release workflow
       - dev -> test -> prod-staging -> prod
+- Added more files to integration testing endpoint
 
 ### Changed
 - pin `asf-search` to v8.3.3, All basic Vertex dataset searches working

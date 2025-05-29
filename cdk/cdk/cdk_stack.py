@@ -59,7 +59,8 @@ class SearchAPIStack(Stack):
             timeout=Duration.seconds(30),
             memory_size=5308,
             code=lambda_.DockerImageCode.from_image_asset(
-                directory='..'
+                directory='..',
+                build_args={'MATURITY': }
                 ),
             **lambda_vpc_kwargs,
         )
