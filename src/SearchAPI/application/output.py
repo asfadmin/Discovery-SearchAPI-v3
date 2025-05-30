@@ -167,6 +167,7 @@ def get_asf_search_script(
         search_endpoint: Literal['param', 'baseline'] = 'param'
         ) -> tuple[str, str]:
     
+    opts.session = None
     if search_endpoint == 'param':
         file_name=make_filename('py', prefix='asf-search-script')
         output_script = asf_search_script_template.format(file_name, str(opts))
