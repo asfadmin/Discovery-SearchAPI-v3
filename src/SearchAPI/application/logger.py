@@ -108,4 +108,4 @@ def get_logger(name: str, level: int=logging.DEBUG) -> logging.Logger:
     return logger
 
 
-api_logger = get_logger(__name__, logging.DEBUG)
+api_logger = get_logger(__name__, logging.INFO)

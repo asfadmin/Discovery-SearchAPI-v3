@@ -42,10 +42,19 @@ async def query_params(searchOptions: SearchOptsModel = Depends(process_search_r
     output = searchOptions.output
     opts = searchOptions.opts
 
+    non_search_param = ['output', 'maxresults', 'pagesize', 'maturity']
+    try:
+        any_searchables = any([key.lower() not in non_search_param for key, _ in opts])
+        if not any_searchables:
+            raise ValueError(
+                'No searchable parameters specified, queries must include'
+                ' parameters besides output= and maxresults='
+            )
+    except ValueError as exc:
+        raise HTTPException(detail=repr(exc), status_code=400) from exc
+
     if output.lower() == 'count':
-        start = time.perf_counter()
         count=asf.search_count(opts=opts)
-        api_logger.info(f'/services/search/param count query time {time.perf_counter()-start}')
         return Response(
             content=str(count),
             status_code=200,
@@ -54,10 +63,8 @@ async def query_params(searchOptions: SearchOptsModel = Depends(process_search_r
         )
 
     if output.lower() == 'python':
-        start = time.perf_counter()
         file_name, search_script = get_asf_search_script(opts)
         
-        api_logger.info(f'/services/search/param count query time {time.perf_counter()-start}')
         return Response(
             content=search_script,
             status_code=200,
@@ -68,9 +75,7 @@ async def query_params(searchOptions: SearchOptsModel = Depends(process_search_r
                 }
         )
     try:
-        start = time.perf_counter()
         results = asf.search(opts=opts)
-        api_logger.info(f'/services/search/param query time {time.perf_counter()-start}')
         response_info = as_output(results, output)
         return Response(**response_info)
 
@@ -91,10 +96,8 @@ async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(proces
     # Load the reference scene:
 
     if output.lower() == 'python':
-        start = time.perf_counter()
         file_name, search_script = get_asf_search_script(opts, reference=reference, search_endpoint='baseline')
         
-        api_logger.info(f'/services/search/param count query time {time.perf_counter()-start}')
         return Response(
             content=search_script,
             status_code=200,
@@ -105,9 +108,7 @@ async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(proces
                 }
         )
     try:
-        start = time.perf_counter()
         reference_product = asf.granule_search(granule_list=[reference], opts=opts)[0]
-        api_logger.info(f'/services/search/baseline reference query time {time.perf_counter()-start}')
     except (KeyError, IndexError, ValueError) as exc:
         raise HTTPException(detail=f"Reference scene not found: {reference}", status_code=400) from exc
 
@@ -137,9 +138,7 @@ async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(proces
     # Figure out the response params:
     if output.lower() == 'count':
         stack_opts = reference_product.get_stack_opts()
-        start = time.perf_counter()
         count = asf.search_count(opts=stack_opts)
-        api_logger.info(f'/services/search/baseline count stack query time {time.perf_counter()-start}')
 
         return Response(
             content=str(count),
@@ -150,9 +149,7 @@ async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(proces
 
     # Finally stream everything back:
     try:
-        start = time.perf_counter()
         stack = reference_product.stack(opts=opts)
-        api_logger.info(f'/services/search/baseline stack query time {time.perf_counter()-start}')
         response_info = as_output(stack, output)
         return Response(**response_info)
 
@@ -222,7 +219,7 @@ def validate_wkt(wkt: str):
         wrapped, unwrapped, reports = asf.validate_wkt(wkt)
         repairs = [{'type': report.report_type, 'report': report.report} for report in reports if report.report_type != "'type': 'WRAP'"]
     except Exception as exc:
-        raise HTTPException(detail=f"Failed to validate wkt: {exc}", status_code=400) from exc
+        raise HTTPException(detail=f"Failed to validate wkt {wkt}: {exc}", status_code=400) from exc
 
     return {
         'wkt': {

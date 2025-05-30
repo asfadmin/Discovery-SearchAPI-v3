@@ -59,21 +59,47 @@ class SearchAPIStack(Stack):
             timeout=Duration.seconds(30),
             memory_size=5308,
             code=lambda_.DockerImageCode.from_image_asset(
-                directory='..'
+                directory='..',
+                # build_args={'MATURITY': }
                 ),
             **lambda_vpc_kwargs,
         )
         
-        staging
         api_id = f'SearchAPI-V3{"-Staging" if staging else ""}-RestAPI'
         api = apigateway.LambdaRestApi(
             self,   
             id=api_id,
             handler=search_api_lambda,
             proxy=True,
+            binary_media_types=['multipart/form-data', 'application/octet-stream'],
             default_cors_preflight_options=apigateway.CorsOptions(
                 allow_origins=apigateway.Cors.ALL_ORIGINS, allow_methods=apigateway.Cors.ALL_METHODS
             ),
+            # deploy_options=apigateway.StageOptions(
+            #     access_log_destination=apigateway.LogGroupLogDestination(
+            #         logs.LogGroup(
+            #             self,
+            #             f'{api_id}-LogGroup',
+            #             retention=logs.RetentionDays.THREE_MONTHS,
+            #         )
+            #     ), # type: ignore
+            #     access_log_format=apigateway.AccessLogFormat.custom(
+            #         json.dumps(
+            #             {
+            #                 'sourceIp': '$context.identity.sourceIp',
+            #                 'httpMethod': '$context.httpMethod',
+            #                 'path': '$context.path',
+            #                 'status': '$context.status',
+            #                 'responseLength': '$context.responseLength',
+            #                 'responseLatency': '$context.responseLatency',
+            #                 'requestTime': '$context.requestTime',
+            #                 'protocol': '$context.protocol',
+            #                 'userAgent': '$context.identity.userAgent',
+            #                 'requestId': '$context.requestId',
+            #             }
+            #         )
+            #     ),
+            # ),
             **apigateway_kwargs,
             # endpoint_configuration=apigateway.EndpointConfiguration(
             #     # https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_apigateway.EndpointConfiguration.html
