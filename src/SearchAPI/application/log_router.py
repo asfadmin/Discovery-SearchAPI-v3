@@ -6,7 +6,7 @@ from fastapi import Response, Request
 from fastapi.routing import APIRoute
 
 from .logger import api_logger
-
+import json
 
 class LoggingRoute(APIRoute):
     """
@@ -39,15 +39,21 @@ class LoggingRoute(APIRoute):
 
         async def custom_route_handler(request: Request) -> Response:
             # Grab the AWS UUID and set it for every log:
-            context = request.scope.get("aws.context")
-            if context is not None:
-                self.aws_request_id = context.aws_request_id
+            
+            if context := request.headers.get('x-amzn-request-context'):
+                context_object = json.loads(context)
+                self.aws_request_id = context_object.get('requestId')
+            
             logging.setLogRecordFactory(self.record_factory)
             # Time the request itself:
             before = time.time()
             try:
                 response: Response = await original_route_handler(request)
             finally:
+                queryBody = {}
+                if (content_type := request.headers.get('content-type')) is not None:
+                    if content_type == 'application/json':
+                        queryBody = await request.json()
                 # What to ALWAYS log:
                 duration = time.time() - before
                 api_logger.info(
@@ -55,6 +61,7 @@ class LoggingRoute(APIRoute):
                     extra={
                         "QueryTime": duration,
                         "QueryParams": dict(request.query_params),
+                        "QueryBody": queryBody,
                         "Endpoint": request.scope['path'],
                     }
                 )

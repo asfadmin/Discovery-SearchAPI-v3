@@ -9,7 +9,10 @@ rest_api_url = cf_response['Stacks'][0]['Outputs'][0]['OutputValue']
 session = asf.ASFSession()
 
 cwd = os.getcwd()
-test_file_path= os.path.join(cwd, 'tests/integration/', 'elvey.geojson')
+geojson_test_file_path= os.path.join(cwd, 'tests/integration/', 'elvey.geojson')
+kml_test_file_path = os.path.join(cwd, 'tests/yml_tests/Resources/kmls_valid/', '3D_coords.kml')
+shp_test_file_path = os.path.join(cwd, 'tests/yml_tests/Resources/shps_valid/', 'NED1_F.shp')
+zip_test_file_path = os.path.join(cwd, 'tests/yml_tests/Resources/zips_valid/', 'NED1_F.zip')
 
 basic_search_params = {
     'maxResults': 250,
@@ -102,9 +105,22 @@ def test_wkt_endpoint_post_json():
     assert response.status_code == 200, f'Non-200 status code from baseline POST endpoint (data): \nstatus code: {response.status_code}\nresponse: {response.text}'
 
 ### WKT FILE UPLOAD TEST
-def test_wkt_file_upload_endpoint():
-    files = {'files': open(test_file_path,'rb')}
+def test_wkt_file_upload_endpoint_geojson():
+    _wkt_file_upload_endpoint(geojson_test_file_path)
+
+def test_wkt_file_upload_endpoint_kml():
+    _wkt_file_upload_endpoint(kml_test_file_path)
+
+def test_wkt_file_upload_endpoint_shp():
+    _wkt_file_upload_endpoint(shp_test_file_path)
+
+def test_wkt_file_upload_endpoint_zip():
+    _wkt_file_upload_endpoint(zip_test_file_path)
+
+
+def _wkt_file_upload_endpoint(file: str):
+    files = {'files': open(file,'rb')}
     response = session.post(files_wkt_endpoint, files=files)
     response.raise_for_status()
 
-    assert response.status_code == 200, f'Non-200 status code from baseline POST endpoint (data): \nstatus code: {response.status_code}\nresponse: {response.text}'
+    assert response.status_code == 200, f'Non-200 status code from files_to_wkt endpoint for file {file.split("/")[-1]}: \nstatus code: {response.status_code}\nresponse: {response.text}'
