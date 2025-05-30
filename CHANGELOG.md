@@ -41,6 +41,7 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
    - Intended Dev->Release workflow
       - dev -> test -> prod-staging -> prod
 - Added more files to integration testing endpoint
+- Add remaining file upload support for .zip and .shp files. All previous file formats now supported 
 
 ### Changed
 - pin `asf-search` to v8.3.3, All basic Vertex dataset searches working
