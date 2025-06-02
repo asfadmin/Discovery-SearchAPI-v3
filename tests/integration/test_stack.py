@@ -3,7 +3,7 @@ from urllib import parse as param_parse
 import asf_search as asf
 import os
 
-cf_client = boto3.client('cloudformation', region_name=os.getenv('CDK_DEFAULT_REGION', 'us-west-2'))
+cf_client = boto3.client('cloudformation', region_name=os.getenv('CDK_DEFAULT_REGION', 'us-east-1'))
 cf_response = cf_client.describe_stacks(StackName='SearchAPI-V3-Stack-Staging')
 rest_api_url = cf_response['Stacks'][0]['Outputs'][0]['OutputValue']
 session = asf.ASFSession()

@@ -8,59 +8,59 @@ on:
 
 jobs:
     # Deploy Staging
-    deploy-edc-prod-staging:
-      runs-on: ubuntu-latest
-      environment: edc-prod
-      permissions:
-        id-token: write
-        contents: read
+    # deploy-edc-prod-staging:
+    #   runs-on: ubuntu-latest
+    #   environment: edc-prod
+    #   permissions:
+    #     id-token: write
+    #     contents: read
 
-      steps:
-        - name: Checkout
-          uses: actions/checkout@v4
+    #   steps:
+    #     - name: Checkout
+    #       uses: actions/checkout@v4
   
-        - name: build
-          uses: ./.github/workflows/search-api-composite
-          with:
-            aws-account-id: ${{ secrets.AWS_ACCOUNT_ID }}
-            vpc-id: ${{ secrets.VPC_ID }}
-            subnet-ids: ${{ secrets.SUBNET_IDS }}
-            security-group: ${{ secrets.SECURITY_GROUP }}
-            staging: true
+    #     - name: build
+    #       uses: ./.github/workflows/search-api-composite
+    #       with:
+    #         aws-account-id: ${{ secrets.AWS_ACCOUNT_ID }}
+    #         vpc-id: ${{ secrets.VPC_ID }}
+    #         subnet-ids: ${{ secrets.SUBNET_IDS }}
+    #         security-group: ${{ secrets.SECURITY_GROUP }}
+    #         staging: true
 
-    run-edc-prod-staging-integration-tests:
-      needs: [deploy-edc-prod-staging]
-      runs-on: ubuntu-latest
-      environment: edc-prod
-      permissions:
-        id-token: write
-        contents: read
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v4
-        - name: Configure AWS OIDC credentials
-          uses: aws-actions/configure-aws-credentials@v3
-          with:
-            role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/SearchAPIActionsOIDCRole
-            aws-region: us-west-2
-        - name: Set up Python
-          uses: actions/setup-python@v4
-          with:
-            python-version: "3.11"
+    # run-edc-prod-staging-integration-tests:
+    #   needs: [deploy-edc-prod-staging]
+    #   runs-on: ubuntu-latest
+    #   environment: edc-prod
+    #   permissions:
+    #     id-token: write
+    #     contents: read
+    #   steps:
+    #     - name: Checkout code
+    #       uses: actions/checkout@v4
+    #     - name: Configure AWS OIDC credentials
+    #       uses: aws-actions/configure-aws-credentials@v3
+    #       with:
+    #         role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/SearchAPIActionsOIDCRole
+    #         aws-region: us-east-1
+    #     - name: Set up Python
+    #       uses: actions/setup-python@v4
+    #       with:
+    #         python-version: "3.11"
     
-        - name: Install dependencies
-          shell: bash
-          run: |
-            python -m pip install --upgrade pip
-            python -m pip install -r requirements.txt
-            python -m pip install -r tests/requirements.txt
-            python -m pip install .
+    #     - name: Install dependencies
+    #       shell: bash
+    #       run: |
+    #         python -m pip install --upgrade pip
+    #         python -m pip install -r requirements.txt
+    #         python -m pip install -r tests/requirements.txt
+    #         python -m pip install .
         
-        - name: run tests
-          shell: bash
-          run: |
-            pytest tests/integration/test_stack.py \
-            --reruns 3 --reruns-delay 10
+    #     - name: run tests
+    #       shell: bash
+    #       run: |
+    #         pytest tests/integration/test_stack.py \
+    #         --reruns 3 --reruns-delay 10
 
     deploy-prod-staging:
       runs-on: ubuntu-latest
@@ -93,7 +93,7 @@ jobs:
           uses: aws-actions/configure-aws-credentials@v3
           with:
             role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/SearchAPIActionsOIDCRole
-            aws-region: us-west-2
+            aws-region: us-east-1
     
         - name: Set up Python
           uses: actions/setup-python@v4
