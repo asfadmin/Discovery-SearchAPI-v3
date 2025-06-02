@@ -28,7 +28,7 @@ runs:
       uses: aws-actions/configure-aws-credentials@v3
       with:
         role-to-assume: arn:aws:iam::${{ inputs.aws-account-id }}:role/SearchAPIActionsOIDCRole
-        aws-region: us-west-2
+        aws-region: us-east-1
 
     - name: Set up Python
       uses: actions/setup-python@v4
