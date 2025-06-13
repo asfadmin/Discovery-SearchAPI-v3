@@ -26,6 +26,16 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 -->
 ------
+## [1.0.4](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.3...v1.0.4)
+### Changed
+- bumped asf-search to 9.0.0 for nisar search types, browse images, and UAT collections
+
+------
+## [1.0.3](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.2...v1.0.3)
+### Changed
+- Swap deployment region from us-west-2 to us-east-1
+
+------
 ## [1.0.2](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.1...v1.0.2)
 
 ### Fixed
