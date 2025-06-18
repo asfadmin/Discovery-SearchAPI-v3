@@ -69,7 +69,7 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
         ]
         ```
 ### Changed
-- bumped asf-search to 9.0.1 for nisar search types, browse images, and UAT collections, `productionConfiguration` list support
+- bumped asf-search to 9.0.2 for nisar search types, browse images, and UAT collections, `productionConfiguration` list support, bbox validation, opera-disp jsonlite outputs
 
 
 ------
