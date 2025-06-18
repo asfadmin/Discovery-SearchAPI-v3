@@ -26,6 +26,53 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 -->
 ------
+## [1.0.4](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.3...v1.0.4)
+### Added
+- Added experimental ARIA S1 GUNW baseline stacking support
+    - requires: `dataset` keyword be set to "ARIA S1 GUNW" and using the desired frame as the `reference`
+    - returns json object list partially formatted for submitting jobs to ASF's On Demand processing.
+        ``` json
+        [
+            {
+                "date": "2025-06-04T00:26:25Z",
+                "products": [
+                "S1A_IW_SLC__1SDV_20250604T002649_20250604T002716_059489_076290_7E0F",
+                "S1A_IW_SLC__1SDV_20250604T002625_20250604T002651_059489_076290_7FE0"
+                ],
+                "group_granule_idx": 0,
+                "perpendicularBaseline": 0,
+                "temporalBaseline": 0
+            },
+            {
+                "date": "2025-05-23T00:26:25Z",
+                "products": [
+                "S1A_IW_SLC__1SDV_20250523T002650_20250523T002717_059314_075C80_5A5D",
+                "S1A_IW_SLC__1SDV_20250523T002625_20250523T002652_059314_075C80_BBE7"
+                ],
+                "group_granule_idx": 0,
+                "perpendicularBaseline": 47,
+                "temporalBaseline": -12
+            },
+
+            ...
+            
+            {
+                "date": "2014-10-12T00:25:42Z",
+                "products": [
+                "S1A_IW_SLC__1SSV_20141012T002607_20141012T002634_002789_00323B_2DB9",
+                "S1A_IW_SLC__1SSV_20141012T002542_20141012T002609_002789_00323B_0E9F"
+                ],
+                "group_granule_idx": 0,
+                "perpendicularBaseline": -160,
+                "temporalBaseline": -3888
+            }
+        ]
+        ```
+### Changed
+- bumped asf-search to 9.0.2 for nisar search types, browse images, and UAT collections, `productionConfiguration` list support, bbox validation, opera-disp jsonlite outputs
+
+
+------
 ## [1.0.3](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.2...v1.0.3)
 ### Changed
 - Swap deployment region from us-west-2 to us-east-1
