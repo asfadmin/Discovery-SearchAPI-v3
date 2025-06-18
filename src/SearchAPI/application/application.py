@@ -15,9 +15,10 @@ from .asf_env import load_config_maturity
 from .asf_opts import process_baseline_request, process_search_request, process_wkt_request
 from .health import get_cmr_health
 from .models import BaselineSearchOptsModel, SearchOptsModel
-from .output import as_output, get_asf_search_script
+from .output import as_output, get_asf_search_script, make_filename
 from .files_to_wkt import FilesToWKT
 from . import constants
+from .search import stack_aria_gunw
 import time
 
 
@@ -93,8 +94,19 @@ async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(proces
     output = searchOptions.output
     reference = searchOptions.reference
     request_method = searchOptions.request_method
-    # Load the reference scene:
 
+    if searchOptions.opts.dataset is not None:
+        if searchOptions.opts.dataset[0] == asf.DATASET.ARIA_S1_GUNW:
+            return JSONResponse(
+                content=stack_aria_gunw(reference),
+                status_code=200,
+                headers= {
+                        **constants.DEFAULT_HEADERS,
+                        'Content-Disposition': f"attachment; filename={make_filename('json')}",
+                    }
+            )
+    # Load the reference scene:
+    
     if output.lower() == 'python':
         file_name, search_script = get_asf_search_script(opts, reference=reference, search_endpoint='baseline')
         
