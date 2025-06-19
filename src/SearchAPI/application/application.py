@@ -18,9 +18,12 @@ from .models import BaselineSearchOptsModel, SearchOptsModel
 from .output import as_output, get_asf_search_script, make_filename
 from .files_to_wkt import FilesToWKT
 from . import constants
-from .search import stack_aria_gunw
+from .SearchAPISession import SearchAPISession
+from .search import get_aria_groups_for_frame, stack_aria_gunw
 import time
+from asf_search.ASFSearchOptions.config import config as asf_config
 
+asf_config['session'] = SearchAPISession()
 
 asf.REPORT_ERRORS = False
 router = APIRouter(route_class=LoggingRoute)
@@ -97,14 +100,17 @@ async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(proces
 
     if searchOptions.opts.dataset is not None:
         if searchOptions.opts.dataset[0] == asf.DATASET.ARIA_S1_GUNW:
-            return JSONResponse(
-                content=stack_aria_gunw(reference),
-                status_code=200,
-                headers= {
-                        **constants.DEFAULT_HEADERS,
-                        'Content-Disposition': f"attachment; filename={make_filename('json')}",
-                    }
-            )
+            if output.lower() == 'count':
+                return Response(
+                    content=str(len(get_aria_groups_for_frame(reference)[1])),
+                    status_code=200,
+                    media_type='text/html; charset=utf-8',
+                    headers=constants.DEFAULT_HEADERS
+                )
+                return 
+            stack = stack_aria_gunw(reference)
+            response_info = as_output(stack, output=output)
+            return Response(**response_info)
     # Load the reference scene:
     
     if output.lower() == 'python':
