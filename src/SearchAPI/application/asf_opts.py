@@ -10,7 +10,7 @@ import asf_search as asf
 from asf_search.ASFSearchOptions import validator_map
 
 from .asf_env import load_config_maturity
-
+from .SearchAPISession import SearchAPISession
 from .logger import api_logger
 
 non_search_param = ['output', 'maxresults', 'pagesize', 'maturity']
@@ -166,7 +166,7 @@ async def process_search_request(request: Request) -> SearchOptsModel:
     merged_args = {**query_params, **body}
 
     if (token := merged_args.get('cmr_token')):
-        session = asf.ASFSession()
+        session = SearchAPISession()
         session.headers.update({'Authorization': 'Bearer {0}'.format(token)})
         query_opts.session = session
 
