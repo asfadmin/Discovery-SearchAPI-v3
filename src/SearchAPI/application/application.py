@@ -107,7 +107,7 @@ async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(proces
                     media_type='text/html; charset=utf-8',
                     headers=constants.DEFAULT_HEADERS
                 )
-                return 
+
             stack = stack_aria_gunw(reference)
             response_info = as_output(stack, output=output)
             return Response(**response_info)
