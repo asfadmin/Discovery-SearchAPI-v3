@@ -22,8 +22,9 @@ ujson==5.7.0
 uvicorn==0.21.1
 watchfiles==0.19.0
 
-asf_search==9.0.2
+asf_search==9.0.4
 python-json-logger==2.0.7
+asf_enumeration
 
 pyshp==2.1.3
 geopandas
