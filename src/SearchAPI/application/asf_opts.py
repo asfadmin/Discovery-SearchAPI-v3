@@ -147,7 +147,7 @@ async def get_body(request: Request):
     return {}
 
 
-async def process_search_request(request: Request) -> SearchOptsModel:
+async def process_search_request(request: Request, is_baseline: bool = False) -> SearchOptsModel:
     """
     Extracts the request's query+body params, returns ASFSearchOptions, request method, output format, and a dictionary
     of the merged request args wrapped in a pydantic model (SearchOptsModel)
@@ -177,7 +177,12 @@ async def process_search_request(request: Request) -> SearchOptsModel:
 
     try:
         # we are no longer allowing unbounded searches
-        if query_opts.granule_list is None and query_opts.product_list is None and output not in ['python', 'count']:
+        if (
+            query_opts.granule_list is None 
+            and query_opts.product_list is None 
+            and output not in ['python', 'count']
+            and not is_baseline
+            ):
             if query_opts.maxResults is None:
                 maxResults = asf.search_count(opts=query_opts)
                 if maxResults > 2000:
@@ -201,7 +206,7 @@ async def process_search_request(request: Request) -> SearchOptsModel:
 
 async def process_baseline_request(request: Request) -> BaselineSearchOptsModel:
     """Processes request to baseline endpoint"""
-    searchOpts = await process_search_request(request=request)
+    searchOpts = await process_search_request(request=request, is_baseline=True)
     reference = searchOpts.merged_args.get('reference')
     try:
         baselineSearchOpts = BaselineSearchOptsModel(**searchOpts.model_dump(), reference=reference)
