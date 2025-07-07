@@ -177,13 +177,20 @@ async def process_search_request(request: Request) -> SearchOptsModel:
 
     try:
         # we are no longer allowing unbounded searches
-        if query_opts.granule_list is None and query_opts.product_list is None:
+        if query_opts.granule_list is None and query_opts.product_list is None and output != 'python':
             if query_opts.maxResults is None:
-                query_opts.maxResults = asf.search_count(opts=query_opts)
+                maxResults = asf.search_count(opts=query_opts)
+                if maxResults > 3000:
+                    raise ValueError(
+                        (
+                            'SearchAPI no longer supports unbounded searches with expected results over 3000, '
+                            'please use the asf-search python module for long-lived searches or set `maxResults` to 3000 or less.'
+                            '\nTo have SearchAPI automatically generate a python script for the equivalent search to your SearchAPI query '
+                            'set `output=python`'
+                        )
+                    )
             elif query_opts.maxResults <= 0:
-                raise ValueError(f'Search keyword "maxResults" must be greater than 0')
-
-            query_opts.maxResults = min(1500, query_opts.maxResults)
+                raise ValueError('Search keyword "maxResults" must be greater than 0')
 
         searchOpts = SearchOptsModel(opts=query_opts, output=output, merged_args=merged_args, request_method=request.method)
     except (ValueError, ValidationError) as exc:
