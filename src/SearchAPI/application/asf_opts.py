@@ -184,8 +184,8 @@ async def process_search_request(request: Request) -> SearchOptsModel:
                     raise ValueError(
                         (
                             'SearchAPI no longer supports unbounded searches with expected results over 2000, '
-                            'please use the asf-search python module for long-lived searches or set `maxResults` to 2000 or less.'
-                            '\nTo have SearchAPI automatically generate a python script for the equivalent search to your SearchAPI query '
+                            'please use the asf-search python module for long-lived searches or set `maxResults` to 2000 or less. '
+                            'To have SearchAPI automatically generate a python script for the equivalent search to your SearchAPI query '
                             'set `output=python`'
                         )
                     )
