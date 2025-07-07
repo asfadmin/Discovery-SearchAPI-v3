@@ -177,7 +177,7 @@ async def process_search_request(request: Request) -> SearchOptsModel:
 
     try:
         # we are no longer allowing unbounded searches
-        if query_opts.granule_list is None and query_opts.product_list is None and output != 'python':
+        if query_opts.granule_list is None and query_opts.product_list is None and output not in ['python', 'count']:
             if query_opts.maxResults is None:
                 maxResults = asf.search_count(opts=query_opts)
                 if maxResults > 2000:
