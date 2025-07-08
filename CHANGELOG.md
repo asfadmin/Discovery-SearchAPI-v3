@@ -35,6 +35,7 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Aria stacking uses aria frame id instead of frame number for stacking
 - asf_search uses `SearchAPISession` by default for search queries
 - bump asf-search to v9.0.4
+- increase search query limit to 2000, raise error if expected output is over that number
 
 ------
 ## [1.0.4](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.3...v1.0.4)
