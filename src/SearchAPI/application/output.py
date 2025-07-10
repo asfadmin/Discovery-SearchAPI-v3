@@ -66,11 +66,18 @@ pprint.pp(stack.geojson())
 
 def as_output(results: asf.ASFSearchResults, output: str) -> dict:
     output_format = output.lower()
-    if output_format == "json":
-        output_format = "jsonlite"
 
     # Use a switch statement, so you only load the type of output you need:
     match output_format:
+        case 'json':
+            return {
+                'content': ''.join(results.json()),
+                'media_type': 'application/json; charset=utf-8',
+                'headers': {
+                    **constants.DEFAULT_HEADERS,
+                    'Content-Disposition': f"attachment; filename={make_filename('json')}",
+                }
+            }
         case 'jsonlite':
             return {
                 'content': ''.join(results.jsonlite()),
