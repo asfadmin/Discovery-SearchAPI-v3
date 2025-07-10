@@ -31,7 +31,7 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Added `json` output format support
 
 ### Changed
-- bump asf-search to v9.0.5
+- bump asf-search to v9.0.6
 
 ------
 ## [1.0.5](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.4...v1.0.5)
