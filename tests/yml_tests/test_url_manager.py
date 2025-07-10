@@ -233,7 +233,7 @@ class test_URL_Manager():
             ## JSON
             else:
                 assert isinstance(file_content, type([])), self.error_msg.format("Response did not contain a list of results.\nContent (First 500 char):\n{0}\n".format(file_content))
-                json_data = file_content[0]
+                json_data = file_content
                 if json_data == []:
                     content_type = "blank json"
                 else:
