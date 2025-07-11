@@ -172,14 +172,14 @@ tests:
     groupid: 12345
     output: json
 
-    expected file: blank jsonlite
+    expected file: blank json
     expected code: 200
 
 - groupid hash blank:
     groupid: sdfkhgsdfkhgsdf
     output: json
 
-    expected file: blank jsonlite
+    expected file: blank json
     expected code: 200
 
 - groupid TEST blank:
@@ -200,35 +200,35 @@ tests:
     groupid: R1_57704_ST7_F173
     output: json
 
-    expected file: blank jsonlite
+    expected file: blank json
     expected code: 200
 
 - groupid ERS blank not in CMR:
     groupid: E2_84699_STD_F309
     output: json
 
-    expected file: blank jsonlite
+    expected file: blank json
     expected code: 200
 
 - groupid JERS blank not in CMR:
     groupid: J1_36439_STD_F268
     output: json
 
-    expected file: blank jsonlite
+    expected file: blank json
     expected code: 200
 
 - groupid Seasat blank not in CMR:
     groupid: SS_01502_STD
     output: json
 
-    expected file: blank jsonlite
+    expected file: blank json
     expected code: 200
 
 - instrument test:
     instrument: test
     output: json
 
-    expected file: blank jsonlite
+    expected file: blank json
     expected code: 200
 
 - instrument notvalid:
@@ -245,7 +245,7 @@ tests:
     output: json
     maxResults: 100
 
-    expected file: blank jsonlite
+    expected file: blank json
     expected code: 200
 
 - output test:
