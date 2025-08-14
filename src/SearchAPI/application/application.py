@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 
 import os
@@ -6,7 +7,7 @@ import dateparser
 
 import asf_search as asf
 from fastapi import Depends, FastAPI, Request, HTTPException, APIRouter, UploadFile
-from fastapi.responses import Response, JSONResponse
+from fastapi.responses import RedirectResponse, Response, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from .log_router import LoggingRoute
@@ -226,6 +227,31 @@ async def file_to_wkt(files: list[UploadFile]):
         status_code=200,
         headers=constants.DEFAULT_HEADERS
     )
+
+# @router.get('/redirect/{shortName}')
+# async def nisar_static_layer(shortName: str, granule_id: str, cmr_token: Optional[str], cmr_host: Optional[str]='uat'):
+#         opts = asf.ASFSearchOptions()
+#         if cmr_token is not None:
+#             if cmr_host == 'uat':
+#                 host = asf.INTERNAL.CMR_HOST_UAT
+#             else:
+#                 host = asf.INTERNAL.CMR_HOST
+#             session = asf.ASFSession(cmr_host=host).auth_with_token(cmr_token)
+#             opts.session = session
+#             opts.host = host
+#         try:
+#             granule = asf.search(
+#                 granule_list=[granule_id],
+#                 opts=opts
+#                 )[0]
+#         except IndexError:
+#             raise HTTPException(status_code=400, detail=f'Unable to find static layer, provided scene named "{granule_id}" not found in CMR record')
+        
+#         static_layer = granule.get_static_layer(opts=asf.ASFSearchOptions(shortName=shortName))
+#         if static_layer is None:
+#             raise HTTPException(status_code=500, detail=f'Static layer not found for scene named "{granule_id}"')
+
+#         return RedirectResponse(static_layer.properties['url'])
 
 
 def validate_wkt(wkt: str):
