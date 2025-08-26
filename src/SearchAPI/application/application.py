@@ -1,4 +1,5 @@
 from datetime import datetime
+import io
 import json
 
 import os
@@ -7,7 +8,7 @@ import dateparser
 
 import asf_search as asf
 from fastapi import Depends, FastAPI, Request, HTTPException, APIRouter, UploadFile
-from fastapi.responses import RedirectResponse, Response, JSONResponse
+from fastapi.responses import FileResponse, RedirectResponse, Response, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from .log_router import LoggingRoute
@@ -21,6 +22,7 @@ from .files_to_wkt import FilesToWKT
 from . import constants
 from .SearchAPISession import SearchAPISession
 from asf_search.ASFSearchOptions.config import config as asf_config
+from .browse_reproject import nisar_browse_kml
 
 asf_config['session'] = SearchAPISession()
 
@@ -253,6 +255,27 @@ async def file_to_wkt(files: list[UploadFile]):
 
 #         return RedirectResponse(static_layer.properties['url'])
 
+@router.get('/services/utils/nisar_browse_reproject')
+def nisar_browse_reproject(product_ur: str, cmr_token: str):
+    session = asf.ASFSession(cmr_host=asf.INTERNAL.CMR_HOST_UAT).auth_with_token(cmr_token)
+    opts = asf.ASFSearchOptions(host=asf.INTERNAL.CMR_HOST_UAT, session=session)
+
+    response = asf.search(product_list=[product_ur], opts=opts)[0]
+
+    
+    kml_url = response.find_urls('.kml')[0]
+    kml_data  = session.get(kml_url).text
+    png_url = response.find_urls('.png')[0]
+    fl = response.properties['flightDirection'].lower()
+
+    res = session.get(png_url, stream=True)
+    png_file = io.BytesIO(res.content)
+    # return JSONResponse(nisar_browse_kml(kml_data), headers=constants.DEFAULT_HEADERS)
+    nisar_browse_kml(kml_data, png_file, 'output.png', orbit_direction=fl)
+    
+    return FileResponse('./2output.png', status_code=200, headers=constants.DEFAULT_HEADERS, media_type='image/png')
+    # return Response(headers=constants.DEFAULT_HEADERS)
+    pass
 
 def validate_wkt(wkt: str):
     try:
