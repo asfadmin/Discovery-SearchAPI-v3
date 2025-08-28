@@ -28,8 +28,11 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ------
 ## [1.0.8](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.7...v1.0.8)
 ### Changed
-- bump asf-search to v10.0.1 for NISAR `GUNW` and `GSLC` `processingLevel` search keyword collection aliases, and ARIA-S1 GUNW Stacking support
-  - also adds NISAR file size export support
+- bump asf-search to v10.0.2 for NISAR product type file sizes, urgent response now searchable with product types, and ARIA-S1 GUNW Stacking support
+
+### Fixed
+- boolean values are properly capitalized in `python` output file
+
 ------
 ## [1.0.7](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.6...v1.0.7)
 ### Changed
