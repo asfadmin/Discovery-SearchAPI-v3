@@ -77,7 +77,6 @@ jobs:
           uses: ./.github/workflows/search-api-composite
           with:
             aws-account-id: ${{ secrets.AWS_ACCOUNT_ID }}
-            staging: true
             maturity: test-staging
     
     run-test-staging-integration-tests:
