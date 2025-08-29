@@ -1,13 +1,11 @@
-from datetime import datetime
 import json
 
 import os
-from typing import Optional
 import dateparser
 
 import asf_search as asf
 from fastapi import Depends, FastAPI, Request, HTTPException, APIRouter, UploadFile
-from fastapi.responses import RedirectResponse, Response, JSONResponse
+from fastapi.responses import Response, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from .log_router import LoggingRoute
@@ -228,17 +226,19 @@ async def file_to_wkt(files: list[UploadFile]):
         headers=constants.DEFAULT_HEADERS
     )
 
-# @router.get('/redirect/{shortName}')
-# async def nisar_static_layer(shortName: str, granule_id: str, cmr_token: Optional[str], cmr_host: Optional[str]='uat'):
+# @router.get('/redirect/{short_name}/{granule_id}')
+# async def nisar_static_layer(environment: Literal['prod', 'test'], short_name: str, granule_id: str):
+#         """
+#         environment: 'prod' or 'test' (whether to search the cmr prod or uat record)
+#         short_name: the CMR static layer collection short name to search
+#         granule_id: the granule id of the product to find the static layer for
+
+#         returns: redirect to file url
+#         """
 #         opts = asf.ASFSearchOptions()
-#         if cmr_token is not None:
-#             if cmr_host == 'uat':
-#                 host = asf.INTERNAL.CMR_HOST_UAT
-#             else:
-#                 host = asf.INTERNAL.CMR_HOST
-#             session = asf.ASFSession(cmr_host=host).auth_with_token(cmr_token)
-#             opts.session = session
-#             opts.host = host
+#         if environment == 'test':
+#             opts.host = asf.INTERNAL.CMR_HOST_UAT
+
 #         try:
 #             granule = asf.search(
 #                 granule_list=[granule_id],
@@ -247,7 +247,7 @@ async def file_to_wkt(files: list[UploadFile]):
 #         except IndexError:
 #             raise HTTPException(status_code=400, detail=f'Unable to find static layer, provided scene named "{granule_id}" not found in CMR record')
         
-#         static_layer = granule.get_static_layer(opts=asf.ASFSearchOptions(shortName=shortName))
+#         static_layer = granule.get_static_layer(opts=asf.ASFSearchOptions(shortName=short_name))
 #         if static_layer is None:
 #             raise HTTPException(status_code=500, detail=f'Static layer not found for scene named "{granule_id}"')
 
