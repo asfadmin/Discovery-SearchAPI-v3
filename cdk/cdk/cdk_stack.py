@@ -12,7 +12,7 @@ from constructs import Construct
 
 class SearchAPIStack(Stack):
 
-    def __init__(self, scope: Construct, construct_id: str, staging: bool = False, **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, api_stage: str, staging: bool = False, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         try:
@@ -60,7 +60,7 @@ class SearchAPIStack(Stack):
             memory_size=5308,
             code=lambda_.DockerImageCode.from_image_asset(
                 directory='..',
-                # build_args={'MATURITY': }
+                build_args={'MATURITY': api_stage},
                 ),
             **lambda_vpc_kwargs,
         )

@@ -32,7 +32,7 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 - boolean values are properly capitalized in `python` output file
-
+- API maturity set for each level of deployment stage
 ------
 ## [1.0.7](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.6...v1.0.7)
 ### Changed
