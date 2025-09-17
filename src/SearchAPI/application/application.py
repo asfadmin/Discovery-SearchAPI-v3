@@ -268,8 +268,8 @@ def nisar_browse_reproject(product_ur: str, cmr_token: str):
     png_url = response.find_urls('.png')[0]
     fl = response.properties['flightDirection'].lower()
 
-    res = session.get(png_url, stream=True)
-    png_file = io.BytesIO(res.content)
+    res = session.get(png_url).content
+    png_file = io.BytesIO(res)
     # return JSONResponse(nisar_browse_kml(kml_data), headers=constants.DEFAULT_HEADERS)
     nisar_browse_kml(kml_data, png_file, 'output.png', orbit_direction=fl)
     

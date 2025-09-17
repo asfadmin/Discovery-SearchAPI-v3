@@ -16,7 +16,7 @@ from shapely.ops import transform
 from shapely.geometry.base import BaseGeometry
 from .logger import api_logger
 from collections import deque
-
+from osgeo import ogr, osr, gdal
 def kml2geometry(kml_file):
     """Extract geometry from KML file"""
 
@@ -98,7 +98,7 @@ def project2map(shape, epsg):
 
 def project2geo(shape, epsg):
     """Reproject a map projected shape into geographic coordinates"""
-
+    osr.SpatialReference.GetCoordinateEpoch()
     gcs_epsg = pyproj.CRS('EPSG:4326')
     map_epsg = pyproj.CRS(f'EPSG:{epsg}')
     project = pyproj.Transformer.from_crs(map_epsg, gcs_epsg,
@@ -228,10 +228,15 @@ def determine_corner(gcs_geometry, dateline, png_file, orbit_direction) -> tuple
 
         
         latitude, longitude = rotate_points(latitude, longitude, orbit_direction)
-        corners['ul'] = f'0 0 {longitude[0]} {latitude[0]}'
-        corners['ur'] = f'{width} 0 {longitude[1]} {latitude[1]}'
-        corners['lr'] = f'{width} {height} {longitude[2]} {latitude[2]}'
-        corners['ll'] = f'0 {height} {longitude[3]} {latitude[3]}'
+        # corners['ul'] = f'0 0 {longitude[0]} {latitude[0]}'
+        # corners['ur'] = f'{width} 0 {longitude[1]} {latitude[1]}'
+        # corners['lr'] = f'{width} {height} {longitude[2]} {latitude[2]}'
+        # corners['ll'] = f'0 {height} {longitude[3]} {latitude[3]}'
+
+        corners['ur'] = gdal.GCP(width, 0.0, 0.0, longitude[1],latitude[1])
+        corners['lr'] = gdal.GCP(width, height, 0.0, longitude[2],latitude[2])
+        corners['ll'] = gdal.GCP(0.0, height, 0.0, longitude[3], latitude[3])
+        corners['ul'] = gdal.GCP(0.0, 0.0, 0.0, longitude[0], latitude[0])
 
     ### Ascending upper right corner or descending upper left corner
     elif math.isclose(latitude[0], max_latitude, abs_tol=0.0001) and \
@@ -244,10 +249,16 @@ def determine_corner(gcs_geometry, dateline, png_file, orbit_direction) -> tuple
             print('Descending - upper left corner')
 
         latitude, longitude = rotate_points(latitude, longitude, orbit_direction)
-        corners['ul'] = f'0 0 {longitude[3]} {latitude[3]}'
-        corners['ur'] = f'{width} 0 {longitude[0]} {latitude[0]}'
-        corners['lr'] = f'{width} {height} {longitude[1]} {latitude[1]}'
-        corners['ll'] = f'0 {height} {longitude[2]} {latitude[2]}'
+        # corners['ul'] = f'0 0 {longitude[3]} {latitude[3]}'
+        # corners['ur'] = f'{width} 0 {longitude[0]} {latitude[0]}'
+        # corners['lr'] = f'{width} {height} {longitude[1]} {latitude[1]}'
+        # corners['ll'] = f'0 {height} {longitude[2]} {latitude[2]}'
+
+        corners['lr'] = gdal.GCP(width, height, 0.0, longitude[1],latitude[1])
+        corners['ll'] = gdal.GCP(0.0, height, 0.0, longitude[2],latitude[2])
+        corners['ul'] = gdal.GCP(0.0, 0.0, 0.0, longitude[3], latitude[3])
+        corners['ur'] = gdal.GCP(width, 0.0, 0.0, longitude[0], latitude[0])
+        
 
     ### Ascending lower right corner or descending upper right corner
     elif math.isclose(longitude[0], max_longitude, abs_tol=0.0001) and \
@@ -260,10 +271,16 @@ def determine_corner(gcs_geometry, dateline, png_file, orbit_direction) -> tuple
             print('Descending - upper right corner')
 
         latitude, longitude = rotate_points(latitude, longitude, orbit_direction)
-        corners['ul'] = f'0 0 {longitude[2]} {latitude[2]}'
-        corners['ur'] = f'{width} 0 {longitude[3]} {latitude[3]}'
-        corners['lr'] = f'{width} {height} {longitude[0]} {latitude[0]}'
-        corners['ll'] = f'0 {height} {longitude[1]} {latitude[1]}'
+        # corners['ul'] = f'0 0 {longitude[2]} {latitude[2]}'
+        # corners['ur'] = f'{width} 0 {longitude[3]} {latitude[3]}'
+        # corners['lr'] = f'{width} {height} {longitude[0]} {latitude[0]}'
+        # corners['ll'] = f'0 {height} {longitude[1]} {latitude[1]}'
+
+        corners['ll'] = gdal.GCP(0.0, height, 0.0, longitude[1],latitude[1])
+        corners['ul'] = gdal.GCP(0.0, 0.0, 0.0, longitude[2],latitude[2])
+        corners['ur'] = gdal.GCP(width, 0.0, 0.0, longitude[3], latitude[3])
+        corners['lr'] = gdal.GCP(width, height, 0.0, longitude[0], latitude[0])
+        
 
     ### Ascending lower left corner or descending lower right corner
     elif math.isclose(latitude[0], min_latitude, abs_tol=0.0001) and \
@@ -275,10 +292,15 @@ def determine_corner(gcs_geometry, dateline, png_file, orbit_direction) -> tuple
         elif orbit_direction == 'descending':
             print('Descending - lower right corner')
         latitude, longitude = rotate_points(latitude, longitude, orbit_direction)
-        corners['ul'] = f'0 0 {longitude[1]} {latitude[1]}'
-        corners['ur'] = f'{width} 0 {longitude[2]} {latitude[2]}'
-        corners['lr'] = f'{width} {height} {longitude[3]} {latitude[3]}'
-        corners['ll'] = f'0 {height} {longitude[0]} {latitude[0]}'
+        corners['ul'] = gdal.GCP(0.0, 0.0, 0.0, longitude[1],latitude[1])
+        corners['ur'] = gdal.GCP(width, 0.0, 0.0, longitude[2],latitude[2])
+        corners['lr'] = gdal.GCP(width, height, 0.0, longitude[3], latitude[3])
+        corners['ll'] = gdal.GCP(0.0, height, 0.0, longitude[0], latitude[0])
+        
+        # corners['ul'] = f'0 0 {longitude[1]} {latitude[1]}'
+        # corners['ur'] = f'{width} 0 {longitude[2]} {latitude[2]}'
+        # corners['lr'] = f'{width} {height} {longitude[3]} {latitude[3]}'
+        # corners['ll'] = f'0 {height} {longitude[0]} {latitude[0]}'
 
     ### Reverse dateline if needed
     if is_ccw:
@@ -304,7 +326,7 @@ def nisar_browse_kml(kml_file: str, png_file: BytesIO, output_file: str, orbit_d
     (gcs_geometry, corners) = \
         determine_corner(gcs_geometry, dateline, png_file, orbit_direction)
     print('Corners')
-    print(json.dumps(corners, indent=2))
+    # print(json.dumps(corners, indent=2))
 
     ### Apply corner coordinates
     tmp = tempfile.NamedTemporaryFile(delete_on_close=False)
@@ -316,14 +338,32 @@ def nisar_browse_kml(kml_file: str, png_file: BytesIO, output_file: str, orbit_d
         # b = png_file.read()
         f.write(b)
 
-        gdal_translate = f'gdal_translate -gcp {corners["ul"]} -gcp {corners["ur"]} -gcp {corners["lr"]} -gcp {corners["ll"]} -a_srs EPSG:4326 ' \
-        f"{tmp.name} {output_file}"
+        # gdal_translate = f'gdal_translate -gcp {corners["ul"]} -gcp {corners["ur"]} -gcp {corners["lr"]} -gcp {corners["ll"]} -a_srs EPSG:4326 ' \
+        # f"{tmp.name} {output_file}"
+        
+        gdal.Translate(
+            destName=output_file,
+            srcDS=tmp.name,
+            options=gdal.TranslateOptions(
+                GCPs=[corners['ul'], corners['ur'], corners['lr'], corners['ll']],
+                # outputSRS='EPSG:4326',
+                format='png',
+                
+            )
+        )
         # start = perf_counter()
-        os.system(gdal_translate)
+        # os.system(gdal_translate)
         # api_logger.info(perf_counter() - start)
-        cmd = f"gdalwarp -t_srs EPSG:4326 -overwrite " \
-            f"{output_file} 2{output_file}"
+        # cmd = f"gdalwarp -t_srs EPSG:4326 -overwrite " \
+        #     f"{output_file} 2{output_file}"
         start = perf_counter()
-        os.system(cmd)
+        gdal.Warp(destNameOrDestDS=f'2{output_file}', srcDSOrSrcDSTab=output_file, options=gdal.WarpOptions(
+            # srcSRS='EPSG:4326',
+            # dstSRS='EPSG:4326',
+            format='png',
+            
+        ))
+        
+        # os.system(cmd)
         api_logger.info(perf_counter() - start)
     print(f'\n\nGeometry: {gcs_geometry}')
