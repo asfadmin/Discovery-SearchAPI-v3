@@ -85,7 +85,7 @@ def get_map_info(gcs_geometry):
     return epsg, bounds
 
 
-def project2map(shape, epsg):
+def project2map(shape, epsg) -> shapely.Geometry:
     """Reproject geographic shape into a map projection"""
 
     gcs_epsg = pyproj.CRS('EPSG:4326')
@@ -98,7 +98,7 @@ def project2map(shape, epsg):
 
 def project2geo(shape, epsg):
     """Reproject a map projected shape into geographic coordinates"""
-    osr.SpatialReference.GetCoordinateEpoch()
+    # osr.SpatialReference.GetCoordinateEpoch()
     gcs_epsg = pyproj.CRS('EPSG:4326')
     map_epsg = pyproj.CRS(f'EPSG:{epsg}')
     project = pyproj.Transformer.from_crs(map_epsg, gcs_epsg,
@@ -325,8 +325,8 @@ def nisar_browse_kml(kml_file: str, png_file: BytesIO, output_file: str, orbit_d
     b = png_file.read()
     (gcs_geometry, corners) = \
         determine_corner(gcs_geometry, dateline, png_file, orbit_direction)
-    print('Corners')
-    # print(json.dumps(corners, indent=2))
+    # print('Corners')
+    # print(json.dumps({corner_name: corner.serialize() for corner_name, corner in corners.items()}, indent=2))
 
     ### Apply corner coordinates
     tmp = tempfile.NamedTemporaryFile(delete_on_close=False)
@@ -338,32 +338,30 @@ def nisar_browse_kml(kml_file: str, png_file: BytesIO, output_file: str, orbit_d
         # b = png_file.read()
         f.write(b)
 
-        # gdal_translate = f'gdal_translate -gcp {corners["ul"]} -gcp {corners["ur"]} -gcp {corners["lr"]} -gcp {corners["ll"]} -a_srs EPSG:4326 ' \
+        # gdal_translate = f'gdal_translate -gcp {corners["ul"]} -gcp {corners["ur"]} -gcp {corners["lr"]} -gcp {corners["ll"]} -a_srs EPSG:3857 ' \
         # f"{tmp.name} {output_file}"
-        
+
         gdal.Translate(
             destName=output_file,
             srcDS=tmp.name,
             options=gdal.TranslateOptions(
-                GCPs=[corners['ul'], corners['ur'], corners['lr'], corners['ll']],
-                # outputSRS='EPSG:4326',
+                GCPs=[corners['ll'], corners['ul'], corners['ur'], corners['lr'], ],
+                outputSRS='EPSG:3857',
                 format='png',
-                
             )
         )
         # start = perf_counter()
         # os.system(gdal_translate)
         # api_logger.info(perf_counter() - start)
-        # cmd = f"gdalwarp -t_srs EPSG:4326 -overwrite " \
+        # cmd = f"gdalwarp -t_srs EPSG:3857 -overwrite " \
         #     f"{output_file} 2{output_file}"
-        start = perf_counter()
+        # start = perf_counter()
         gdal.Warp(destNameOrDestDS=f'2{output_file}', srcDSOrSrcDSTab=output_file, options=gdal.WarpOptions(
-            # srcSRS='EPSG:4326',
-            # dstSRS='EPSG:4326',
             format='png',
-            
+            dstSRS='EPSG:4326',
+            srcSRS="EPSG:3857"
         ))
         
         # os.system(cmd)
-        api_logger.info(perf_counter() - start)
+        # api_logger.info(perf_counter() - start)
     print(f'\n\nGeometry: {gcs_geometry}')
