@@ -29,7 +29,7 @@ Your code runs without any unhandled errors, warnings, or regressions
 You have added unit tests to the test suite see the [README Testing section](https://github.com/asfadmin/Discovery-SearchAPI-v3/tree/dev?tab=readme-ov-file#writing-tests) for an overview on adding tests to the test suite.
 
 ## Target Merge Branch
-Your pull request targets the `master` branch
+Your pull request targets the `dev` branch
 
 
 ***
