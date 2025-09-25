@@ -230,29 +230,29 @@ async def file_to_wkt(files: list[UploadFile]):
     )
 
 # example: https://api.daac.asf.alaska.edu/services/redirect/NISAR_L2_STATIC/{granule_id}.h5
-@router.get('/services/redirect/{short_name}/{granule_id}')
-async def nisar_static_layer(short_name: str, granule_id: str):
-        """
-        short_name: the CMR static layer collection short name to search
-        granule_id: the granule id of the product to find the static layer for
+# @router.get('/services/redirect/{short_name}/{granule_id}')
+# async def nisar_static_layer(short_name: str, granule_id: str):
+#         """
+#         short_name: the CMR static layer collection short name to search
+#         granule_id: the granule id of the product to find the static layer for
 
-        returns: redirect to file url
-        """
-        opts = asf.ASFSearchOptions(host=cfg['cmr_base'])
+#         returns: redirect to file url
+#         """
+#         opts = asf.ASFSearchOptions(host=cfg['cmr_base'])
 
-        try:
-            granule = asf.search(
-                granule_list=[granule_id],
-                opts=opts
-                )[0]
-        except IndexError:
-            raise HTTPException(status_code=400, detail=f'Unable to find static layer, provided scene named "{granule_id}" not found in CMR record')
+#         try:
+#             granule = asf.search(
+#                 granule_list=[granule_id],
+#                 opts=opts
+#                 )[0]
+#         except IndexError:
+#             raise HTTPException(status_code=400, detail=f'Unable to find static layer, provided scene named "{granule_id}" not found in CMR record')
         
-        static_layer = granule.get_static_layer(opts=asf.ASFSearchOptions(shortName=short_name))
-        if static_layer is None:
-            raise HTTPException(status_code=500, detail=f'Static layer not found for scene named "{granule_id}"')
+#         static_layer = granule.get_static_layer(opts=asf.ASFSearchOptions(shortName=short_name))
+#         if static_layer is None:
+#             raise HTTPException(status_code=500, detail=f'Static layer not found for scene named "{granule_id}"')
 
-        return RedirectResponse(static_layer.properties['url'])
+#         return RedirectResponse(static_layer.properties['url'])
 
 
 def validate_wkt(wkt: str):
