@@ -283,10 +283,10 @@ def determine_corner(gcs_geometry, dateline, png_file, orbit_direction) -> tuple
         
 
     ### Ascending lower left corner or descending lower right corner
-    elif math.isclose(latitude[0], min_latitude, abs_tol=0.0001) and \
-        math.isclose(longitude[1], min_longitude, abs_tol=0.0001) and \
-        math.isclose(latitude[2], max_latitude, abs_tol=0.0001) and \
-        math.isclose(longitude[3], max_longitude, abs_tol=0.0001):
+    else: # math.isclose(latitude[0], min_latitude, abs_tol=0.0001) and \
+        # math.isclose(longitude[1], min_longitude, abs_tol=0.0001) and \
+        # math.isclose(latitude[2], max_latitude, abs_tol=0.0001) and \
+        # math.isclose(longitude[3], max_longitude, abs_tol=0.0001):
         if orbit_direction == 'ascending':
             print('Ascending - lower left corner')
         elif orbit_direction == 'descending':
@@ -330,8 +330,6 @@ def nisar_browse_kml(kml_file: str, png_file: BytesIO, output_file: str, orbit_d
 
     ### Apply corner coordinates
     tmp = tempfile.NamedTemporaryFile(delete_on_close=False)
-    tmp_warped = tempfile.NamedTemporaryFile(delete_on_close=False)
-    bounds = ' '.join([str(p) for p in gcs_geometry.bounds])
     
     # Open the file for writing.
     with open(tmp.name, 'wb') as f:
