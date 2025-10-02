@@ -28,7 +28,7 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ------
 ## [1.0.8](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.7...v1.0.8)
 ### Changed
-- bump asf-search to v10.0.4 for NISAR product type file sizes, urgent response now searchable with product types, and ARIA-S1 GUNW Stacking support
+- bump asf-search to v10.1.0 for NISAR product type file sizes, urgent response now searchable with product types, and ARIA-S1 GUNW Stacking support, better nisar metadata output formatting
 
 ### Fixed
 - boolean values are properly capitalized in `python` output file
