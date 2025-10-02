@@ -1,5 +1,8 @@
 # SearchAPI-v3
 
+
+[![es](https://img.shields.io/badge/lang-es-yellow.svg)](./README.es.md)
+
 SearchAPI-v3 is a wrapper around the [asf-search python module](https://github.com/asfadmin/Discovery-asf_search) using a serverless deployment with the FastAPI web framework and AWS lambda.
 
 ### Main Endpoints
@@ -8,7 +11,7 @@ SearchAPI-v3 is a wrapper around the [asf-search python module](https://github.c
   <thead>
     <tr>
       <th>Endpoint</th>
-      <th>Descirption</th>
+      <th>Description</th>
       <th>Methods</th>
     </tr>
   </thead>
