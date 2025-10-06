@@ -1,7 +1,6 @@
 import json
 
 import os
-from typing import Optional
 import dateparser
 
 import asf_search as asf
@@ -15,12 +14,10 @@ from .asf_env import load_config_maturity
 from .asf_opts import process_baseline_request, process_search_request, process_wkt_request
 from .health import get_cmr_health
 from .models import BaselineSearchOptsModel, SearchOptsModel
-from .output import as_output, get_asf_search_script, make_filename
+from .output import as_output, get_asf_search_script
 from .files_to_wkt import FilesToWKT
 from . import constants
 from .SearchAPISession import SearchAPISession
-from .search import get_aria_groups_for_frame, stack_aria_gunw
-import time
 from asf_search.ASFSearchOptions.config import config as asf_config
 
 asf_config['session'] = SearchAPISession()
@@ -36,6 +33,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+cfg = load_config_maturity()
+cmr_health = get_cmr_health(cfg['cmr_base'], cfg['cmr_health'])
 
 
 @router.api_route("/services/search/param", methods=["GET", "POST", "HEAD"])
@@ -98,19 +98,8 @@ async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(proces
     reference = searchOptions.reference
     request_method = searchOptions.request_method
 
-    if searchOptions.opts.dataset is not None:
-        if searchOptions.opts.dataset[0] == asf.DATASET.ARIA_S1_GUNW:
-            if output.lower() == 'count':
-                return Response(
-                    content=str(len(get_aria_groups_for_frame(reference)[1])),
-                    status_code=200,
-                    media_type='text/html; charset=utf-8',
-                    headers=constants.DEFAULT_HEADERS
-                )
+    is_frame_based = searchOptions.opts.dataset is not None
 
-            stack = stack_aria_gunw(reference)
-            response_info = as_output(stack, output=output)
-            return Response(**response_info)
     # Load the reference scene:
     
     if output.lower() == 'python':
@@ -125,15 +114,24 @@ async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(proces
                     'Content-Disposition': f"attachment; filename={file_name}",
                 }
         )
-    try:
-        reference_product = asf.granule_search(granule_list=[reference], opts=opts)[0]
-    except (KeyError, IndexError, ValueError) as exc:
-        raise HTTPException(detail=f"Reference scene not found: {reference}", status_code=400) from exc
+
+    # reference_product = None
+    if is_frame_based and opts.dataset[0] == asf.DATASET.ARIA_S1_GUNW:
+        try:
+            reference_product = asf.search(frame=int(reference), opts=opts, maxResults=1)[0]
+        except (KeyError, IndexError, ValueError) as exc:
+            raise HTTPException(detail=f"Reference scene not found with frame: {reference}", status_code=400) from exc
+
+    else:
+        try:
+            reference_product = asf.granule_search(granule_list=[reference], opts=opts)[0]
+        except (KeyError, IndexError, ValueError) as exc:
+            raise HTTPException(detail=f"Reference scene not found: {reference}", status_code=400) from exc
 
     try:
         if reference_product.get_stack_opts() is None:
             reference_product = asf.ASFStackableProduct(args={'umm': reference_product.umm, 'meta': reference_product.meta}, session=reference_product.session)
-        if not reference_product.has_baseline() or not reference_product.is_valid_reference():
+        if (not reference_product.has_baseline() or not reference_product.is_valid_reference() or not reference_product.has_baseline()) and not is_frame_based:
             raise asf.exceptions.ASFBaselineError(f"Requested reference scene has no baseline")
     except (asf.exceptions.ASFBaselineError, ValueError) as exc:
         raise HTTPException(detail=f"Search failed to find results: {exc}", status_code=400)
@@ -231,6 +229,31 @@ async def file_to_wkt(files: list[UploadFile]):
         headers=constants.DEFAULT_HEADERS
     )
 
+# example: https://api.daac.asf.alaska.edu/services/redirect/NISAR_L2_STATIC/{granule_id}.h5
+# @router.get('/services/redirect/{short_name}/{granule_id}')
+# async def nisar_static_layer(short_name: str, granule_id: str):
+#         """
+#         short_name: the CMR static layer collection short name to search
+#         granule_id: the granule id of the product to find the static layer for
+
+#         returns: redirect to file url
+#         """
+#         opts = asf.ASFSearchOptions(host=cfg['cmr_base'])
+
+#         try:
+#             granule = asf.search(
+#                 granule_list=[granule_id],
+#                 opts=opts
+#                 )[0]
+#         except IndexError:
+#             raise HTTPException(status_code=400, detail=f'Unable to find static layer, provided scene named "{granule_id}" not found in CMR record')
+        
+#         static_layer = granule.get_static_layer(opts=asf.ASFSearchOptions(shortName=short_name))
+#         if static_layer is None:
+#             raise HTTPException(status_code=500, detail=f'Static layer not found for scene named "{granule_id}"')
+
+#         return RedirectResponse(static_layer.properties['url'])
+
 
 def validate_wkt(wkt: str):
     try:
@@ -259,14 +282,11 @@ async def health_check():
         api_logger.info(exc)
         api_version = {'version': 'unknown'}
 
-    cfg = load_config_maturity()
-    cmr_health = get_cmr_health(cfg['cmr_base'], cfg['cmr_health'])
-
     api_health = {
         'ASFSearchAPI': {
             'ok?': True,
             'version': api_version['version'],
-            'config': load_config_maturity()
+            'config': cfg
         },
         'CMRSearchAPI': cmr_health
     }

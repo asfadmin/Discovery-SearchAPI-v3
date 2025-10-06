@@ -26,6 +26,16 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 -->
 ------
+## [1.0.8](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.7...v1.0.8)
+### Changed
+- bump asf-search to v10.1.1 for NISAR product type file sizes, urgent response now searchable with product types, and ARIA-S1 GUNW Stacking support, better nisar metadata output formatting, OPERA-S1 `TROPO-ZENITH`
+
+### Fixed
+- boolean values are properly capitalized in `python` output file
+- API maturity set for each level of deployment stage
+- API maturity loaded once per api instance
+
+------
 ## [1.0.7](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.6...v1.0.7)
 ### Changed
 - bump asf-search to v9.0.8

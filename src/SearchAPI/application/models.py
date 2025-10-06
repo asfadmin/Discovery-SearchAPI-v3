@@ -14,7 +14,7 @@ class SearchOptsModel(BaseModel):
     """
     opts: InstanceOf[ASFSearchOptions]
     request_method: str # ["GET", "POST", "HEAD"]
-    output: Optional[str] = 'metalink'
+    output: str = 'metalink'
     merged_args: dict = {}
 
     output_types: ClassVar[list[str]] = ['metalink', 'csv', 'geojson', 'json', 'jsonlite', 'jsonlite2', 'kml', 'count', 'download', 'python']

@@ -175,12 +175,14 @@ def get_asf_search_script(
         ) -> tuple[str, str]:
     
     opts.session = None
+    # ASFSearchOptions formatting uses json.dumps for serialization. Add proper python capitalization
+    opts_str = str(opts).replace('true', 'True', -1).replace('false', 'False')
     if search_endpoint == 'param':
         file_name=make_filename('py', prefix='asf-search-script')
-        output_script = asf_search_script_template.format(file_name, str(opts))
+        output_script = asf_search_script_template.format(file_name, opts_str)
     else:
         file_name=make_filename('py', prefix='asf-search-baseline-script')
-        output_script = asf_search_baseline_script_template.format(file_name, reference, str(opts))
+        output_script = asf_search_baseline_script_template.format(file_name, reference, opts_str)
     return file_name, output_script
 
 def make_filename(suffix, prefix:str = 'asf-results'):
