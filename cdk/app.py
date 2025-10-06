@@ -8,12 +8,12 @@ from cdk.cdk_stack import SearchAPIStack
 
 app = cdk.App()
 
-staging = app.node.try_get_context('staging')
-if staging is None:
-    staging = False
-
+staging = False
 suffix = ''
-if staging:
+api_stage = app.node.try_get_context('api_stage')
+
+if api_stage.endswith('staging'):
+    staging = True
     suffix = '-Staging'
 
 SearchAPIStack(app, f"SearchAPIStack{suffix}",
@@ -24,6 +24,7 @@ SearchAPIStack(app, f"SearchAPIStack{suffix}",
     # Uncomment the next line to specialize this stack for the AWS Account
     # and Region that are implied by the current CLI configuration.
     staging=staging,
+    api_stage=api_stage,
     env=cdk.Environment(
         account=os.getenv('CDK_DEFAULT_ACCOUNT'),
         region=os.getenv('CDK_DEFAULT_REGION')

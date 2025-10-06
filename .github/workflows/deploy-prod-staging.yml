@@ -78,6 +78,7 @@ jobs:
           with:
             aws-account-id: ${{ secrets.AWS_ACCOUNT_ID }}
             staging: true
+            maturity: prod-staging
     
     run-prod-staging-integration-tests:
       needs: [deploy-prod-staging]
