@@ -26,6 +26,11 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 -->
 ------
+## [1.0.9](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.8...v1.0.9)
+### Fixed
+- Fixed bug with ARIA-S1 GUNW stacking over areas without pre-existing ARIA-S1-Frames
+
+------
 ## [1.0.8](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.7...v1.0.8)
 ### Changed
 - bump asf-search to v10.1.1 for NISAR product type file sizes, urgent response now searchable with product types, and ARIA-S1 GUNW Stacking support, better nisar metadata output formatting, OPERA-S1 `TROPO-ZENITH`
