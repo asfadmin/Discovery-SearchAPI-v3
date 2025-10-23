@@ -268,22 +268,17 @@ def validate_wkt(wkt: str):
     }
 
 def _get_aria_baseline_stack(reference: str, opts: asf.ASFSearchOptions, output: str):
+    if output.lower() == 'count':
+        stack_opts = asf.Products.ARIAS1GUNWProduct.get_stack_opts_for_frame(int(reference), opts=opts)
+        count=asf.search_count(opts=stack_opts)
+        return Response(
+            content=str(count),
+            status_code=200,
+            media_type='text/html; charset=utf-8',
+            headers=constants.DEFAULT_HEADERS
+        )
     try:
-        if output.lower() == 'count':
-            stack_opts = asf.Products.ARIAS1GUNWProduct.get_stack_opts_for_frame(int(reference), opts=opts)
-            count=asf.search_count(opts=stack_opts)
-            if count < 2:
-                raise ValueError(f"Invalid stack frame, not enough scenes found with stack parameters. Stack size: {count}")
-            return Response(
-                content=str(count),
-                status_code=200,
-                media_type='text/html; charset=utf-8',
-                headers=constants.DEFAULT_HEADERS
-            )
-    
         stack = asf.stack_from_id(reference, opts=opts)
-        if len(stack) < 2:
-            raise ValueError(f"Invalid stack frame, not enough scenes found with stack parameters. Stack size: {len(stack)}")
         response_info = as_output(stack, output)
         return Response(**response_info)
     except (KeyError, IndexError, ValueError) as exc:
