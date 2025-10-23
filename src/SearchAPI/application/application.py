@@ -268,18 +268,8 @@ def validate_wkt(wkt: str):
     }
 
 def _get_aria_baseline_stack(reference: str, opts: asf.ASFSearchOptions, output: str):
-        if output.lower == 'count':
-            stack_opts = asf.ASFSearchOptions() if opts is None else copy(opts)
-            aria_frame = aria_s1_gunw.get_frame(int(reference))
-            stack_opts.dataset = asf.DATASET.SENTINEL1
-            stack_opts.platform = ['SA', 'SB', 'SC']
-            stack_opts.processingLevel = asf.PRODUCT_TYPE.SLC
-            stack_opts.beamMode = asf.BEAMMODE.IW
-            stack_opts.polarization = [asf.POLARIZATION.VV, asf.POLARIZATION.VV_VH]
-            stack_opts.flightDirection = aria_frame.flight_direction
-            stack_opts.relativeOrbit = aria_frame.path
-            stack_opts.intersectsWith = aria_frame.wkt
-
+        if output.lower() == 'count':
+            stack_opts = asf.Products.ARIAS1GUNWProduct.get_stack_opts_for_frame(int(reference), opts=opts)
             count=asf.search_count(opts=stack_opts)
             return Response(
                 content=str(count),
