@@ -1,3 +1,4 @@
+from copy import copy
 import json
 
 import os
@@ -19,6 +20,7 @@ from .files_to_wkt import FilesToWKT
 from . import constants
 from .SearchAPISession import SearchAPISession
 from asf_search.ASFSearchOptions.config import config as asf_config
+from asf_enumeration import aria_s1_gunw
 
 asf_config['session'] = SearchAPISession()
 
@@ -115,18 +117,13 @@ async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(proces
                 }
         )
 
-    # reference_product = None
     if is_frame_based and opts.dataset[0] == asf.DATASET.ARIA_S1_GUNW:
-        try:
-            reference_product = asf.search(frame=int(reference), opts=opts, maxResults=1)[0]
-        except (KeyError, IndexError, ValueError) as exc:
-            raise HTTPException(detail=f"Reference scene not found with frame: {reference}", status_code=400) from exc
+        return _get_aria_baseline_stack(reference=reference, opts=opts, output=output)
 
-    else:
-        try:
-            reference_product = asf.granule_search(granule_list=[reference], opts=opts)[0]
-        except (KeyError, IndexError, ValueError) as exc:
-            raise HTTPException(detail=f"Reference scene not found: {reference}", status_code=400) from exc
+    try:
+        reference_product = asf.granule_search(granule_list=[reference], opts=opts)[0]
+    except (KeyError, IndexError, ValueError) as exc:
+        raise HTTPException(detail=f"Reference scene not found: {reference}", status_code=400) from exc
 
     try:
         if reference_product.get_stack_opts() is None:
@@ -269,6 +266,33 @@ def validate_wkt(wkt: str):
         },
         'repairs':  repairs
     }
+
+def _get_aria_baseline_stack(reference: str, opts: asf.ASFSearchOptions, output: str):
+        if output.lower == 'count':
+            stack_opts = asf.ASFSearchOptions() if opts is None else copy(opts)
+            aria_frame = aria_s1_gunw.get_frame(int(reference))
+            stack_opts.dataset = asf.DATASET.SENTINEL1
+            stack_opts.platform = ['SA', 'SB', 'SC']
+            stack_opts.processingLevel = asf.PRODUCT_TYPE.SLC
+            stack_opts.beamMode = asf.BEAMMODE.IW
+            stack_opts.polarization = [asf.POLARIZATION.VV, asf.POLARIZATION.VV_VH]
+            stack_opts.flightDirection = aria_frame.flight_direction
+            stack_opts.relativeOrbit = aria_frame.path
+            stack_opts.intersectsWith = aria_frame.wkt
+
+            count=asf.search_count(opts=stack_opts)
+            return Response(
+                content=str(count),
+                status_code=200,
+                media_type='text/html; charset=utf-8',
+                headers=constants.DEFAULT_HEADERS
+            )
+        try:
+            stack = asf.stack_from_id(reference, opts=opts)
+            response_info = as_output(stack, output)
+            return Response(**response_info)
+        except (KeyError, IndexError, ValueError) as exc:
+            raise HTTPException(detail=f"Reference scene not found with frame: {reference}", status_code=400) from exc
 
 
 @router.get('/', response_class=JSONResponse)
