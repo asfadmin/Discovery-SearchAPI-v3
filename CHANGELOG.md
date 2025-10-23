@@ -30,6 +30,9 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 - Fixed bug with ARIA-S1 GUNW stacking over areas without pre-existing ARIA-S1-Frames
 
+### Changed
+- bump asf-search to v10.1.2 (Sentinel-1C in ARIA stacking, NISAR L0B science product aliasing)
+
 ------
 ## [1.0.8](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.7...v1.0.8)
 ### Changed
