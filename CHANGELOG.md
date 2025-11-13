@@ -26,6 +26,14 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 -->
 ------
+## [1.0.10](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.9...v1.0.10)
+### Changed
+- bump asf-search to v10.2.0
+    - new SEASAT dataset collection
+    - NISAR concept-id + collection names in jsonlite outputs
+    - L0B science product now only contains RRSD
+
+------
 ## [1.0.9](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.8...v1.0.9)
 ### Fixed
 - Fixed bug with ARIA-S1 GUNW stacking over areas without pre-existing ARIA-S1-Frames
