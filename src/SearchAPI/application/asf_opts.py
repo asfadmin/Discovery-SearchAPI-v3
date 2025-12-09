@@ -167,7 +167,7 @@ async def process_search_request(request: Request, is_baseline: bool = False) ->
 
     if (token := merged_args.get('cmr_token')):
         session = SearchAPISession()
-        session.headers.update({'Authorization': request.headers.get('Authorization')})
+        session.headers.update({'Authorization': 'Bearer {0}'.format(token)})
         query_opts.session = session
 
     output = merged_args.get('output', 'metalink')
