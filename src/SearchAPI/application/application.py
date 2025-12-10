@@ -1,3 +1,4 @@
+from typing import Optional
 from copy import copy
 import json
 
@@ -225,6 +226,26 @@ async def file_to_wkt(files: list[UploadFile]):
         status_code=200,
         headers=constants.DEFAULT_HEADERS
     )
+
+@router.get('/services/utils/kml_footprint')
+async def kml_to_footprint(request: Request, granule: str, maturity: str = 'prod'):
+    config = load_config_maturity(maturity=maturity)
+
+    query_opts = asf.ASFSearchOptions(granule_list=[granule])
+    if (auth:=request.headers.get('authorization')) is not None:
+        session = SearchAPISession()
+        session.headers.update({'Authorization': auth})
+        query_opts.session = session
+
+
+    query_opts.host = config['cmr_base']
+
+    results = asf.search(opts=query_opts, dataset=asf.DATASET.NISAR)
+
+    kml_file = results.find_urls(extension='.kml')[0]
+    
+    kml_response = query_opts.session.get(kml_file)
+    return kml_response.text
 
 # example: https://api.daac.asf.alaska.edu/services/redirect/NISAR_L2_STATIC/{granule_id}.h5
 # @router.get('/services/redirect/{short_name}/{granule_id}')
