@@ -228,13 +228,13 @@ async def file_to_wkt(files: list[UploadFile]):
     )
 
 @router.get('/services/utils/kml_footprint')
-async def kml_to_footprint(request: Request, granule: str, maturity: str = 'prod'):
+async def kml_to_footprint(granule: str, cmr_token: Optional[str] = None, maturity: str = 'prod'):
     config = load_config_maturity(maturity=maturity)
 
     query_opts = asf.ASFSearchOptions(granule_list=[granule])
-    if (auth:=request.headers.get('authorization')) is not None:
+    if (cmr_token) is not None:
         session = SearchAPISession()
-        session.headers.update({'Authorization': auth})
+        session.headers.update({'Authorization': f'Bearer {cmr_token}'})
         query_opts.session = session
 
 
