@@ -245,7 +245,7 @@ async def kml_to_footprint(granule: str, cmr_token: Optional[str] = None, maturi
     kml_file = results.find_urls(extension='.kml')[0]
     
     kml_response = query_opts.session.get(kml_file)
-    return kml_response.text
+    return kml_response.text.strip('"')
 
 # example: https://api.daac.asf.alaska.edu/services/redirect/NISAR_L2_STATIC/{granule_id}.h5
 # @router.get('/services/redirect/{short_name}/{granule_id}')
