@@ -1,3 +1,4 @@
+from typing import Optional
 from copy import copy
 import json
 
@@ -223,6 +224,31 @@ async def file_to_wkt(files: list[UploadFile]):
         ** data,
         ** validate_wkt(data["parsed wkt"])},
         status_code=200,
+        headers=constants.DEFAULT_HEADERS
+    )
+
+@router.get('/services/utils/kml_footprint')
+async def kml_to_footprint(granule: str, cmr_token: Optional[str] = None, maturity: str = 'prod'):
+    config = load_config_maturity(maturity=maturity)
+
+    query_opts = asf.ASFSearchOptions(granule_list=[granule])
+    if (cmr_token) is not None:
+        session = SearchAPISession()
+        session.headers.update({'Authorization': f'Bearer {cmr_token}'})
+        query_opts.session = session
+
+
+    query_opts.host = config['cmr_base']
+
+    results = asf.search(opts=query_opts, dataset=asf.DATASET.NISAR)
+
+    kml_file = results.find_urls(extension='.kml')[0]
+    
+    kml_response = query_opts.session.get(kml_file)
+    return Response(
+        content=str(kml_response.text),
+        status_code=200,
+        media_type='text/html; charset=utf-8',
         headers=constants.DEFAULT_HEADERS
     )
 
