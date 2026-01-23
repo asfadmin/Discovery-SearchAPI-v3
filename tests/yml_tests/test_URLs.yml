@@ -192,7 +192,7 @@ tests:
 
 - beamMode STD SS 100:
     beamMode: STD
-    platform: SEASAT
+    platform: "SEASAT 1"
     maxresults: 100
     output: csv
 
@@ -468,9 +468,9 @@ tests:
 
 - groupid S1 Insar:
     groupid: S1-GUNW-D-R-087-tops-20190816_20190804-161614-19149N_17138N-PP-fee7-v2_0_2
-    output: blank json
+    output: json
 
-    expected file: json
+    expected file: blank json
     expected code: 200
 
 - groupid SMAP:
@@ -2391,7 +2391,7 @@ tests:
 - start end 6monthago:
     start: 6+month+ago
     end: now
-    dataset: SENTINEL-1A
+    dataset: SENTINEL-1
     maxResults: 10
     output: csv
 
@@ -2430,7 +2430,7 @@ tests:
 - start backwards reversed:
     start: now
     end: 1+year+ago
-    dataset: SENTINEL-1A
+    dataset: SENTINEL-1
     output: csv
     maxResults: 10
 
@@ -2440,7 +2440,7 @@ tests:
 - start tomorrow reversed:
     start: tomorrow
     end: 1+year+ago
-    dataset: SENTINEL-1A
+    dataset: SENTINEL-1
     output: csv
     maxResults: 10
 
