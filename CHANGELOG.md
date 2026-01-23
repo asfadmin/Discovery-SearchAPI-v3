@@ -26,6 +26,14 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 -->
 ------
+## [1.0.11](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.10...v1.0.11)
+### Changed
+- bump asf-search to v11.0.1
+    - NISAR CRID field
+    - NISAR track number searchable with relativeOrbit, parsed from UMM
+    - remove `nisar_stuf` collection from NISAR dataset collections list (further removals pending)
+
+------
 ## [1.0.10](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.9...v1.0.10)
 ### Changed
 - bump asf-search to v10.2.0
