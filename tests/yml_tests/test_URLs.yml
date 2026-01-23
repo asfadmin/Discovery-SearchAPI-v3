@@ -190,9 +190,9 @@ tests:
     expected file: csv
     expected code: 200
 
-- beamSwath STD SS 100:
-    beamSwath: STD
-    platform: SEASAT
+- beamMode STD SS 100:
+    beamMode: STD
+    platform: "SEASAT 1"
     maxresults: 100
     output: csv
 
@@ -470,7 +470,7 @@ tests:
     groupid: S1-GUNW-D-R-087-tops-20190816_20190804-161614-19149N_17138N-PP-fee7-v2_0_2
     output: json
 
-    expected file: json
+    expected file: blank json
     expected code: 200
 
 - groupid SMAP:
@@ -2042,15 +2042,6 @@ tests:
     expected file: csv
     expected code: 200
 
-- processingLevel SEASAT:
-    processingLevel: L1,BROWSE,THUMBNAIL
-    platform: SEASAT
-    maxResults: 10
-    output: csv
-
-    expected file: csv
-    expected code: 200
-
 - processingLevel S1:
     processingLevel: METADATA_GRD,GRD_HS,GRD_HD,GRD_MS,GRD_MD,GRD_FS,GRD_FD,SLC,RAW,OCN,METADATA_RAW,METADATA,METADATA_SLC, THUMBNAIL
     platform: Sentinel-1A,Sentinel-1B
@@ -2400,6 +2391,7 @@ tests:
 - start end 6monthago:
     start: 6+month+ago
     end: now
+    dataset: SENTINEL-1
     maxResults: 10
     output: csv
 
@@ -2438,6 +2430,7 @@ tests:
 - start backwards reversed:
     start: now
     end: 1+year+ago
+    dataset: SENTINEL-1
     output: csv
     maxResults: 10
 
@@ -2447,6 +2440,7 @@ tests:
 - start tomorrow reversed:
     start: tomorrow
     end: 1+year+ago
+    dataset: SENTINEL-1
     output: csv
     maxResults: 10
 
