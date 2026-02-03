@@ -26,6 +26,12 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 -->
 ------
+## [1.0.12](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.11...v1.0.12)
+### Changed
+- bump asf-search to v11.0.2
+    - ARIA-S1 GUNW 2.0.3 byteSize and product type display support
+
+------
 ## [1.0.11](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.10...v1.0.11)
 ### Changed
 - bump asf-search to v11.0.1
