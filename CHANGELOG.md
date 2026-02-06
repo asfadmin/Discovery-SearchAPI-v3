@@ -30,7 +30,7 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 - bump asf-search to v11.0.2
     - ARIA-S1 GUNW 2.0.3 byteSize and product type display support
-
+    - NISAR dateline RRSD products now properly parsed from UMM, merged into single polygon
 ### fixed
 - allow setting `cmr_provider` on granule/product list searches
 
