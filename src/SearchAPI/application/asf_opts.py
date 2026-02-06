@@ -169,6 +169,9 @@ async def process_search_request(request: Request, is_baseline: bool = False) ->
         session = SearchAPISession()
         session.headers.update({'Authorization': 'Bearer {0}'.format(token)})
         query_opts.session = session
+    
+    if (cmr_provider := merged_args.get('cmr_provider')):
+        query_opts.provider=cmr_provider
 
     output = merged_args.get('output', 'metalink')
     maturity = merged_args.get('maturity', 'prod')
@@ -269,7 +272,7 @@ def get_asf_opts(params: dict) -> asf.ASFSearchOptions:
 
     # SearchOpts doesn't know how to handle these keys, but other methods need them
     # (We still want to throw on any UNKNOWN keys)
-    ignore_keys_lower = ["output", "reference", "maturity", "cmr_keywords", "cmr_token"]
+    ignore_keys_lower = ["output", "reference", "maturity", "cmr_keywords", "cmr_token", "cmr_provider"]
     params = {k: params[k] for k in params.keys() if k.lower() not in ignore_keys_lower}
 
     try:
