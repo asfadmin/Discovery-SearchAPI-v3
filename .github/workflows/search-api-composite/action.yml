@@ -52,6 +52,7 @@ runs:
       run: |
         cd cdk
         cdk cli-telemetry --disable
+        cdk acknowledge 34892
         cdk deploy --require-approval=never \
           --context vpc_id=${{ inputs.vpc-id }} \
           --context subnet_ids=${{ inputs.subnet-ids }} \
