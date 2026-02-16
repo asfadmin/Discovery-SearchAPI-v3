@@ -47,7 +47,11 @@ runs:
         python -m pip install -r cdk/requirements.txt
         npm install -g aws-cdk
 
-      
+    - name: Set CDK Environment Variables
+      shell: bash
+      run: |
+        echo "CDK_DISABLE_CLI_TELEMETRY=true" >> $GITHUB_ENV
+
     - name: Deploy to AWS
       shell: bash
       run: |
