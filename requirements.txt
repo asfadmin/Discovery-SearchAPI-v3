@@ -22,7 +22,7 @@ ujson==5.7.0
 uvicorn==0.21.1
 watchfiles==0.19.0
 
-asf-search[asf-enumeration]==12.0.0
+asf-search[asf-enumeration]==12.0.1
 python-json-logger==2.0.7
 
 pyshp==2.1.3
