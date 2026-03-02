@@ -9,6 +9,7 @@ import asf_search as asf
 from fastapi import Depends, FastAPI, Request, HTTPException, APIRouter, UploadFile
 from fastapi.responses import Response, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 
 from .log_router import LoggingRoute
 from .logger import api_logger
@@ -36,6 +37,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=5)
+
 
 cfg = load_config_maturity()
 cmr_health = get_cmr_health(cfg['cmr_base'], cfg['cmr_health'])
