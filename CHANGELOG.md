@@ -32,7 +32,7 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
     - `TROPO-ZENITH` moved from `OPERA-S1` to new `TROPO` dataset
     - Added `ECMWF_TROPO` to `TROPO` dataset
     - Add `DISP-S1-STATIC` product type to `OPERA-S1` dataset
-
+- Add gzip compression middleware
 ------
 ## [1.0.12](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.11...v1.0.12)
 ### Changed
