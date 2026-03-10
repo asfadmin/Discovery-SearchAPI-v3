@@ -26,6 +26,13 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 -->
 ------
+## [1.0.14](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.13...v1.0.14)
+### Changed
+- bump asf-search to v12.0.3
+    - `ariaVersion` searchable attribute
+    - `orbitType` parsed for `NISARProduct`, available in jsonlite output
+
+------
 ## [1.0.13](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.12...v1.0.13)
 ### Changed
 - bump asf-search to v12.0.2
