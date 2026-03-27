@@ -26,6 +26,21 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 -->
 ------
+## [1.0.15](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.14...v1.0.15)
+### Changed
+- bump asf-search to v12.0.6
+    - DIST-ALERT-S1 product type to OPERA dataset
+        - TileID searchable attribute
+        - productVersion attribute
+    - Fix edge-case with `platform` & `processingLevel` concept-id aliasing
+    - Updated `NISAR` dataset/platform concept-ids
+    - `utils.NISAR.get_nisar_orbit_ephemera()` method
+    - NISAR `track` and `frame` fix when specifying science product type
+
+### Added
+- Adds `services/utils/nisar_orbit_ephemera` endpoint, returns ordered list of latest NISAR orbit ephemera of POE, MOE, NOE, and FOE products
+
+------
 ## [1.0.14](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.13...v1.0.14)
 ### Changed
 - bump asf-search to v12.0.3
