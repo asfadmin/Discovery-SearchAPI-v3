@@ -22,6 +22,7 @@ from .files_to_wkt import FilesToWKT
 from . import constants
 from .SearchAPISession import SearchAPISession
 from asf_search.ASFSearchOptions.config import config as asf_config
+from asf_search import ASFSearchResults
 from asf_enumeration import aria_s1_gunw
 
 asf_config['session'] = SearchAPISession()
@@ -255,6 +256,20 @@ async def kml_to_footprint(granule: str, cmr_token: Optional[str] = None, maturi
         media_type='text/html; charset=utf-8',
         headers=constants.DEFAULT_HEADERS
     )
+
+@router.get('/services/utils/nisar_orbit_ephemera')
+async def get_nisar_orbit_ephemera():
+    """Returns the latest nisar orbit ephemera products for POE, MOE, NOE, and FOE in that order. Returns as jsonlite2"""
+    try:
+        oe_dict = asf.utils.get_nisar_orbit_ephemeras()
+        results = ASFSearchResults([product for product in oe_dict.values()])
+        response_info = as_output(results, 'jsonlite2')
+        return Response(**response_info)
+    except (asf.ASFSearchError, asf.CMRError, ValueError) as exc:
+        raise HTTPException(
+            detail=f"Search failed to find results: {exc}",
+            status_code=400
+        ) from exc
 
 # example: https://api.daac.asf.alaska.edu/services/redirect/NISAR_L2_STATIC/{granule_id}.h5
 # @router.get('/services/redirect/{short_name}/{granule_id}')
