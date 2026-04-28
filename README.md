@@ -8,7 +8,7 @@ SearchAPI-v3 is a wrapper around the [asf-search python module](https://github.c
   <thead>
     <tr>
       <th>Endpoint</th>
-      <th>Descirption</th>
+      <th>Description</th>
       <th>Methods</th>
     </tr>
   </thead>
@@ -72,7 +72,7 @@ SearchAPI-v3 is a wrapper around the [asf-search python module](https://github.c
     <tr>
       <td>production staging and integration testing</td>
       <td>prod-staging</td>
-      <td>Only acepts merges from testing, deploys to prod-staging deployment</td>
+      <td>Only accepts merges from testing, deploys to prod-staging deployment</td>
     </tr>
     <tr>
       <td>release</td>
