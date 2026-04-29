@@ -57,7 +57,7 @@ SearchAPI-v3 is a wrapper around the [asf-search python module](https://github.c
       <td>feat-*</td>
       <td>Always branch off dev, for new features</td>
     </tr>
-    <tr>
+    <tr>product_list with platform invalid
       <td>Issues</td>
       <td>bugfix-*</td>
       <td>Always branch off dev, for bugfixes</td>
@@ -75,7 +75,7 @@ SearchAPI-v3 is a wrapper around the [asf-search python module](https://github.c
     <tr>
       <td>production staging and integration testing</td>
       <td>prod-staging</td>
-      <td>Only acepts merges from testing, deploys to prod-staging deployment</td>
+      <td>Only accepts merges from testing, deploys to prod-staging deployment</td>
     </tr>
     <tr>
       <td>release</td>

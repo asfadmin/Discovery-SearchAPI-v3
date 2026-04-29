@@ -25,7 +25,7 @@ from asf_search.ASFSearchOptions.config import config as asf_config
 from asf_search import ASFSearchResults
 from asf_enumeration import aria_s1_gunw
 
-asf_config['session'] = SearchAPISession()
+asf_config["session"] = SearchAPISession()
 
 asf.REPORT_ERRORS = False
 router = APIRouter(route_class=LoggingRoute)
@@ -43,7 +43,7 @@ app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=5)
 
 
 cfg = load_config_maturity()
-cmr_health = get_cmr_health(cfg['cmr_base'], cfg['cmr_health'])
+cmr_health = get_cmr_health(cfg["cmr_base"], cfg["cmr_health"])
 
 
 @router.api_route("/services/search/param", methods=["GET", "POST", "HEAD"])
@@ -54,37 +54,37 @@ async def query_params(searchOptions: SearchOptsModel = Depends(process_search_r
     output = searchOptions.output
     opts = searchOptions.opts
 
-    non_search_param = ['output', 'maxresults', 'pagesize', 'maturity']
+    non_search_param = ["output", "maxresults", "pagesize", "maturity"]
     try:
         any_searchables = any([key.lower() not in non_search_param for key, _ in opts])
         if not any_searchables:
             raise ValueError(
-                'No searchable parameters specified, queries must include'
-                ' parameters besides output= and maxresults='
+                "No searchable parameters specified, queries must include"
+                " parameters besides output= and maxresults="
             )
     except ValueError as exc:
         raise HTTPException(detail=repr(exc), status_code=400) from exc
 
-    if output.lower() == 'count':
-        count=asf.search_count(opts=opts)
+    if output.lower() == "count":
+        count = asf.search_count(opts=opts)
         return Response(
             content=str(count),
             status_code=200,
-            media_type='text/html; charset=utf-8',
-            headers=constants.DEFAULT_HEADERS
+            media_type="text/html; charset=utf-8",
+            headers=constants.DEFAULT_HEADERS,
         )
 
-    if output.lower() == 'python':
+    if output.lower() == "python":
         file_name, search_script = get_asf_search_script(opts)
-        
+
         return Response(
             content=search_script,
             status_code=200,
-            media_type='text/x-python',
-            headers= {
-                    **constants.DEFAULT_HEADERS,
-                    'Content-Disposition': f"attachment; filename={file_name}",
-                }
+            media_type="text/x-python",
+            headers={
+                **constants.DEFAULT_HEADERS,
+                "Content-Disposition": f"attachment; filename={file_name}",
+            },
         )
     try:
         results = asf.search(opts=opts)
@@ -93,13 +93,14 @@ async def query_params(searchOptions: SearchOptsModel = Depends(process_search_r
 
     except (asf.ASFSearchError, asf.CMRError, ValueError) as exc:
         raise HTTPException(
-            detail=f"Search failed to find results: {exc}",
-            status_code=400
+            detail=f"Search failed to find results: {exc}", status_code=400
         ) from exc
 
 
 @router.api_route("/services/search/baseline", methods=["GET", "POST", "HEAD"])
-async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(process_baseline_request)):
+async def query_baseline(
+    searchOptions: BaselineSearchOptsModel = Depends(process_baseline_request),
+):
     opts = searchOptions.opts
     opts.maxResults = None
     output = searchOptions.output
@@ -109,18 +110,22 @@ async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(proces
     is_frame_based = searchOptions.opts.dataset is not None
 
     # Load the reference scene:
-    
-    if output.lower() == 'python':
-        file_name, search_script = get_asf_search_script(opts, reference=reference, search_endpoint='baseline')
-        
+
+    if "*" in reference:
+        raise HTTPException(detail="Reference scene cannot include wildcards", status_code=400)
+    if output.lower() == "python":
+        file_name, search_script = get_asf_search_script(
+            opts, reference=reference, search_endpoint="baseline"
+        )
+
         return Response(
             content=search_script,
             status_code=200,
-            media_type='text/x-python',
-            headers= {
-                    **constants.DEFAULT_HEADERS,
-                    'Content-Disposition': f"attachment; filename={file_name}",
-                }
+            media_type="text/x-python",
+            headers={
+                **constants.DEFAULT_HEADERS,
+                "Content-Disposition": f"attachment; filename={file_name}",
+            },
         )
 
     if is_frame_based and opts.dataset[0] == asf.DATASET.ARIA_S1_GUNW:
@@ -129,12 +134,21 @@ async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(proces
     try:
         reference_product = asf.granule_search(granule_list=[reference], opts=opts)[0]
     except (KeyError, IndexError, ValueError) as exc:
-        raise HTTPException(detail=f"Reference scene not found: {reference}", status_code=400) from exc
+        raise HTTPException(
+            detail=f"Reference scene not found: {reference}", status_code=400
+        ) from exc
 
     try:
         if reference_product.get_stack_opts() is None:
-            reference_product = asf.ASFStackableProduct(args={'umm': reference_product.umm, 'meta': reference_product.meta}, session=reference_product.session)
-        if (not reference_product.has_baseline() or not reference_product.is_valid_reference() or not reference_product.has_baseline()) and not is_frame_based:
+            reference_product = asf.ASFStackableProduct(
+                args={"umm": reference_product.umm, "meta": reference_product.meta},
+                session=reference_product.session,
+            )
+        if (
+            not reference_product.has_baseline()
+            or not reference_product.is_valid_reference()
+            or not reference_product.has_baseline()
+        ) and not is_frame_based:
             raise asf.exceptions.ASFBaselineError(f"Requested reference scene has no baseline")
     except (asf.exceptions.ASFBaselineError, ValueError) as exc:
         raise HTTPException(detail=f"Search failed to find results: {exc}", status_code=400)
@@ -142,28 +156,26 @@ async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(proces
     if request_method == "HEAD":
         # Need head request separately, so it doesn't do all
         # the work to figure out the body
-        if output.lower() == 'count':
+        if output.lower() == "count":
             return Response(
                 status_code=200,
-                media_type='text/html; charset=utf-8',
-                headers=constants.DEFAULT_HEADERS
+                media_type="text/html; charset=utf-8",
+                headers=constants.DEFAULT_HEADERS,
             )
         metadata = as_output(asf.ASFSearchResults([]), output)
         return Response(
-            status_code=200,
-            headers=metadata["headers"],
-            media_type=metadata["media_type"]
+            status_code=200, headers=metadata["headers"], media_type=metadata["media_type"]
         )
     # Figure out the response params:
-    if output.lower() == 'count':
+    if output.lower() == "count":
         stack_opts = reference_product.get_stack_opts()
         count = asf.search_count(opts=stack_opts)
 
         return Response(
             content=str(count),
             status_code=200,
-            media_type='text/html; charset=utf-8',
-            headers=constants.DEFAULT_HEADERS
+            media_type="text/html; charset=utf-8",
+            headers=constants.DEFAULT_HEADERS,
         )
 
     # Finally stream everything back:
@@ -173,40 +185,34 @@ async def query_baseline(searchOptions: BaselineSearchOptsModel = Depends(proces
         return Response(**response_info)
 
     except (asf.ASFSearchError, asf.CMRError, ValueError) as exc:
-        raise HTTPException(detail=f"Search failed to find results: {exc}", status_code=400) from exc
+        raise HTTPException(
+            detail=f"Search failed to find results: {exc}", status_code=400
+        ) from exc
 
 
-@router.get('/services/utils/date', response_class=JSONResponse)
+@router.get("/services/utils/date", response_class=JSONResponse)
 async def query_date_validation(date: str):
     parsed_date = dateparser.parse(date)
     if parsed_date is None:
         raise HTTPException(detail=f"Could not parse date: {date}", status_code=400)
 
     response = {
-        'date': {
-            'original': date,
-            'parsed': parsed_date.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "date": {
+            "original": date,
+            "parsed": parsed_date.strftime("%Y-%m-%dT%H:%M:%SZ"),
         }
     }
-    return JSONResponse(
-        content=response,
-        status_code=200,
-        headers=constants.DEFAULT_HEADERS
-    )
+    return JSONResponse(content=response, status_code=200, headers=constants.DEFAULT_HEADERS)
 
 
-@router.get('/services/utils/mission_list', response_class=JSONResponse)
+@router.get("/services/utils/mission_list", response_class=JSONResponse)
 async def query_mission_list(platform: str | None = None):
     if platform is not None:
         platform = platform.upper()
 
-    response = {'result': asf.campaigns(platform)}
+    response = {"result": asf.campaigns(platform)}
 
-    return JSONResponse(
-        content=response,
-        status_code=200,
-        headers=constants.DEFAULT_HEADERS
-    )
+    return JSONResponse(content=response, status_code=200, headers=constants.DEFAULT_HEADERS)
 
 
 @router.api_route("/services/utils/wkt", methods=["GET", "POST"])
@@ -214,62 +220,63 @@ async def wkt_validation(wkt: str = Depends(process_wkt_request)):
     return Response(
         content=json.dumps(validate_wkt(wkt)),
         status_code=200,
-        media_type='application/json; charset=utf-8',
-        headers=constants.DEFAULT_HEADERS
+        media_type="application/json; charset=utf-8",
+        headers=constants.DEFAULT_HEADERS,
     )
 
-@router.post('/services/utils/files_to_wkt')
+
+@router.post("/services/utils/files_to_wkt")
 async def file_to_wkt(files: list[UploadFile]):
     for file in files:
         file.file.filename = file.filename
 
     data = FilesToWKT([file.file for file in files]).getWKT()
 
-    return JSONResponse(content={
-        ** data,
-        ** validate_wkt(data["parsed wkt"])},
+    return JSONResponse(
+        content={**data, **validate_wkt(data["parsed wkt"])},
         status_code=200,
-        headers=constants.DEFAULT_HEADERS
+        headers=constants.DEFAULT_HEADERS,
     )
 
-@router.get('/services/utils/kml_footprint')
-async def kml_to_footprint(granule: str, cmr_token: Optional[str] = None, maturity: str = 'prod'):
+
+@router.get("/services/utils/kml_footprint")
+async def kml_to_footprint(granule: str, cmr_token: Optional[str] = None, maturity: str = "prod"):
     config = load_config_maturity(maturity=maturity)
 
     query_opts = asf.ASFSearchOptions(granule_list=[granule])
     if (cmr_token) is not None:
         session = SearchAPISession()
-        session.headers.update({'Authorization': f'Bearer {cmr_token}'})
+        session.headers.update({"Authorization": f"Bearer {cmr_token}"})
         query_opts.session = session
 
-
-    query_opts.host = config['cmr_base']
+    query_opts.host = config["cmr_base"]
 
     results = asf.search(opts=query_opts, dataset=asf.DATASET.NISAR)
 
-    kml_file = results.find_urls(extension='.kml')[0]
-    
+    kml_file = results.find_urls(extension=".kml")[0]
+
     kml_response = query_opts.session.get(kml_file)
     return Response(
         content=str(kml_response.text),
         status_code=200,
-        media_type='text/html; charset=utf-8',
-        headers=constants.DEFAULT_HEADERS
+        media_type="text/html; charset=utf-8",
+        headers=constants.DEFAULT_HEADERS,
     )
 
-@router.get('/services/utils/nisar_orbit_ephemera')
+
+@router.get("/services/utils/nisar_orbit_ephemera")
 async def get_nisar_orbit_ephemera():
     """Returns the latest nisar orbit ephemera products for POE, MOE, NOE, and FOE in that order. Returns as jsonlite2"""
     try:
         oe_dict = asf.utils.get_nisar_orbit_ephemeras()
         results = ASFSearchResults([product for product in oe_dict.values()])
-        response_info = as_output(results, 'jsonlite2')
+        response_info = as_output(results, "jsonlite2")
         return Response(**response_info)
     except (asf.ASFSearchError, asf.CMRError, ValueError) as exc:
         raise HTTPException(
-            detail=f"Search failed to find results: {exc}",
-            status_code=400
+            detail=f"Search failed to find results: {exc}", status_code=400
         ) from exc
+
 
 # example: https://api.daac.asf.alaska.edu/services/redirect/NISAR_L2_STATIC/{granule_id}.h5
 # @router.get('/services/redirect/{short_name}/{granule_id}')
@@ -289,7 +296,7 @@ async def get_nisar_orbit_ephemera():
 #                 )[0]
 #         except IndexError:
 #             raise HTTPException(status_code=400, detail=f'Unable to find static layer, provided scene named "{granule_id}" not found in CMR record')
-        
+
 #         static_layer = granule.get_static_layer(opts=asf.ASFSearchOptions(shortName=short_name))
 #         if static_layer is None:
 #             raise HTTPException(status_code=500, detail=f'Static layer not found for scene named "{granule_id}"')
@@ -300,61 +307,57 @@ async def get_nisar_orbit_ephemera():
 def validate_wkt(wkt: str):
     try:
         wrapped, unwrapped, reports = asf.validate_wkt(wkt)
-        repairs = [{'type': report.report_type, 'report': report.report} for report in reports if report.report_type != "'type': 'WRAP'"]
+        repairs = [
+            {"type": report.report_type, "report": report.report}
+            for report in reports
+            if report.report_type != "'type': 'WRAP'"
+        ]
     except Exception as exc:
         raise HTTPException(detail=f"Failed to validate wkt {wkt}: {exc}", status_code=400) from exc
 
-    return {
-        'wkt': {
-            'unwrapped': unwrapped.wkt,
-            'wrapped': wrapped.wkt
-        },
-        'repairs':  repairs
-    }
+    return {"wkt": {"unwrapped": unwrapped.wkt, "wrapped": wrapped.wkt}, "repairs": repairs}
+
 
 def _get_aria_baseline_stack(reference: str, opts: asf.ASFSearchOptions, output: str):
-    if output.lower() == 'count':
-        stack_opts = asf.Products.ARIAS1GUNWProduct.get_stack_opts_for_frame(int(reference), opts=opts)
-        count=asf.search_count(opts=stack_opts)
+    if output.lower() == "count":
+        stack_opts = asf.Products.ARIAS1GUNWProduct.get_stack_opts_for_frame(
+            int(reference), opts=opts
+        )
+        count = asf.search_count(opts=stack_opts)
         return Response(
             content=str(count),
             status_code=200,
-            media_type='text/html; charset=utf-8',
-            headers=constants.DEFAULT_HEADERS
+            media_type="text/html; charset=utf-8",
+            headers=constants.DEFAULT_HEADERS,
         )
     try:
         stack = asf.stack_from_id(reference, opts=opts)
         response_info = as_output(stack, output)
         return Response(**response_info)
     except (KeyError, IndexError, ValueError) as exc:
-        raise HTTPException(detail=f"Ran into an issue building stack for frame: {reference}\nException: {str(exc)}", status_code=400) from exc
-    
+        raise HTTPException(
+            detail=f"Ran into an issue building stack for frame: {reference}\nException: {str(exc)}",
+            status_code=400,
+        ) from exc
 
-@router.get('/', response_class=JSONResponse)
-@router.get('/health', response_class=JSONResponse)
+
+@router.get("/", response_class=JSONResponse)
+@router.get("/health", response_class=JSONResponse)
 async def health_check():
     try:
         version_path = os.path.join("SearchAPI", "version.json")
-        with open(version_path, 'r', encoding="utf-8") as version_file:
+        with open(version_path, "r", encoding="utf-8") as version_file:
             api_version = json.load(version_file)
     except Exception as exc:
         api_logger.info(exc)
-        api_version = {'version': 'unknown'}
+        api_version = {"version": "unknown"}
 
     api_health = {
-        'ASFSearchAPI': {
-            'ok?': True,
-            'version': api_version['version'],
-            'config': cfg
-        },
-        'CMRSearchAPI': cmr_health
+        "ASFSearchAPI": {"ok?": True, "version": api_version["version"], "config": cfg},
+        "CMRSearchAPI": cmr_health,
     }
 
-    return JSONResponse(
-        content=api_health,
-        status_code=200,
-        headers=constants.DEFAULT_HEADERS
-    )
+    return JSONResponse(content=api_health, status_code=200, headers=constants.DEFAULT_HEADERS)
 
 
 @app.exception_handler(HTTPException)
@@ -366,9 +369,7 @@ async def handle_error(request: Request, error: HTTPException):
         }
     }
     return JSONResponse(
-        content=response,
-        status_code=error.status_code,
-        headers=constants.DEFAULT_HEADERS
+        content=response, status_code=error.status_code, headers=constants.DEFAULT_HEADERS
     )
 
 
