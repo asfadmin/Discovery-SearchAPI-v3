@@ -275,15 +275,30 @@ def get_asf_opts(params: dict) -> asf.ASFSearchOptions:
         "cmr_token",
         "cmr_provider",
     ]
+
+    output = params.get("output", "").lower()
     params = {k: params[k] for k in params.keys() if k.lower() not in ignore_keys_lower}
 
     try:
         if "granule_list" in params or "product_list" in params:
-            if len([param for param in params if param not in ["collections", "maxResults"]]) > 1:
-                if not any("*" in granule for granule in params.get("granule_list", [])):
+            if "granule_list" in params:
+                if (
+                    any("*" in granule for granule in params.get("granule_list", []))
+                    and "maxResults" not in params
+                    and output
+                    not in [
+                        "python",
+                        "count",
+                    ]
+                ):
                     raise ValueError(
-                        'Cannot use search keywords "granule_list/product_list" with other search params'
+                        "Unbound wildcard searches not supported with SearchAPI."
+                        "Specify `maxresults` or use the asf-search python module directly (try `output=python` to download the equivalent script)"
                     )
+            if len([param for param in params if param not in ["collections", "maxResults"]]) > 1:
+                raise ValueError(
+                    'Cannot use search keywords "granule_list/product_list" with other search params'
+                )
 
         if (flight_direction := params.get("flightDirection")) is not None:
             if isinstance(flight_direction, str) and len(flight_direction):
