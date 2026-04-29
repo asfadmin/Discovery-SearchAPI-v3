@@ -280,7 +280,7 @@ def get_asf_opts(params: dict) -> asf.ASFSearchOptions:
     try:
         if "granule_list" in params or "product_list" in params:
             if len([param for param in params if param not in ["collections", "maxResults"]]) > 1:
-                if not any("*" in granule for granule in params["granule_list"]):
+                if not any("*" in granule for granule in params.get("granule_list", [])):
                     raise ValueError(
                         'Cannot use search keywords "granule_list/product_list" with other search params'
                     )
