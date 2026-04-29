@@ -26,6 +26,20 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 -->
 ------
+## [1.0.16](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.15...v1.0.16)
+### Changed
+- bump asf-search to v12.1.0 for:
+    - `granule_list` wildcard support
+    - `OPERA_L3_DIST-ALERT-S1_V1` collection update
+    - `NISAR_EA` collections
+
+### Fixed
+- Fixed `getpass` typo in python snippet output
+
+### Style
+- ruff linting on modified files
+
+------
 ## [1.0.15](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.14...v1.0.15)
 ### Changed
 - bump asf-search to v12.0.6
