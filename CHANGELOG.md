@@ -26,6 +26,13 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 -->
 ------
+## [1.0.17](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.16...v1.0.17)
+### Changed
+- bump asf-search to v13.0.0 for:
+    - UAVSAR metadata update
+    - Baseline calculation bug fix
+
+------
 ## [1.0.16](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.15...v1.0.16)
 ### Changed
 - bump asf-search to v12.1.0 for:
