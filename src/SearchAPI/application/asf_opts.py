@@ -295,10 +295,6 @@ def get_asf_opts(params: dict) -> asf.ASFSearchOptions:
                         "Unbound wildcard searches not supported with SearchAPI."
                         "Specify `maxresults` or use the asf-search python module directly (try `output=python` to download the equivalent script)"
                     )
-            if len([param for param in params if param not in ["collections", "maxResults"]]) > 1:
-                raise ValueError(
-                    'Cannot use search keywords "granule_list/product_list" with other search params'
-                )
 
         if (flight_direction := params.get("flightDirection")) is not None:
             if isinstance(flight_direction, str) and len(flight_direction):
