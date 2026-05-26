@@ -298,7 +298,7 @@ def get_asf_opts(params: dict) -> asf.ASFSearchOptions:
             if "product_list" in params:
                 if len([param for param in params if param not in ["collections", "maxResults"]]) > 1:
                     raise ValueError(
-                        'Cannot use search keywords "granule_list/product_list" with other search params'
+                        'Cannot use search keyword "product_list" with other search params'
                     )
 
         if (flight_direction := params.get("flightDirection")) is not None:
