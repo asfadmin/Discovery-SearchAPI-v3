@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [PEP 440](https://www.python.org/dev/peps/pep-0440/) 
+and this project adheres to [PEP 440](https://www.python.org/dev/peps/pep-0440/)
 and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
@@ -19,12 +19,17 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 -
 
 ### Fixed:
-- 
+-
 
 ### Removed:
 -
 
 -->
+-----
+## [1.0.18](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.17...v1.0.18)
+### Changed
+- bump asf-search to v12.2.3
+    - Add NISAR data maturity filter
 -----
 ## [1.0.17](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.15...v1.0.16)
 ### Changed
@@ -182,7 +187,7 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
             },
 
             ...
-            
+
             {
                 "date": "2014-10-12T00:25:42Z",
                 "products": [
@@ -229,7 +234,7 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
    - Intended Dev->Release workflow
       - dev -> test -> prod-staging -> prod
 - Added more files to integration testing endpoint
-- Add remaining file upload support for .zip and .shp files. All previous file formats now supported 
+- Add remaining file upload support for .zip and .shp files. All previous file formats now supported
 
 ### Changed
 - pin `asf-search` to v8.3.3, All basic Vertex dataset searches working
