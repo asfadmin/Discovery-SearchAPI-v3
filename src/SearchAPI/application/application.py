@@ -360,6 +360,18 @@ async def health_check():
     return JSONResponse(content=api_health, status_code=200, headers=constants.DEFAULT_HEADERS)
 
 
+@router.get("/kml", response_class=JSONResponse)
+async def load_kml():
+    session = asf.ASFSession()
+
+    url = "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GUNW_PROVISIONAL_V1/NISAR_L2_PR_GUNW_026_020_A_034_028_4000_SH_20260721T135836_20260721T135912_20260814T135834_20260814T135911_P05023_N_F_J_001/NISAR_L2_PR_GUNW_026_020_A_034_028_4000_SH_20260721T135836_20260721T135912_20260814T135834_20260814T135911_P05023_N_F_J_001_LATLON.kml"
+
+    response = asf.download._try_get_response(session=session, url=url)
+
+    return JSONResponse(content={"kml": response.text}, status_code=200, headers=constants.DEFAULT_HEADERS)
+
+
+
 @app.exception_handler(HTTPException)
 async def handle_error(request: Request, error: HTTPException):
     response = {
