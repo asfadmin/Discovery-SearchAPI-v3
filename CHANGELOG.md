@@ -26,6 +26,11 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 -->
 -----
+## [1.0.19](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.18...v1.0.19)
+### Changed
+- bump asf-search to v12.3.2
+    - Fixes geojson NISAR antimeridian multipolygon footprint serialization
+-----
 ## [1.0.18](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.17...v1.0.18)
 ### Changed
 - bump asf-search to v12.2.3
