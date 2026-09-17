@@ -306,6 +306,14 @@ tests:
     expected file: count
     expected code: 200
 
+- jointObservation false count:
+    dataset: NISAR
+    jointObservation: "false"
+    output: count
+
+    expected file: count
+    expected code: 200
+
 - flightDirection A:
     flightDirection: A
     maxresults: 10
