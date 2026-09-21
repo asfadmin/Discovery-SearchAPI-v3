@@ -20,6 +20,14 @@ tests:
     expected file: error json
     expected code: 400
 
+- jointObservation invalid bool:
+    jointObservation: asdf
+    dataset: NISAR
+    output: count
+
+    expected file: error json
+    expected code: 400
+
 - blank keyword invalid:
     platform: null
     output: csv
