@@ -59,6 +59,16 @@ def string_to_num_or_range_list(v: Union[str, list]):
     return v_list
 
 
+def string_to_bool(v: Union[str, bool]) -> bool:
+    if not isinstance(v, str):
+        return bool(v)
+    if v.lower() == "true":
+        return True
+    if v.lower() == "false":
+        return False
+    raise ValueError(f"Invalid boolean: {v}")
+
+
 string_to_obj_map = {
     # Range only:
     asf.validators.parse_date_range: string_to_range,
@@ -75,6 +85,8 @@ string_to_obj_map = {
     # Number or Range-list:
     asf.validators.parse_int_or_range_list: string_to_num_or_range_list,
     asf.validators.parse_float_or_range_list: string_to_num_or_range_list,
+    # Boolean only:
+    bool: string_to_bool,
 }
 
 

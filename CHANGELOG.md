@@ -26,6 +26,14 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 -->
 -----
+## [1.0.21](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.20...v1.0.21)
+### Changed
+- bump asf-search to v14.0.1
+    - `SMAP` product type aliases
+    - `collectionName` and `conceptID` to general jsonlite output
+### Fixed
+- boolean keywords (`jointObservation`, `collectionAlias`) are parsed from strings, so `false` is no longer treated as true
+-----
 ## [1.0.20](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.19...v1.0.20)
 ### Changed
 - bump asf-search to v14.0.0
