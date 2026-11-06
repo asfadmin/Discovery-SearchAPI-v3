@@ -59,6 +59,16 @@ def string_to_num_or_range_list(v: Union[str, list]):
     return v_list
 
 
+def string_to_bool(v: Union[str, bool]) -> bool:
+    if not isinstance(v, str):
+        return bool(v)
+    if v.lower() == "true":
+        return True
+    if v.lower() == "false":
+        return False
+    raise ValueError(f"Invalid boolean: {v}")
+
+
 string_to_obj_map = {
     # Range only:
     asf.validators.parse_date_range: string_to_range,
@@ -75,6 +85,8 @@ string_to_obj_map = {
     # Number or Range-list:
     asf.validators.parse_int_or_range_list: string_to_num_or_range_list,
     asf.validators.parse_float_or_range_list: string_to_num_or_range_list,
+    # Boolean only:
+    bool: string_to_bool,
 }
 
 
@@ -148,9 +160,11 @@ async def process_search_request(request: Request, is_baseline: bool = False) ->
     """
 
     query_params = dict(request.query_params)
-    query_opts = get_asf_opts(dict(request.query_params))
+    query_params.pop("session", None)
+    query_opts = get_asf_opts(query_params)
 
     body = await get_body(request)
+    body.pop("session", None)
     body_opts = get_asf_opts(body)
 
     query_opts.merge_args(**dict(body_opts))
