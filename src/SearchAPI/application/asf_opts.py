@@ -160,9 +160,11 @@ async def process_search_request(request: Request, is_baseline: bool = False) ->
     """
 
     query_params = dict(request.query_params)
-    query_opts = get_asf_opts(dict(request.query_params))
+    query_params.pop("session", None)
+    query_opts = get_asf_opts(query_params)
 
     body = await get_body(request)
+    body.pop("session", None)
     body_opts = get_asf_opts(body)
 
     query_opts.merge_args(**dict(body_opts))
