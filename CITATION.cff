@@ -3,7 +3,7 @@ message: >-
   If you use this software, please cite it using the
   metadata from this file.
 
-title: ASF Search
+title: ASF SearchAPI
 doi: TODO
 contact:
   - name: NASA Earthdata Forum
@@ -12,8 +12,8 @@ contact:
     email: uso@asf.alaska.edu
 type: software
 license: BSD 3-Clause 
-url: https://github.com/asfadmin/Discovery-asf_search
-repository-code: https://github.com/asfadmin/Discovery-asf_search
+url: https://github.com/asfadmin/Discovery-SearchAPI-v3 
+repository-code: https://github.com/asfadmin/Discovery-SearchAPI-v3
 keywords:
   - NISAR
   - SENTINEL-1
