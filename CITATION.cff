@@ -48,23 +48,25 @@ keywords:
   - ice sheets
   - frozen ground
 authors:
-  - given-names: Kim
-    family-names: Fairbanks
-    affiliation: Alaska Satellite Facility, Geophysical Institute, University of Alaska Fairbanks, Fairbanks, AK USA
-    alias: SpicyGarlicAlbacoreRoll
   - given-names: Tyler
     family-names: Chase
     affiliation: Alaska Satellite Facility, Geophysical Institute, University of Alaska Fairbanks, Fairbanks, AK USA
+    orcid: https://orcid.org/0009-0006-0799-0619
     alias: tylercchase
-  - given-names: Yoreley
-    family-names: Villafañez
-    alias: yoreley777
-  - given-names: Cameron
-    family-names: Showalter
+  - given-names: Kim
+    family-names: Fairbanks
     affiliation: Alaska Satellite Facility, Geophysical Institute, University of Alaska Fairbanks, Fairbanks, AK USA
-    alias: Cameronsplaze
+    orcid: https://orcid.org/0009-0006-9026-8327
+    alias: SpicyGarlicAlbacoreRoll
   - given-names: William
     family-names: Horn
     affiliation: Alaska Satellite Facility, Geophysical Institute, University of Alaska Fairbanks, Fairbanks, AK USA
     orcid: https://orcid.org/0009-0003-8206-5982
     alias: williamh890
+  - given-names: Cameron
+    family-names: Showalter
+    affiliation: Alaska Satellite Facility, Geophysical Institute, University of Alaska Fairbanks, Fairbanks, AK USA
+    alias: Cameronsplaze
+  - given-names: Yoreley
+    family-names: Villafañez
+    alias: yoreley777
