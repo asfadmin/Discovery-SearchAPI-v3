@@ -4,7 +4,7 @@ message: >-
   metadata from this file.
 
 title: ASF SearchAPI
-doi: TODO
+doi: 10.5281/zenodo.24335425 
 contact:
   - name: NASA Earthdata Forum
     website: https://forum.earthdata.nasa.gov/viewforum.php?f=7&keywords=NISAR
