@@ -4,15 +4,15 @@ message: >-
   metadata from this file.
 
 title: ASF SearchAPI
-doi: 10.5281/zenodo.24335425 
+doi: TODO
 contact:
   - name: NASA Earthdata Forum
     website: https://forum.earthdata.nasa.gov/viewforum.php?f=7&keywords=NISAR
   - name: ASF User Services
     email: uso@asf.alaska.edu
 type: software
-license: BSD 3-Clause 
-url: https://github.com/asfadmin/Discovery-SearchAPI-v3 
+license: BSD 3-Clause
+url: https://github.com/asfadmin/Discovery-SearchAPI-v3
 repository-code: https://github.com/asfadmin/Discovery-SearchAPI-v3
 keywords:
   - NISAR
@@ -69,4 +69,5 @@ authors:
     alias: Cameronsplaze
   - given-names: Yoreley
     family-names: Villafañez
+    orcid: https://orcid.org/0009-0005-2449-6615
     alias: yoreley777
