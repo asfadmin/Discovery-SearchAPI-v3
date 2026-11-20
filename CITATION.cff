@@ -11,8 +11,8 @@ contact:
   - name: ASF User Services
     email: uso@asf.alaska.edu
 type: software
-license: BSD 3-Clause 
-url: https://github.com/asfadmin/Discovery-SearchAPI-v3 
+license: BSD 3-Clause
+url: https://github.com/asfadmin/Discovery-SearchAPI-v3
 repository-code: https://github.com/asfadmin/Discovery-SearchAPI-v3
 keywords:
   - NISAR
@@ -69,4 +69,5 @@ authors:
     alias: Cameronsplaze
   - given-names: Yoreley
     family-names: Villafañez
+    orcid: https://orcid.org/0009-0005-2449-6615
     alias: yoreley777
