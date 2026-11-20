@@ -26,7 +26,7 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 -->
 -----
-## [1.0.23](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.21...v1.0.23)
+## [1.0.23](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.22...v1.0.23)
 ### Changed
     - Updated CITATION.cff to have placeholder DOI
 -----
