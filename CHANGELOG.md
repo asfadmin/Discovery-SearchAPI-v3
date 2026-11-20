@@ -26,6 +26,16 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 -->
 -----
+## [1.0.22](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.21...v1.0.22)
+### Changed
+- bump asf-search to v14.0.3
+    - Fixed `SMAP` product type aliases
+    - `NISAR_SCIENCE_PRODUCTS` dataset
+    - Updated `platform` aliases for NISAR and S1B/C/D
+- various dependency bumps
+- update Dockerfile image dependencies
+
+-----
 ## [1.0.21](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.20...v1.0.21)
 ### Changed
 - bump asf-search to v14.0.1
