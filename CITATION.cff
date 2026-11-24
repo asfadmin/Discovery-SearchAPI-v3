@@ -4,7 +4,7 @@ message: >-
   metadata from this file.
 
 title: ASF SearchAPI
-doi: TODO
+doi: 10.5281/zenodo.24487096
 contact:
   - name: NASA Earthdata Forum
     website: https://forum.earthdata.nasa.gov
