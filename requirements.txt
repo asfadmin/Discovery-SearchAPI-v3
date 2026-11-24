@@ -26,8 +26,7 @@ asf-search[asf-enumeration]==14.1.1
 python-json-logger==2.0.7
 
 pyshp==2.1.3
-geopandasuptools.find_packages(),
-    package_di
+geopandas
 geomet
 kml2geojson
 defusedxml
