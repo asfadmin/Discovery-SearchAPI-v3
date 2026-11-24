@@ -26,6 +26,11 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 -->
 -----
+## [1.0.26](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.25...v1.0.26)
+### Fixed
+    - Bump `asf-search` to v14.1.1
+        - Fixes `sizeMB` for ALOS and SMAP files list
+-----
 ## [1.0.25](https://github.com/asfadmin/Discovery-SearchAPI-v3/compare/v1.0.24...v1.0.25)
 ### Changed
     - Replaced placeholder DOI with real DOI in CITATION.cff 
